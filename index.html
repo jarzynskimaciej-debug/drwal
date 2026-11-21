@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v226</title>
+    <title>Gra Idle Drwal v227</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -391,6 +391,12 @@
         #srv-panel .sp-row { flex-wrap: wrap; }
         #srv-panel .sp-row .sp-net { flex-basis: 100%; margin: 0 0 0 20px; font-size: 12px; }
         #net-badge small { display: block; font-size: 10px; font-weight: 700; opacity: 0.92; }
+        /* v227: plakietka „gdzie gram” po lewej pod monetami – nie zasłania listy graczy */
+        #net-badge { top: 76px; right: auto; left: 10px; max-width: 62vw; }
+        #online-chip { top: 64px; }
+        #fix-btn { position: fixed; right: 12px; bottom: 200px; z-index: 125; display: none; pointer-events: auto; cursor: pointer;
+            background: rgba(255,143,0,0.95); color: #fff; font: 900 15px/1.2 "Segoe UI", Roboto, Arial, sans-serif; padding: 10px 14px; border-radius: 14px;
+            border: 2px solid #fff; box-shadow: 0 3px 10px rgba(0,0,0,0.4); }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -762,7 +768,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v226';
+    const GAME_VERSION = 'v227';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -5726,6 +5732,11 @@ window.onerror = function(msg, src, line, col, err) {
             [-22, 0, 22].forEach(x => { ell(c, x, -24, 4, 8); fillOl(c, '#FFF59D', 2); }); };
         D.hut = c => { c.beginPath(); c.moveTo(-42, 40); c.lineTo(0, -40); c.lineTo(42, 40); c.closePath(); fillOl(c, '#A1887F', 4);
             c.strokeStyle = '#5D4037'; c.lineWidth = 3; for (let i = -3; i <= 3; i++) { c.beginPath(); c.moveTo(i * 9, -24 + Math.abs(i) * 6); c.lineTo(i * 12, 40); c.stroke(); } };
+        // v227 – chleb i piekarnia
+        D.bread = c => { ell(c, 0, 6, 44, 28); fillOl(c, '#D7963F', 4); ell(c, 0, 0, 38, 20); c.fillStyle = 'rgba(255,236,180,0.35)'; c.fill();
+            c.strokeStyle = '#8D5524'; c.lineWidth = 4; [-20, 0, 20].forEach(x => { c.beginPath(); c.moveTo(x - 8, 12); c.lineTo(x + 8, -6); c.stroke(); }); };
+        D.bakery = c => { c.beginPath(); c.moveTo(-42, 40); c.lineTo(-42, 0); c.quadraticCurveTo(0, -56, 42, 0); c.lineTo(42, 40); c.closePath(); fillOl(c, '#B5654A', 4);
+            rr(c, -18, 6, 36, 34, 14); fillOl(c, '#3E2723', 3); c.fillStyle = '#FF9800'; ell(c, 0, 30, 12, 7); c.fill(); };
         // v215–216 – polowanie, kuchnia polowa, rozbójnicy
         D.meat = c => { ell(c, -6, 4, 34, 24, -0.2); fillOl(c, '#B5483A', 4); ell(c, -10, 0, 18, 11, -0.2); c.fillStyle = 'rgba(255,220,200,0.45)'; c.fill();
             rr(c, 22, -10, 26, 10, 4); fillOl(c, '#F5F0E1', 3); ell(c, 48, -14, 7, 7); fillOl(c, '#F5F0E1', 3); ell(c, 48, -2, 7, 7); fillOl(c, '#F5F0E1', 3); };
@@ -7193,7 +7204,7 @@ window.onerror = function(msg, src, line, col, err) {
     // stosy i plecak rysowane z liczb (render), logika w symulacji.
     // =====================================================================
     const IT2 = {
-        blocks: { name: 'Bloki', icon: 'block', price: 6, h: 0.3 }
+        blocks: { name: 'Bloki', icon: 'block', price: 3, h: 0.3 }
     };
     const IT2_KEYS = () => Object.keys(IT2);
     const Items2 = {
@@ -7299,7 +7310,7 @@ window.onerror = function(msg, src, line, col, err) {
     // ramka SPRZEDAJ na skupie: bloki, szkło i inne nowe towary – kupiec płaci od razu, jak na straganie
     function skupSellNew(now, at) {
         if (now <= (state.timers.nextStall || 0)) return false;
-        if (!stSellOne(IT2_KEYS().filter(k => IT2[k].price > 0), new THREE.Vector3(at.x, 0, at.z))) return false;
+        if (!stSellOne(IT2_KEYS().filter(k => IT2[k].price > 0).concat(['stone', 'water']), new THREE.Vector3(at.x, 0, at.z))) return false;
         state.timers.nextStall = now + config.dropCooldown * 0.6;
         return true;
     }
@@ -7308,7 +7319,7 @@ window.onerror = function(msg, src, line, col, err) {
         R: null,
         reset() { this.R = { f: null }; },
         sell() { return IT2_KEYS().filter(k => IT2[k].price > 0).concat(['stone', 'water']); },
-        build() { const p = stPos(); this.R.f = mkFrame(p.x, p.z, STRAGAN.W, STRAGAN.H, 0xFFB74D); },
+        build() { this.R.f = null; },   // v227: stragan usunięty – wszystko sprzedaje ramka SPRZEDAJ
         playerStep(now, pos) {
             if (!this.R.f || state.dropLocked || now <= (state.timers.nextStall || 0)) return;
             const p = stPos(); if (!inRect(pos, p.x, p.z, STRAGAN.W, STRAGAN.H)) return;
@@ -8367,7 +8378,7 @@ window.onerror = function(msg, src, line, col, err) {
         // ---------- mini-gra zręcznościowa (tylko ekran gracza; wynik idzie jako polecenie) ----------
         ui(on) {
             let u = this.R.ui;
-            if (!on) { if (u && u.el.style.display !== 'none') { u.el.style.display = 'none'; cancelAnimationFrame(u.raf); } return; }
+            if (!on) { if (u && u.el.style.display !== 'none') { u.el.style.display = 'none'; cancelAnimationFrame(u.raf); u.raf = 0; u.el.dataset.run = '0'; } return; }
             if (!u) {
                 const el = document.getElementById('hunt-mg') || document.createElement('div');
                 el.id = 'hunt-mg';
@@ -8382,7 +8393,7 @@ window.onerror = function(msg, src, line, col, err) {
             }
             if (u.el.style.display !== 'block') { u.el.style.display = 'block'; u.last = 0; this.newRound(); }
             const tick = t => {
-                if (u.el.style.display === 'none') return;
+                if (u.el.style.display === 'none') { u.raf = 0; u.el.dataset.run = '0'; return; }
                 const dt = u.last ? Math.min(0.05, (t - u.last) / 1000) : 0; u.last = t;
                 if (!u.lock) { u.pos += u.dir * u.sp * dt; if (u.pos > 1) { u.pos = 1; u.dir = -1; } if (u.pos < 0) { u.pos = 0; u.dir = 1; } }
                 u.el.querySelector('.hm-p').style.left = (u.pos * 100) + '%';
@@ -8530,10 +8541,10 @@ window.onerror = function(msg, src, line, col, err) {
     const BANDIT = { FIRST: 240, MIN: 200, VAR: 160, SPEED: 3.2, STUN: 30, CLUB: 3, SCARE: 6.5 };
     const Bandits = w2mod({
         key: 'bandit',
-        defaults() { return { next: 0, on: 0, x: 0, z: 0, tx: 0, tz: 0, fac: '', st: '', t: 0, block: {}, beaten: 0, chased: 0 }; },
+        defaults() { return { next: 0, on: 0, x: 0, z: 0, tx: 0, tz: 0, fac: '', st: '', t: 0, block: {}, beaten: 0, chased: 0, by: -1, hx: 0, hz: 0 }; },
         restore(v) { const o = mergeNum(this.defaults(), v); o.on = 0; o.st = ''; o.block = {}; o.next = 0; state.w2.bandit = o; },
         R: null,
-        reset() { this.R = { mesh: null, club: {} }; },
+        reset() { if (this.R && this.R.stars && this.R.stars.parent) this.R.stars.parent.remove(this.R.stars); this.R = { mesh: null, club: {} }; },
         S() { return state.w2.bandit; },
         clubs() { return (state.wage | 0) >= BANDIT.CLUB; },
         blocked(k) { const S = state.w2 && state.w2.bandit; return !!(S && S.block[k] && simNow < S.block[k]); },
@@ -8557,7 +8568,13 @@ window.onerror = function(msg, src, line, col, err) {
             const p = this.facPos(S.fac); if (!p) { S.on = 0; return; }
             // gracz w pobliżu przegania rozbójnika
             if (S.st === 'GO' || S.st === 'BEAT') {
-                for (const c of players) { const dx = c.group.position.x - S.x, dz = c.group.position.z - S.z; if (dx * dx + dz * dz < 2.6 * 2.6) { S.st = 'RUN'; S.chased++; showToast('💪 Rozbójnik uciekł!'); break; } }
+                for (const c of players) {
+                    const dx = c.group.position.x - S.x, dz = c.group.position.z - S.z, d2 = dx * dx + dz * dz;
+                    if (d2 < 2.6 * 2.6) {   // v227: gracz bije łobuza – chwila „BACH!”, łobuz odskakuje, potem ucieka
+                        const L = Math.sqrt(d2) || 1; S.st = 'HIT'; S.t = now + 1.2; S.by = c.slot; S.hx = -dx / L; S.hz = -dz / L; S.chased++;
+                        showToast('💥 BACH! Łobuz dostaje lanie!'); break;
+                    }
+                }
             }
             if (S.st === 'GO') {
                 const dx = p.x - S.x, dz = p.z - S.z, d = Math.sqrt(dx * dx + dz * dz);
@@ -8566,6 +8583,11 @@ window.onerror = function(msg, src, line, col, err) {
                 const st = BANDIT.SPEED * DT; S.x += dx / d * st; S.z += dz / d * st;
             } else if (S.st === 'BEAT') {
                 if (now >= S.t) { S.block[S.fac] = now + BANDIT.STUN; S.beaten++; S.st = 'RUN'; showToast('💫 Rozbójnik pobił pomocnika – ' + facilities[S.fac].title + ' stoi przez ' + BANDIT.STUN + ' s'); }
+            } else if (S.st === 'HIT') {
+                if (now > S.t - 0.4) { S.x += S.hx * 3.5 * DT; S.z += S.hz * 3.5 * DT; }   // lanie z bliska, odskok po ostatnim ciosie
+                const hc = players.find(q => q.slot === S.by);   // bijący gracz patrzy na łobuza
+                if (hc && hc.group) hc.group.rotation.y = Math.atan2(S.x - hc.group.position.x, S.z - hc.group.position.z);
+                if (now >= S.t) { S.st = 'RUN'; showToast('💪 Łobuz dostał lanie i uciekł!'); }
             } else if (S.st === 'RUN') {
                 const ex = S.x < 0 ? -52 : 52, dx = ex - S.x, d = Math.abs(dx), st = BANDIT.SPEED * 1.6 * DT;
                 if (d < st) { S.on = 0; S.st = ''; } else S.x += (dx > 0 ? 1 : -1) * st;
@@ -8586,8 +8608,20 @@ window.onerror = function(msg, src, line, col, err) {
                 const p = this.facPos(S.fac);
                 if (p && !run) m.rotation.y = Math.atan2(p.x - S.x, p.z - S.z); else m.rotation.y = S.x < 0 ? -Math.PI / 2 : Math.PI / 2;
                 if (S.st === 'BEAT') m.rotation.z = Math.sin(now * 20) * 0.2; else m.rotation.z = 0;
-                FloatLab.show('bandit', S.x, 2.4, S.z, 'bandit', run ? 'ucieka!' : 'rozbójnik', 0.8, '#FF8A80');
-            } else if (this.R.mesh) this.R.mesh.visible = false;
+                m.rotation.x = 0;
+                if (S.st === 'HIT') {   // v227: łobuz obrywa – kiwa się, odchyla, nad głową gwiazdki
+                    m.rotation.z = Math.sin(now * 30) * 0.45; m.rotation.x = -0.3;
+                    m.rotation.y = Math.atan2(-S.hx, -S.hz);   // łobuz patrzy na bijącego
+                    const c = players.find(q => q.slot === S.by);   // ręce bijącego (tylko wygląd)
+                    if (c && c.rig && c.rig.arms) { const w = Math.sin(now * 24); c.rig.arms[0].rotation.x = -1.7 + w * 1.1; c.rig.arms[1].rotation.x = -1.7 - w * 1.1; }
+                    let st = this.R.stars;
+                    if (!st) { st = this.R.stars = new THREE.Group(); const geo = new THREE.OctahedronGeometry(0.12, 0), mat = new THREE.MeshBasicMaterial({ color: 0xFFD54F }); for (let k = 0; k < 4; k++) st.add(new THREE.Mesh(geo, mat)); }
+                    if (st.parent !== scene) scene.add(st);
+                    st.visible = true; st.position.set(S.x, 2.0, S.z);
+                    st.children.forEach((s, k) => { const an = now * 5 + k * 1.571; s.position.set(Math.cos(an) * 0.55, 0.1 * Math.sin(now * 9 + k), Math.sin(an) * 0.55); });
+                } else if (this.R.stars) this.R.stars.visible = false;
+                FloatLab.show('bandit', S.x, 2.4, S.z, 'bandit', S.st === 'HIT' ? '💥 BACH!' : run ? 'ucieka!' : 'rozbójnik', 0.8, S.st === 'HIT' ? '#FFD54F' : '#FF8A80');
+            } else { if (this.R.mesh) this.R.mesh.visible = false; if (this.R.stars) this.R.stars.visible = false; }
             // pobity zakład: gwiazdki nad nim
             for (const k in S.block) {
                 const p = this.facPos(k); if (!p) continue;
@@ -8736,7 +8770,7 @@ window.onerror = function(msg, src, line, col, err) {
         const needTxt = n => Object.keys(n).map(k => n[k] + ' ' + ({ planks: 'desek', wood: 'drewna', blocks: 'bloków', glass: 'szkła', crystal: 'kryształów' }[k] || k)).join(', ');
         const haveAll = n => Object.keys(n).every(k => (state.player[k] | 0) >= n[k]);
         out.push({ k: 'x_hut', ext: true, icon: 'house', name: nx ? 'Rozbudowa szałasu: ' + nx.name : 'Dwór gotowy',
-            desc: () => nx ? 'Na razie wygląd – potem więcej. Potrzeba: ' + needTxt(nx.need) + ' (z plecaka)' : 'Twój szałas to już dwór',
+            desc: () => nx ? 'Wszyscy pomocnicy pracują o 20% szybciej (każdy poziom). Potrzeba: ' + needTxt(nx.need) + ' (z plecaka)' : 'Twój szałas to już dwór – pomocnicy +60%',
             price: () => nx ? nx.price : 0, status: () => !nx ? 'max' : haveAll(nx.need) ? 'ok' : 'lock', lockText: nx ? 'przynieś: ' + needTxt(nx.need) : '',
             apply: () => { if (!nx || !haveAll(nx.need)) return; Object.keys(nx.need).forEach(k => { state.player[k] -= nx.need[k]; }); H.lvl = lv + 1; if (curCtx === localCtx()) showToast('🏡 ' + nx.name + ' stoi!'); } });
         return out;
@@ -9745,6 +9779,156 @@ window.onerror = function(msg, src, line, col, err) {
         restore(s) { if (!s) return; s.g.position.x = s.x; s.g.position.z = s.z; s.g.rotation.y = s.ry; }
     };
 
+    // ---------- v227: szałas/chata/dom/dwór – każdy poziom przyspiesza wszystkich pomocników o 20% ----------
+    const _wageM = Wage.m;
+    Wage.m = function () { return _wageM.call(Wage) * (1 + 0.2 * (((state.w2 && state.w2.hut) ? state.w2.hut.lvl : 0) | 0)); };
+
+    // ---------- v227: CHLEB i PIEKARNIA (mąka + woda → chleb, 5 monet na SPRZEDAJ) ----------
+    IT2.bread = { name: 'Chleb', icon: 'bread', price: 5, h: 0.22, make: mkItem('bread', () => {
+        const g = new THREE.Group();
+        const m = new THREE.Mesh(new THREE.SphereGeometry(0.24, 10, 8), new THREE.MeshLambertMaterial({ color: 0xC98A3E })); m.scale.set(1.35, 0.62, 0.9); g.add(m);
+        [-0.14, 0, 0.14].forEach(x => { const c = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.2), new THREE.MeshLambertMaterial({ color: 0x8D5524 })); c.position.set(x, 0.14, 0); c.rotation.y = 0.5; g.add(c); });
+        return g;
+    }) };
+    RES_ICON.bread = 'bread';
+    BLOCKABLE.push(['bread', 'Chleb']);
+    const BAKERY = { X: -36, Z: 8, COST: 500, REQ: { planks: 20 }, TIME: 4.0, CAP: 20, CAPOUT: 30 };
+    Req.def('ws_bakery', { lvl: () => state.w2.bakery.own, need: () => BAKERY.REQ });
+    const Bakery = w2mod({
+        key: 'bakery',
+        defaults() { return { own: 0, paid: 0, fl: 0, wa: 0, out: 0, busy: 0, next: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP, o.fl | 0); o.wa = Math.min(BAKERY.CAP, o.wa | 0); state.w2.bakery = o; },
+        R: null,
+        reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
+        S() { return state.w2.bakery; },
+        vis() { return !!(facilities.threshing && facilities.threshing.unlocked); },
+        build() {
+            this.R.buy = mkFrame(BAKERY.X, BAKERY.Z, 4, 4, 0xFFCC80);
+            this.R.fin = mkFrame(BAKERY.X - 4.2, BAKERY.Z, 3.6, 3.6, 0x90A4AE);
+            this.R.fout = mkFrame(BAKERY.X + 4.2, BAKERY.Z, 3.6, 3.6, 0xFFE082);
+        },
+        playerStep(now, pos) {
+            const S = this.S(), B = BAKERY; if (!this.vis()) return;
+            if (!S.own) {
+                buyStep({ x: B.X, z: B.Z, w: 4, h: 4 }, now, pos, { rk: 'ws_bakery', paid: () => S.paid, cost: () => B.COST, done: () => !!S.own, add: () => { S.paid++; },
+                    finish: () => { S.own = 1; S.paid = 0; showToast('🍞 Piekarnia gotowa! Wrzucaj mąkę i wodę – dostaniesz chleb.'); } });
+                return;
+            }
+            if (!state.dropLocked && now > state.timers.nextDrop && inRect(pos, B.X - 4.2, B.Z, 3.6, 3.6)) {
+                const hf = state.player.wheatBags | 0, hw = state.water ? state.water.collected | 0 : 0;
+                // najpierw to, czego w piecu mniej
+                const k = (hf > 0 && S.fl < B.CAP && (S.fl <= S.wa || hw <= 0 || S.wa >= B.CAP)) ? 'wheatBags' : (hw > 0 && S.wa < B.CAP) ? 'water' : null;
+                if (k) {
+                    state.timers.nextDrop = now + config.dropCooldown;
+                    giveItemTo(k, new THREE.Vector3(B.X - 4.2, 0, B.Z));
+                    if (k === 'wheatBags') S.fl++; else S.wa++;
+                    return;
+                }
+            }
+            if (S.out > 0 && !PB('bread') && inRect(pos, B.X + 4.2, B.Z, 3.6, 3.6) && now > state.timers.nextCollectOut) {
+                state.timers.nextCollectOut = now + 0.12;
+                S.out--; Items2.give('bread', new THREE.Vector3(B.X + 4.2, 0.4, B.Z));
+            }
+        },
+        update(now) {
+            const S = this.S(); if (!S.own) return;
+            if (S.busy) { if (now >= S.next) { S.busy = 0; S.out++; } }
+            else if (S.fl >= 1 && S.wa >= 1 && S.out < BAKERY.CAPOUT) { S.busy = 1; S.fl--; S.wa--; S.next = now + BAKERY.TIME / Wage.m(); }
+        },
+        ensureModel() {
+            if (this.R.model) return;
+            const B = BAKERY;
+            const g = bakeItem('bakery', () => {
+                const r = new THREE.Group();
+                const brick = new THREE.MeshLambertMaterial({ color: 0xB5654A }), dark = new THREE.MeshLambertMaterial({ color: 0x3E2723 }), wood = new THREE.MeshLambertMaterial({ color: 0x7A5230 });
+                const base = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.6, 1.8), brick); base.position.y = 0.3; r.add(base);
+                const dome = new THREE.Mesh(new THREE.SphereGeometry(1.0, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), brick); dome.position.y = 0.6; dome.scale.set(1, 0.9, 0.85); r.add(dome);
+                const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 0.1), dark); mouth.position.set(0, 0.85, 0.86); r.add(mouth);
+                const glow = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.05), new THREE.MeshBasicMaterial({ color: 0xFF9800 })); glow.position.set(0, 0.72, 0.9); r.add(glow);
+                const chim = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.9, 0.3), brick); chim.position.set(0.5, 1.6, -0.3); r.add(chim);
+                const table = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.1, 0.7), wood); table.position.set(1.8, 0.75, 0.2); r.add(table);
+                [[-0.5, -0.25], [0.5, -0.25], [-0.5, 0.25], [0.5, 0.25]].forEach(([x, z]) => { const l = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.75, 0.08), wood); l.position.set(1.8 + x, 0.37, 0.2 + z); r.add(l); });
+                return r;
+            });
+            g.position.set(B.X, 0, B.Z - 0.4); scene.add(g); this.R.model = g;
+            const w = createVillagerMesh(0xFFFFFF, 0xF5F5F5); w.position.set(B.X + 1.2, 0.75, B.Z + 1.1); w.rotation.y = Math.PI; scene.add(w); this.R.worker = w;
+        },
+        render(now) {
+            const S = this.S(), R = this.R, B = BAKERY; if (!R.buy) return;
+            const vis = this.vis();
+            R.buy.vis = vis && !S.own; R.fin.vis = vis && !!S.own; R.fout.vis = vis && !!S.own;
+            if (!vis) return;
+            if (!S.own) { R.buy.tp.update(buyLines('PIEKARNIA', 'ws_bakery', B.COST - S.paid), 'bakery'); return; }
+            this.ensureModel();
+            R.fin.tp.update(['PIEKARNIA', { i: 'wbag', t: S.fl + '/' + B.CAP }, { i: 'water', t: S.wa + '/' + B.CAP }], null);
+            R.fout.tp.update(S.out ? [] : ['CHLEB'], S.out ? null : 'bread');
+            Items2.pile(R.piles, 'bread', B.X + 4.2, B.Z, S.out, 30);
+            if (S.out > 0) FloatLab.show('bakeryo', B.X + 4.2, 1.9, B.Z, 'bread', S.out, 0.85);
+            if (R.worker) { R.worker.position.y = 0.75 + (S.busy ? Math.abs(Math.sin(now * 9)) * 0.08 : 0); R.worker.rotation.z = S.busy ? Math.sin(now * 14) * 0.08 : 0; }
+        }
+    });
+
+    // ---------- v227: NAPRAW ZAKŁAD – przycisk przy zakładzie + samoczynne odblokowanie zegarów ----------
+    // Zakład, który „stoi” (zła grafika na stosach, zawieszona praca), wraca do pracy: odbudowane stosy,
+    // wyzerowane liczniki, zdjęta blokada po łobuzie. Polecenie idzie przez grę – u wszystkich tak samo.
+    const FIX_FAC = Object.keys(facilities);   // piła, sierp, suszarnia, ognisko, młocarnia, kominek
+    function facRebuild(k) {
+        const fac = facilities[k]; if (!fac || !fac.unlocked) return;
+        const grp = worldObjects[k + 'Group'] || (k === 'kominek' ? worldObjects.tavernGroup : null); if (!grp) return;
+        (fac.visualsIn || []).concat(fac.visualsOut || []).forEach(m => { if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } });
+        fac.visualsIn = []; fac.visualsOut = [];
+        for (let i = 0; i < Math.min(fac.input | 0, 120); i++) { const m = meshForItem(fac.inType); if (!m) break; m.position.copy(getFacilityPileLocal(i, false, k)); grp.add(m); fac.visualsIn.push(m); }
+        for (let i = 0; i < Math.min(fac.output | 0, 120); i++) { const m = meshForItem(fac.outType); if (!m) break; m.position.copy(getFacilityPileLocal(i, true, k)); grp.add(m); fac.visualsOut.push(m); }
+        fac.isProcessing = false; fac.nextTime = 0;
+    }
+    function fixTargets() {
+        const out = [];
+        FIX_FAC.forEach(k => { const f = facilities[k], z = worldObjects[k + 'ZoneIn']; if (f && f.unlocked && z) { const v = new THREE.Vector3(); z.getWorldPosition(v); out.push({ k, title: f.title || k, x: v.x, z: v.z }); } });
+        Object.keys(WSHOPS).forEach(k => { const S = state.w2['ws_' + k]; if (S && S.own) out.push({ k: 'ws_' + k, title: WSHOPS[k].title, x: WSHOPS[k].X, z: WSHOPS[k].Z }); });
+        Object.keys(WS2).forEach(k => { const S = state.w2['ws2_' + k]; if (S && S.own) out.push({ k: 'ws2_' + k, title: WS2[k].title, x: WS2[k].X, z: WS2[k].Z }); });
+        if (state.w2.bakery && state.w2.bakery.own) out.push({ k: 'bakery', title: 'PIEKARNIA', x: BAKERY.X, z: BAKERY.Z });
+        return out;
+    }
+    w2mod({
+        key: 'facfix',
+        cmd2(c) {
+            if (c.k !== 'facfix' || typeof c.f !== 'string') return;
+            const f = c.f;
+            if (FIX_FAC.indexOf(f) >= 0) facRebuild(f);
+            else if (f === 'bakery' && state.w2.bakery) { state.w2.bakery.next = 0; }   // bieżący chleb od razu gotowy – surowce już zużyte
+            else if ((f.indexOf('ws_') === 0 || f.indexOf('ws2_') === 0) && state.w2[f]) { state.w2[f].next = 0; }
+            else return;
+            const B = state.w2.bandit; if (B && B.block) delete B.block[f];
+            const t = fixTargets().find(x => x.k === f);
+            showToast('🔧 Naprawiono: ' + (t ? t.title : f) + ' – pracuje dalej');
+        },
+        // zegary z przyszłości (np. po przeskoku czasu gry) – same wracają do normy
+        update(now) {
+            FIX_FAC.forEach(k => { const f = facilities[k]; if (f && f.isProcessing && f.nextTime > now + 30) f.nextTime = now + (f.time || 2); });
+            Object.keys(WSHOPS).forEach(k => { const S = state.w2['ws_' + k]; if (S && S.busy && S.next > now + 60) S.next = now; });
+            Object.keys(WS2).forEach(k => { const S = state.w2['ws2_' + k]; if (S && S.busy && S.next > now + 60) S.next = now; });
+            const Bk = state.w2.bakery; if (Bk && Bk.busy && Bk.next > now + 60) Bk.next = now;
+            if (state.fishing && state.fishing.nextCatch > now + 60) state.fishing.nextCatch = now;
+            if (state.wheatField && (state.wheatField.nextHarvest || 0) > now + 60) state.wheatField.nextHarvest = now;
+        },
+        render() {
+            let b = document.getElementById('fix-btn');
+            if (!b) {
+                b = document.createElement('div'); b.id = 'fix-btn';
+                const go = e => { e.preventDefault(); e.stopPropagation(); if (b.dataset.k) { Engine.queueCmd({ t: 'w2', k: 'facfix', f: b.dataset.k }); b.style.display = 'none'; this.hideUntil = performance.now() + 2500; } };
+                b.addEventListener('pointerdown', go); b.addEventListener('click', e => e.stopPropagation());
+                document.body.appendChild(b);
+            }
+            const tn = performance.now(); if (tn < (this.nextChk || 0)) return; this.nextChk = tn + 200;
+            const L = localCtx(), p = L && L.group ? L.group.position : null;
+            let best = null, bd = 25;   // do 5 kratek od zakładu
+            if (p && !Server.on && !(L.menu) && tn > (this.hideUntil || 0)) fixTargets().forEach(t => { const d = (t.x - p.x) * (t.x - p.x) + (t.z - p.z) * (t.z - p.z); if (d < bd) { bd = d; best = t; } });
+            if (!best) { if (b.style.display !== 'none') b.style.display = 'none'; return; }
+            if (b.dataset.k !== best.k) { b.dataset.k = best.k; b.textContent = '🔧 Napraw: ' + best.title; }
+            if (b.style.display !== 'block') b.style.display = 'block';
+        }
+    });
+
     init();
 
     function init() {
@@ -9988,7 +10172,7 @@ window.onerror = function(msg, src, line, col, err) {
         // 3D Suszarnia dołączona do grupy herb (przesuwa się razem)
         const herbDryer3d = createHerbDryer3D_v2();
         herbDryer3d.position.set(5.5, 0, 0);
-        worldObjects.herbGroup.add(herbDryer3d);
+        // v227: suszarka zasłaniała ramkę – usunięta (była tylko ozdobą)
 
         // SKUP – startuje z jednym slotem 4x6, rośnie po każdym poszerzeniu
         worldObjects.woodZone = createZone(4, 6, 0xCD853F, 0, 3, worldObjects.skupGroup);
@@ -11764,8 +11948,8 @@ window.onerror = function(msg, src, line, col, err) {
                         else if (choice === 'fish') { state.dropZone.fish--; totalCoinsToGive += 1; itemMesh = worldObjects.visualFishDropStack.pop(); }
                         else if (choice === 'roastedFish') { state.dropZone.roastedFish--; totalCoinsToGive += 1; itemMesh = worldObjects.visualRoastedFishDropStack.pop(); }
                         else if (choice === 'wheat') { state.dropZone.wheat--; totalCoinsToGive += 1; itemMesh = (worldObjects.visualWheatSkupStack||[]).pop(); }
-                        else if (choice === 'wheatBags') { state.dropZone.wheatBags--; totalCoinsToGive += 1; itemMesh = worldObjects.visualWheatBagStack.pop(); }
-                        else if (choice === 'snopki') { state.dropZone.snopki--; totalCoinsToGive += 1; itemMesh = (worldObjects.visualSnopkiSkupStack||[]).pop(); }
+                        else if (choice === 'wheatBags') { state.dropZone.wheatBags--; totalCoinsToGive += 4; itemMesh = worldObjects.visualWheatBagStack.pop(); }
+                        else if (choice === 'snopki') { state.dropZone.snopki--; totalCoinsToGive += 3; itemMesh = (worldObjects.visualSnopkiSkupStack||[]).pop(); }
                         else if (choice === 'water') { state.dropZone.water=(state.dropZone.water||0)-1; totalCoinsToGive += 1; itemMesh = (worldObjects.visualWaterStack||[]).pop(); }
                         else if (choice === 'gems') { state.dropZone.gems--; totalCoinsToGive += MINE.GEM_PRICE; itemMesh = (worldObjects.visualGemDropStack||[]).pop(); }
                         
