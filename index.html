@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v229</title>
+    <title>Gra Idle Drwal v230</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -775,7 +775,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v229';
+    const GAME_VERSION = 'v230';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -3967,6 +3967,7 @@ window.onerror = function(msg, src, line, col, err) {
         function buildLevel1() {
             if (!R.grp || R.grp.children.some(c => c.userData.tlvl === 1)) return;
             const g = new THREE.Group(); g.userData.tlvl = 1;
+            R.smoke = []; [-3, 9, 15].forEach(x => lantern(g, x, TAV.Z0 - 0.7)); R.grp.add(g); return;   // v230: bez domu z czerwonym dachem
             const PL = 0xF1E2C2, BM = 0x5D3A1A, RF = 0x9C3D2E, ST = 0x9E9E9E;
             const p = [box(6.2, 2.8, 11.2, -14.5, 1.4, 0, PL), box(6.5, 0.3, 11.5, -14.5, 0.15, 0, 0x8D8D8D)];
             [-5.55, -2.8, 0, 2.8, 5.55].forEach(z => p.push(box(0.2, 2.8, 0.22, -11.35, 1.4, z, BM)));
@@ -4276,7 +4277,7 @@ window.onerror = function(msg, src, line, col, err) {
             } else if (w.item !== 'b' && w.guest && w.guest.stew) {
                 T.stew--; w.cw = 's'; m = Items2.mesh('stew'); sp.set(R.grp.position.x + TAV.STEW[0], 0.5, R.grp.position.z + TAV.STEW[1]);
             } else if (w.item !== 'b' && w.guest && w.guest.roast) {
-                T.roast--; w.cw = 'm'; m = Items2.mesh('meat'); sp.set(R.grp.position.x - 5, 1.0, R.grp.position.z + 0.6);
+                T.roast--; w.cw = 'm'; m = Items2.mesh('pieczen') || Items2.mesh('meat'); sp.set(R.grp.position.x - 5, 1.0, R.grp.position.z + 0.6);
             } else if (w.item === 'b') {
                 T.brew.out--;
                 m = R.brewOut.pop();
@@ -5752,6 +5753,12 @@ window.onerror = function(msg, src, line, col, err) {
             c.strokeStyle = '#8D5524'; c.lineWidth = 4; [-20, 0, 20].forEach(x => { c.beginPath(); c.moveTo(x - 8, 12); c.lineTo(x + 8, -6); c.stroke(); }); };
         D.bakery = c => { c.beginPath(); c.moveTo(-42, 40); c.lineTo(-42, 0); c.quadraticCurveTo(0, -56, 42, 0); c.lineTo(42, 40); c.closePath(); fillOl(c, '#B5654A', 4);
             rr(c, -18, 6, 36, 34, 14); fillOl(c, '#3E2723', 3); c.fillStyle = '#FF9800'; ell(c, 0, 30, 12, 7); c.fill(); };
+        // v230 – pieczeń z dziczyzny i palenisko
+        D.pieczen = c => { ell(c, 0, 18, 46, 16); fillOl(c, '#ECEFF1', 3); ell(c, -4, 2, 32, 20, -0.25); fillOl(c, '#8D4A22', 4); ell(c, -10, -4, 16, 9, -0.25); c.fillStyle = 'rgba(255,190,120,0.45)'; c.fill();
+            rr(c, 22, -14, 22, 9, 4); fillOl(c, '#F5F0E1', 3); ell(c, 44, -16, 6, 6); fillOl(c, '#F5F0E1', 3); ell(c, 44, -6, 6, 6); fillOl(c, '#F5F0E1', 3); };
+        D.palenisko = c => { [[-30, 30], [-10, 36], [10, 36], [30, 30]].forEach(([x, y]) => { ell(c, x, y, 12, 9); fillOl(c, '#9E9E9E', 3); });
+            c.beginPath(); c.moveTo(-22, 26); c.quadraticCurveTo(-18, -16, 0, -40); c.quadraticCurveTo(18, -16, 22, 26); c.closePath(); fillOl(c, '#FF7043', 4);
+            c.beginPath(); c.moveTo(-10, 24); c.quadraticCurveTo(-8, -2, 0, -16); c.quadraticCurveTo(8, -2, 10, 24); c.closePath(); c.fillStyle = '#FFD54F'; c.fill(); };
         // v215–216 – polowanie, kuchnia polowa, rozbójnicy
         D.meat = c => { ell(c, -6, 4, 34, 24, -0.2); fillOl(c, '#B5483A', 4); ell(c, -10, 0, 18, 11, -0.2); c.fillStyle = 'rgba(255,220,200,0.45)'; c.fill();
             rr(c, 22, -10, 26, 10, 4); fillOl(c, '#F5F0E1', 3); ell(c, 48, -14, 7, 7); fillOl(c, '#F5F0E1', 3); ell(c, 48, -2, 7, 7); fillOl(c, '#F5F0E1', 3); };
@@ -6174,7 +6181,7 @@ window.onerror = function(msg, src, line, col, err) {
         refresh() {
             const tab = document.getElementById('ts-tab'); if (!tab) return;
             const L = localCtx(); const mine = L && L.player ? (L.player.coins | 0) : 0, bank = state.bank | 0;
-            const key = mine + '|' + bank + '|' + (state.wage | 0) + '|' + JSON.stringify(state.porters || {}) + '|' + Object.keys(facilities).map(k => facilities[k].unlocked ? 1 : 0).join('') + (state.stoneHelper.unlocked ? 1 : 0) + '|' + (state.w2 ? JSON.stringify([state.w2.shopx, Object.keys(state.w2.stalls || {}).map(k => state.w2.stalls[k].own + ':' + state.w2.stalls[k].min)]) : '') + Object.keys(facilities).map(k => facilities[k].helperUnlocked ? 1 : 0).join('');
+            const key = mine + '|' + bank + '|' + (state.wage | 0) + '|' + JSON.stringify(state.porters || {}) + '|' + Object.keys(facilities).map(k => facilities[k].unlocked ? 1 : 0).join('') + (state.stoneHelper.unlocked ? 1 : 0) + '|' + (state.w2 ? JSON.stringify([state.w2.shopx, Object.keys(state.w2.stalls || {}).map(k => state.w2.stalls[k].own + ':' + state.w2.stalls[k].min + ':' + (state.w2.stalls[k].off | 0))]) : '') + Object.keys(facilities).map(k => facilities[k].helperUnlocked ? 1 : 0).join('');
             if (key === this.last && tab.childNodes.length) return; this.last = key;
             document.getElementById('ts-money').innerHTML = `<img src="${Icons.url('tent', 32)}"> Skarbiec: <b>${bank}</b> &nbsp; <img src="${Icons.url('coin', 32)}"> Twoje: <b>${mine}</b>`;
             tab.innerHTML = SHOP_ITEMS.concat(ShopX.items().filter(i => !i.hidden)).map(it => {
@@ -6182,7 +6189,7 @@ window.onerror = function(msg, src, line, col, err) {
                 let desc = it.ext ? it.desc() : it.desc;
                 if (it.k === 'wage') desc += ` (poziom ${state.wage | 0}/5, teraz +${Math.round((Wage.m() - 1) * 100)}%)`;
                 let btn;
-                if (s === 'own') btn = '<span class="ts-own">' + (it.ownText || '✔ pracuje') + '</span>' + (it.toggle ? `<button class="ts-tog" data-k="${it.toggle.k}">${it.toggle.label()}</button>` : '');
+                if (s === 'own') btn = '<span class="ts-own">' + (it.ownText || '✔ pracuje') + '</span>' + (it.toggle ? `<button class="ts-tog" data-k="${it.toggle.k}">${it.toggle.label()}</button>` : '') + (it.toggle2 ? `<button class="ts-tog" data-k="${it.toggle2.k}">${it.toggle2.label()}</button>` : '');
                 else if (s === 'max') btn = '<span class="ts-own">✔ maks.</span>';
                 else if (s === 'lock' && it.ext) btn = `<span class="ts-lock">${it.lockText || 'niedostępne'}</span>`;
                 else if (s === 'lock') btn = `<span class="ts-lock">${it.fac === 'stone' ? 'najpierw zatrudnij GÓRNIKA' : 'najpierw kup ' + (facilities[it.fac] ? facilities[it.fac].title : '')}</span>`;
@@ -7391,7 +7398,7 @@ window.onerror = function(msg, src, line, col, err) {
 
     // ---------- WARSZTATY: kup ramkę, wrzucaj surowiec, odbieraj wyrób ----------
     const WSHOPS = {
-        mason: { title: 'KAMIENIARZ', icon: 'mason', X: 22, Z: -24, cost: 400, req: { planks: 20 }, inKey: 'stone', inN: 3, out: 'blocks', time: 4.0, capIn: 45, capOut: 30,
+        mason: { title: 'KAMIENIARZ', icon: 'mason', X: 22, Z: -24, cost: 400, req: { planks: 20 }, inKey: 'stone', inN: 3, out: 'blocks', time: 4.0, capIn: 45, capMax: 105, capStep: 15, xcost: 300, capOut: 30,
                  vis: () => !!state.pickaxe.unlocked, toast: '🧱 Kamieniarz gotowy! Wrzucaj kamień – dostaniesz bloki.' }
     };
     Object.keys(WSHOPS).forEach(k => Req.def('ws_' + k, { lvl: () => state.w2['ws_' + k].own, need: () => WSHOPS[k].req }));
@@ -7404,8 +7411,8 @@ window.onerror = function(msg, src, line, col, err) {
         const d = WSHOPS[key], sk = 'ws_' + key;
         return w2mod({
             key: sk,
-            defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0 }; },
-            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.in = Math.max(0, Math.min(d.capIn, o.in | 0)); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
+            defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0, cap: d.capIn, xpaid: 0, xcost: d.xcost || 300 }; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.cap = Math.max(d.capIn, Math.min(d.capMax || d.capIn, o.cap | 0)); o.in = Math.max(0, Math.min(o.cap, o.in | 0)); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
             R: null,
             reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
             S() { return state.w2[sk]; },
@@ -7423,7 +7430,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
                 if (state.dropLocked || now <= state.timers.nextDrop) {
                     // odbiór nie czeka na zrzut (osobny licznik)
-                } else if (inRect(pos, d.X - 4.2, d.Z, 3.6, 3.6) && S.in < d.capIn && wsInHave(d) > 0) {
+                } else if (inRect(pos, d.X - 4.2, d.Z, 3.6, 3.6) && S.in < S.cap && wsInHave(d) > 0) {
                     state.timers.nextDrop = now + config.dropCooldown;
                     wsGiveIn(d, new THREE.Vector3(d.X - 4.2, 0, d.Z)); S.in++;
                     return;
@@ -7471,7 +7478,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!vis) return;
                 if (!S.own) { R.buy.tp.update(buyLines(d.title, sk, d.cost - S.paid), d.icon); return; }
                 this.ensureModel();
-                R.fin.tp.update(S.in >= d.capIn ? ['PEŁNO'] : [{ i: d.inKey === 'stone' ? 'stone' : IT2[d.inKey].icon, t: S.in + '/' + d.capIn }], null);
+                R.fin.tp.update(S.in >= S.cap ? ['PEŁNO'] : [{ i: d.inKey === 'stone' ? 'stone' : IT2[d.inKey].icon, t: S.in + '/' + S.cap }], null);
                 R.fout.tp.update(S.out ? [] : [d.title], S.out ? null : IT2[d.out].icon);
                 Items2.pile(R.piles, d.inKey, d.X - 4.2, d.Z, S.in, 24);
                 Items2.pile(R.piles, d.out, d.X + 4.2, d.Z, S.out, 30);
@@ -8137,7 +8144,7 @@ window.onerror = function(msg, src, line, col, err) {
     const STALL_COST = 1500, STALL_MINS = [0, 5, 10, 20];
     const Stalls = w2mod({
         key: 'stalls',
-        defaults() { const o = {}; Object.keys(STALL_FAC).forEach(k => { o[k] = { own: 0, min: 5, cash: 0, next: 0, nx: 0, nz: 0, st: '', t: 0, k: 0 }; }); return o; },
+        defaults() { const o = {}; Object.keys(STALL_FAC).forEach(k => { o[k] = { own: 0, min: 5, cash: 0, next: 0, nx: 0, nz: 0, st: '', t: 0, k: 0, off: 0 }; }); return o; },
         restore(v) {
             const o = this.defaults();
             Object.keys(STALL_FAC).forEach(k => { const s = mergeNum(o[k], v && v[k]); s.own = s.own ? 1 : 0; s.min = STALL_MINS.indexOf(s.min) >= 0 ? s.min : 5; s.cash = Math.max(0, s.cash | 0); s.st = ''; s.next = 0; o[k] = s; });
@@ -8167,7 +8174,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!S.st) {
                     if (now < S.next) continue;
                     S.next = now + 18 + rand() * 16;
-                    if ((fac.output | 0) <= S.min) continue;
+                    if (S.off || (fac.output | 0) <= S.min) continue;   // v230: sprzedaż wyłączona na życzenie
                     S.st = 'IN'; S.nx = p.x + (rand() < 0.5 ? -26 : 26); S.nz = 25; S.k = 0;
                     continue;
                 }
@@ -8195,7 +8202,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (f.x !== p.x || f.z !== p.z + 2.9) { f.x = p.x; f.z = p.z + 2.9; f.zone.position.set(f.x, 0.01, f.z); f.tp.mesh.position.set(f.x, 0.06, f.z); if (this.R.model[k]) this.R.model[k].position.set(p.x, 0, p.z); }
                 f.vis = !!S.own;
                 if (!S.own) continue;
-                f.tp.update(S.cash ? [] : ['KASA'], S.cash ? null : 'coin');
+                f.tp.update(S.cash ? [] : (S.off ? ['KASA', 'wyłączony'] : ['KASA']), S.cash ? null : 'coin');
                 if (!this.R.model[k]) {
                     const g = bakeItem('fstall', () => {
                         const r = new THREE.Group(), wd = new THREE.MeshLambertMaterial({ color: 0x8B5A2B }), dk = new THREE.MeshLambertMaterial({ color: 0x5D3A1A });
@@ -8243,9 +8250,11 @@ window.onerror = function(msg, src, line, col, err) {
                 const d = STALL_FAC[k], S = state.w2 && state.w2.stalls ? state.w2.stalls[k] : null; if (!S) return;
                 out.push({ k: 'x_st_' + k, ext: true, icon: d.icon, name: 'Stragan przy: ' + d.name,
                     desc: () => S.own ? `Wieśniacy kupują tu sami po ${d.price}. Zostawia min. ${S.min} dla tragarzy karczmy.` : `Wieśniacy przychodzą prosto do zakładu i płacą do kasy obok (po ${d.price} za sztukę)`,
-                    price: () => STALL_COST, status: () => S.own ? 'own' : Stalls.ok(k) ? 'ok' : 'lock', lockText: 'najpierw pomocnik przy ' + d.name, ownText: '✔ handluje',
+                    price: () => STALL_COST, status: () => S.own ? 'own' : Stalls.ok(k) ? 'ok' : 'lock', lockText: 'najpierw pomocnik przy ' + d.name, ownText: S.off ? '⏸ wyłączony' : '✔ handluje',
                     apply: () => { S.own = 1; S.next = simNow + 5; if (curCtx === localCtx()) showToast('🏪 Stragan przy zakładzie ' + d.name + ' otwarty!'); },
-                    toggle: S.own ? { k: 'x_min_' + k, label: () => 'min. ' + S.min } : null });
+                    toggle: S.own ? { k: 'x_min_' + k, label: () => 'min. ' + S.min } : null,
+                    toggle2: S.own ? { k: 'x_off_' + k, label: () => S.off ? '▶ włącz' : '⏸ wyłącz' } : null });
+                out.push({ k: 'x_off_' + k, ext: true, hidden: true, free: true, apply: () => { S.off = S.off ? 0 : 1; if (curCtx === localCtx()) showToast(S.off ? '⏸ Stragan przy ' + d.name + ' wyłączony – towar zostaje w zakładzie' : '▶ Stragan przy ' + d.name + ' znów sprzedaje'); } });
                 out.push({ k: 'x_min_' + k, ext: true, hidden: true, free: true, apply: () => { const i = STALL_MINS.indexOf(S.min); S.min = STALL_MINS[(i + 1) % STALL_MINS.length]; } });
             });
             return out;
@@ -8342,7 +8351,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (S.cap < HUNT.CAPMAX) buyStep({ x: HUNT.FX, z: HUNT.OZ, w: 3.4, h: 3.4 }, now, pos, { rk: 'huntx', paid: () => S.xpaid, cost: () => S.xcost, done: () => S.cap >= HUNT.CAPMAX, add: () => { S.xpaid++; },
                     finish: () => { S.cap = Math.min(HUNT.CAPMAX, S.cap + 10); S.xpaid = 0; S.xcost *= 2; showToast('🦌 Maks dziczyzny: ' + S.cap + '!'); } });
                 if (!S.por) buyStep({ x: HUNT.FPX, z: HUNT.OZ, w: 3.4, h: 3.4 }, now, pos, { rk: null, paid: () => S.ppaid, cost: () => HUNT.POR, done: () => !!S.por, add: () => { S.ppaid++; },
-                    finish: () => { S.por = 1; S.ppaid = 0; showToast('🥩 Tragarz mięsa zatrudniony – nosi dziczyznę na grill w karczmie, a gdy tam pełno – na SPRZEDAJ'); } });
+                    finish: () => { S.por = 1; S.ppaid = 0; showToast('🥩 Tragarz mięsa zatrudniony – nosi dziczyznę na PALENISKO, a gdy tam pełno – na SPRZEDAJ'); } });
             }
             const p = state.player;
             let near = -1, nd = HUNT.SKIN_R * HUNT.SKIN_R;
@@ -8868,14 +8877,19 @@ window.onerror = function(msg, src, line, col, err) {
         lvl(k, pl) { const p = pl || state.player; return (p && p.gr && p.gr[k]) | 0; },
         dropK() { return 1 / (1 + 0.15 * this.lvl('plecak')); },
         cost(g, lv) { const d = GEAR.find(x => x.k === g); return d ? (d.cost[lv] || null) : null; },
-        can(p, g) { const lv = this.lvl(g, p); if (lv >= GEAR_MAX) return false; const c = this.cost(g, lv); return !!c && Object.keys(c).every(r => (p[r] | 0) >= c[r]); },
+        // v230: skóry liczą się z plecaka i ze schowka SKÓRY przy namiocie
+        store(r) { const S = state.w2 && state.w2.skory; return S ? (r === 'skoraJ' ? S.j | 0 : r === 'skoraD' ? S.d | 0 : 0) : 0; },
+        have(p, r) { return (p[r] | 0) + this.store(r); },
+        can(p, g) { const lv = this.lvl(g, p); if (lv >= GEAR_MAX) return false; const c = this.cost(g, lv); return !!c && Object.keys(c).every(r => this.have(p, r) >= c[r]); },
         // w symulacji (polecenie gracza) – skóry i sznurek z plecaka lecą do namiotu
         buy(g) {
             const p = state.player, d = GEAR.find(x => x.k === g); if (!d || !p.gr) return;
             const lv = this.lvl(g); if (lv >= GEAR_MAX || !this.can(p, g)) return;
             const c = d.cost[lv];
             const tg = worldObjects.tentGroup ? worldObjects.tentGroup.position.clone() : playerGroup.position.clone();
-            Object.keys(c).forEach(r => { for (let i = 0; i < c[r]; i++) { if (IT2[r]) Items2.take(r, tg); else if ((p[r] | 0) > 0) giveItemTo(r, tg); } });
+            Object.keys(c).forEach(r => { for (let i = 0; i < c[r]; i++) {
+                if ((p[r] | 0) <= 0 && this.store(r) > 0) { const S = state.w2.skory; if (r === 'skoraJ') S.j--; else S.d--; continue; }   // ze schowka
+                if (IT2[r]) Items2.take(r, tg); else if ((p[r] | 0) > 0) giveItemTo(r, tg); } });
             p.gr[g] = lv + 1;
             if (curCtx === localCtx()) showToast('🧵 ' + d.name + ' – poziom ' + p.gr[g] + '! ' + d.desc);
         }
@@ -8947,7 +8961,7 @@ window.onerror = function(msg, src, line, col, err) {
         refresh() {
             const dev = document.getElementById('ts-dev'); if (!dev || dev.style.display === 'none') return;
             const L = localCtx(), p = L && L.player; if (!p || !p.q) return;
-            const key = JSON.stringify([p.q, p.qt, p.sk, p.sp, p.gr, p.skoraJ | 0, p.skoraD | 0, p.twine | 0]);
+            const key = JSON.stringify([p.q, p.qt, p.sk, p.sp, p.gr, p.skoraJ | 0, p.skoraD | 0, p.twine | 0, Gear.store('skoraJ'), Gear.store('skoraD')]);
             if (key === this.last) return; this.last = key;
             const bar = (v, t) => `<div class="dv-bar"><i style="width:${Math.min(100, Math.round(v / t * 100))}%"></i></div>`;
             let h = `<div class="dv-pts"><img src="${Icons.url('star', 36)}"> Punkty rozwoju: <b>${p.sp | 0}</b></div><div class="dv-h">Zadania</div>`;
@@ -8964,7 +8978,7 @@ window.onerror = function(msg, src, line, col, err) {
             h += '<div class="dv-h">Sprzęt ze skór (szyjesz sznurkiem)</div><div class="dv-tip">Skóry są w lesie łowieckim: trafione zwierzę zostaje na ziemi – podejdź do niego i postój chwilę.</div>';
             h += GEAR.map(G => {
                 const lv = Gear.lvl(G.k, p), c = lv < GEAR_MAX ? G.cost[lv] : null;
-                const need = c ? Object.keys(c).map(r => `<i class="${(p[r] | 0) >= c[r] ? 'ok' : 'no'}"><img src="${Icons.url(IT2[r] ? IT2[r].icon : (RES_ICON[r] || r), 24)}">${p[r] | 0}/${c[r]}</i>`).join('') : '';
+                const need = c ? Object.keys(c).map(r => `<i class="${Gear.have(p, r) >= c[r] ? 'ok' : 'no'}"><img src="${Icons.url(IT2[r] ? IT2[r].icon : (RES_ICON[r] || r), 24)}">${Gear.have(p, r)}/${c[r]}</i>`).join('') : '';
                 return `<div class="dv-q"><img src="${Icons.url(G.icon, 32)}"><span><b>${G.name} ${lv}/${GEAR_MAX}</b><small>${G.desc}</small>${c ? `<em class="dv-need">${need}</em>` : '<small>najlepszy poziom!</small>'}</span><button class="dv-gb" data-g="${G.k}" ${c && Gear.can(p, G.k) ? '' : 'disabled'}>🧵</button></div>`;
             }).join('');
             dev.innerHTML = h;
@@ -9003,7 +9017,7 @@ window.onerror = function(msg, src, line, col, err) {
     Port.newShip = function (now) { _newShip(now); const S = this.S(); if (S.kind === 'n' && TavUp.has('witraz')) S.nob = Math.min(8, S.nob + 2); };
 
     // ---------- pieczeń z dziczyzny: zrzucasz dziczyznę, kucharz piecze ją na grillu ----------
-    TAVSTOCK.meat = { lx: 38.4, title: 'DZICZYZNA NA GRILL', icon: 'meat', cap: () => TAV.ROAST_CAP, key: 'meat', field: 'meatRaw' };
+    TAVSTOCK.meat = { lx: 38.4, title: 'DO KARCZMY', icon: 'pieczen', cap: () => TAV.ROAST_CAP, key: 'pieczen', field: 'roast' };   // v230: pieczeń z PALENISKA dla gości
     const _tvis2 = W2.mods.find(m => m.key === 'tavstock');
     const _tv1 = _tvis2.vis.bind(_tvis2);
     _tvis2.vis = function (k) { if (k === 'meat') { const T = Tavern.T; return !!(T && state.tavern && state.tavern.kominekBuilt && ((state.w2.seen && state.w2.seen.meat) || Areas.has('east'))); } return _tv1(k); };
@@ -9022,7 +9036,7 @@ window.onerror = function(msg, src, line, col, err) {
     _tvis2.render = function (now) {
         _tr(now);
         const T = Tavern.T, f = this.R.f.meat; if (!f || !T || !f.vis) return;
-        f.tp.update(['DZICZYZNA', { i: 'meat', t: (T.meatRaw | 0) + ' surowe' }, { i: 'meat', t: (T.roast | 0) + ' pieczeń' }], null);
+        f.tp.update(['DO KARCZMY', { i: 'pieczen', t: (T.roast | 0) + '/' + TAV.ROAST_CAP }], null);
     };
     w2mod({
         key: 'roast',
@@ -9932,6 +9946,7 @@ window.onerror = function(msg, src, line, col, err) {
         Object.keys(WSHOPS).forEach(k => { const S = state.w2['ws_' + k]; if (S && S.own) out.push({ k: 'ws_' + k, title: WSHOPS[k].title, x: WSHOPS[k].X, z: WSHOPS[k].Z }); });
         Object.keys(WS2).forEach(k => { const S = state.w2['ws2_' + k]; if (S && S.own) out.push({ k: 'ws2_' + k, title: WS2[k].title, x: WS2[k].X, z: WS2[k].Z }); });
         if (state.w2.bakery && state.w2.bakery.own) out.push({ k: 'bakery', title: 'PIEKARNIA', x: BAKERY.X, z: BAKERY.Z });
+        if (state.w2.pal && state.w2.pal.own) out.push({ k: 'pal', title: 'PALENISKO', x: PAL.X, z: PAL.Z });
         return out;
     }
     w2mod({
@@ -9940,7 +9955,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (c.k !== 'facfix' || typeof c.f !== 'string') return;
             const f = c.f;
             if (FIX_FAC.indexOf(f) >= 0) facRebuild(f);
-            else if (f === 'bakery' && state.w2.bakery) { state.w2.bakery.next = 0; }   // bieżący chleb od razu gotowy – surowce już zużyte
+            else if ((f === 'bakery' || f === 'pal') && state.w2[f]) { state.w2[f].next = 0; }   // bieżący chleb od razu gotowy – surowce już zużyte
             else if ((f.indexOf('ws_') === 0 || f.indexOf('ws2_') === 0) && state.w2[f]) { state.w2[f].next = 0; }
             else return;
             const B = state.w2.bandit; if (B && B.block) delete B.block[f];
@@ -9953,6 +9968,7 @@ window.onerror = function(msg, src, line, col, err) {
             Object.keys(WSHOPS).forEach(k => { const S = state.w2['ws_' + k]; if (S && S.busy && S.next > now + 60) S.next = now; });
             Object.keys(WS2).forEach(k => { const S = state.w2['ws2_' + k]; if (S && S.busy && S.next > now + 60) S.next = now; });
             const Bk = state.w2.bakery; if (Bk && Bk.busy && Bk.next > now + 60) Bk.next = now;
+            const Pk = state.w2.pal; if (Pk && Pk.busy && Pk.next > now + 60) Pk.next = now;
             if (state.fishing && state.fishing.nextCatch > now + 60) state.fishing.nextCatch = now;
             if (state.wheatField && (state.wheatField.nextHarvest || 0) > now + 60) state.wheatField.nextHarvest = now;
         },
@@ -10011,14 +10027,10 @@ window.onerror = function(msg, src, line, col, err) {
         owned() { const H = state.w2.hunt; return !!(H && H.por) && Areas.has('east'); },
         home() { return { x: HUNT.FPX, z: HUNT.OZ + 3.0 }; },
         tav() { return W2.mods.find(m => m.key === 'tavstock'); },
-        grillRoom() {
-            const T = Tavern.T, tv = this.tav();
-            if (!T || !tv || !TAVSTOCK.meat || !tv.vis('meat')) return 0;
-            return Math.max(0, TAVSTOCK.meat.cap() - (T.meatRaw | 0));
-        },
-        dest() { return this.grillRoom() > 0 ? 1 : skupHasRoom('meat') ? 2 : 0; },
+        palRoom() { const P = state.w2.pal; return (P && P.own) ? Math.max(0, PAL.CAP - (P.in | 0)) : 0; },
+        dest() { return this.palRoom() > 0 ? 1 : skupHasRoom('meat') ? 2 : 0; },
         dpos(d) {
-            if (d === 1) { const p = this.tav().pos('meat'); return p ? { x: p.x + 2.4, z: p.z } : null; }
+            if (d === 1) return { x: PAL.X - 4.2, z: PAL.Z + 2.6 };
             const z = worldObjects.woodZone; if (!z) return null;
             const v = new THREE.Vector3(); z.getWorldPosition(v); return { x: v.x - 2.5, z: v.z + 2.2 };
         },
@@ -10061,7 +10073,7 @@ window.onerror = function(msg, src, line, col, err) {
                     if (!d) { S.st = 0; break; }
                     if (d !== S.d) { S.st = 3; break; }
                     const from = new THREE.Vector3(S.x, 1.3, S.z);
-                    if (d === 1) { const T = Tavern.T; T.meatRaw = (T.meatRaw | 0) + 1; S.n--; this.toss(from, this.tav().pos('meat')); }
+                    if (d === 1) { state.w2.pal.in++; S.n--; this.toss(from, { x: PAL.X - 4.2, z: PAL.Z }); }
                     else if (skupPutIt2('meat', from)) S.n--;
                     else { S.st = 0; break; }
                     S.t = now + MPOR.DROP;
@@ -10085,12 +10097,130 @@ window.onerror = function(msg, src, line, col, err) {
         hash() { const S = this.S(); return S ? S.x.toFixed(3) + ',' + S.z.toFixed(3) + ',' + S.st + ',' + S.n : ''; }
     });
 
+    // ---------- v230: PALENISKO – drugi ogień: dziczyzna → pieczeń (pomocnik do kupienia, jak w innych warsztatach) ----------
+    IT2.pieczen = { name: 'Pieczeń z dziczyzny', icon: 'pieczen', price: 35, h: 0.22, make: mkItem('pieczen', () => {
+        const g = new THREE.Group();
+        const m = new THREE.Mesh(new THREE.SphereGeometry(0.22, 10, 8), new THREE.MeshLambertMaterial({ color: 0x8D4A22 })); m.scale.set(1.3, 0.75, 0.95); m.position.y = 0.12; g.add(m);
+        const b = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.26, 6), new THREE.MeshLambertMaterial({ color: 0xF5F0E1 })); b.rotation.z = Math.PI / 2; b.position.set(0.36, 0.14, 0); g.add(b);
+        return g;
+    }) };
+    RES_ICON.pieczen = 'pieczen';
+    BLOCKABLE.push(['pieczen', 'Pieczeń']);
+    ['bread', 'pieczen'].forEach(k => { if (Collecting.keys.indexOf(k) < 0) Collecting.keys.push(k); });
+    const PAL = { X: 40, Z: 38, COST: 800, REQ: { stone: 10, planks: 10 }, TIME: 5.0, CAP: 20, CAPOUT: 24 };
+    Req.def('ws_pal', { lvl: () => state.w2.pal.own, need: () => PAL.REQ });
+    w2mod({
+        key: 'pal',
+        defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.in = Math.max(0, Math.min(PAL.CAP, o.in | 0)); o.out = Math.max(0, Math.min(PAL.CAPOUT, o.out | 0)); state.w2.pal = o; },
+        R: null,
+        reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, fire: null, spit: null, piles: {} }; },
+        S() { return state.w2.pal; },
+        vis() { return Areas.has('east') || !!(state.w2.seen && state.w2.seen.meat); },
+        build() {
+            this.R.buy = mkFrame(PAL.X, PAL.Z, 4, 4, 0xFFCC80);
+            this.R.fin = mkFrame(PAL.X - 4.2, PAL.Z, 3.6, 3.6, 0xEF9A9A);
+            this.R.fout = mkFrame(PAL.X + 4.2, PAL.Z, 3.6, 3.6, 0xFFE082);
+        },
+        playerStep(now, pos) {
+            const S = this.S(), P = PAL; if (!this.vis()) return;
+            if (!S.own) {
+                buyStep({ x: P.X, z: P.Z, w: 4, h: 4 }, now, pos, { rk: 'ws_pal', paid: () => S.paid, cost: () => P.COST, done: () => !!S.own, add: () => { S.paid++; },
+                    finish: () => { S.own = 1; S.paid = 0; showToast('🔥 Palenisko gotowe! Wrzucaj dziczyznę – upieczesz pieczeń (karczma i SPRZEDAJ).'); } });
+                return;
+            }
+            if (!state.dropLocked && now > state.timers.nextDrop && S.in < P.CAP && (state.player.meat | 0) > 0 && inRect(pos, P.X - 4.2, P.Z, 3.6, 3.6)) {
+                state.timers.nextDrop = now + config.dropCooldown;
+                Items2.take('meat', new THREE.Vector3(P.X - 4.2, 0, P.Z)); S.in++;
+                return;
+            }
+            if (S.out > 0 && !PB('pieczen') && inRect(pos, P.X + 4.2, P.Z, 3.6, 3.6) && now > state.timers.nextCollectOut) {
+                state.timers.nextCollectOut = now + 0.12;
+                S.out--; Items2.give('pieczen', new THREE.Vector3(P.X + 4.2, 0.4, P.Z));
+            }
+        },
+        update(now) {
+            const S = this.S(); if (!S.own) return;
+            if (S.busy) { if (now >= S.next) { S.busy = 0; S.out++; } }
+            else if (S.in >= 1 && S.out < PAL.CAPOUT) { S.busy = 1; S.in--; S.next = now + PAL.TIME / Wage.m(); }
+        },
+        ensureModel() {
+            if (this.R.model) return;
+            const g = bakeItem('palenisko', () => {
+                const r = new THREE.Group();
+                const st = new THREE.MeshLambertMaterial({ color: 0x9E9E9E }), wd = new THREE.MeshLambertMaterial({ color: 0x6D4C41 }), ash = new THREE.MeshLambertMaterial({ color: 0x3E3E3E });
+                for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2, s = new THREE.Mesh(new THREE.DodecahedronGeometry(0.28, 0), st); s.position.set(Math.cos(a) * 0.95, 0.16, Math.sin(a) * 0.95); s.scale.set(1, 0.7, 1); r.add(s); }
+                const bed = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.85, 0.08, 12), ash); bed.position.y = 0.04; r.add(bed);
+                [0.5, -0.5].forEach(a => { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.2, 6), wd); l.rotation.z = Math.PI / 2; l.rotation.y = a; l.position.y = 0.16; r.add(l); });
+                // widełki rożna
+                [-1.25, 1.25].forEach(x => {
+                    const post = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.3, 0.1), wd); post.position.set(x, 0.65, 0); r.add(post);
+                    [-1, 1].forEach(sd => { const f = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.32, 0.08), wd); f.position.set(x + sd * 0.07, 1.38, 0); f.rotation.z = -sd * 0.45; r.add(f); });
+                });
+                return r;
+            });
+            g.position.set(PAL.X, 0, PAL.Z - 0.3); scene.add(g); this.R.model = g;
+            const fire = new THREE.Group();
+            const f1 = new THREE.Mesh(new THREE.ConeGeometry(0.42, 0.95, 7), new THREE.MeshBasicMaterial({ color: 0xFF7043 })); f1.position.y = 0.55; fire.add(f1);
+            const f2 = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.6, 7), new THREE.MeshBasicMaterial({ color: 0xFFD54F })); f2.position.y = 0.42; fire.add(f2);
+            fire.position.set(PAL.X, 0, PAL.Z - 0.3); scene.add(fire); this.R.fire = fire;
+            const spit = new THREE.Group();
+            const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.7, 6), new THREE.MeshLambertMaterial({ color: 0x9E9E9E })); rod.rotation.z = Math.PI / 2; spit.add(rod);
+            const chunk = Items2.mesh('meat'); if (chunk) { chunk.scale.setScalar(1.5); chunk.position.y = -0.15; spit.add(chunk); }
+            spit.position.set(PAL.X, 1.45, PAL.Z - 0.3); scene.add(spit); this.R.spit = spit;
+            const w = createVillagerMesh(0xFFFFFF, 0xD84315); w.position.set(PAL.X + 1.3, 0.75, PAL.Z + 1.2); w.rotation.y = Math.PI; scene.add(w); this.R.worker = w;
+        },
+        render(now) {
+            const S = this.S(), R = this.R, P = PAL; if (!R.buy) return;
+            const vis = this.vis();
+            R.buy.vis = vis && !S.own; R.fin.vis = vis && !!S.own; R.fout.vis = vis && !!S.own;
+            [R.model, R.fire, R.spit].forEach(m => { if (m) m.visible = vis && !!S.own; });
+            if (!vis) return;
+            if (!S.own) { R.buy.tp.update(buyLines('PALENISKO', 'ws_pal', P.COST - S.paid), 'palenisko'); return; }
+            this.ensureModel();
+            R.fin.tp.update(['PALENISKO', { i: 'meat', t: S.in + '/' + P.CAP }], null);
+            R.fout.tp.update(S.out ? [] : ['PIECZEŃ'], S.out ? null : 'pieczen');
+            Items2.pile(R.piles, 'meat', P.X - 4.2, P.Z, S.in, 16);
+            Items2.pile(R.piles, 'pieczen', P.X + 4.2, P.Z, S.out, 24);
+            if (S.out > 0) FloatLab.show('palo', P.X + 4.2, 1.9, P.Z, 'pieczen', S.out, 0.85);
+            const k = 0.85 + 0.3 * Math.abs(Math.sin(now * 13)) * (S.busy ? 1 : 0.4);
+            if (R.fire) R.fire.scale.set(k * (S.busy ? 1 : 0.7), (0.6 + k * 0.6) * (S.busy ? 1 : 0.6), k * (S.busy ? 1 : 0.7));
+            if (R.spit) { R.spit.visible = !!S.busy; R.spit.rotation.x = now * 2.2; }
+            if (R.worker) { R.worker.rotation.z = S.busy ? Math.sin(now * 10) * 0.06 : 0; }
+        }
+    });
+
+    // ---------- v230: SKÓRY – schowek przy namiocie (nie trzeba ich nosić; szycie w namiocie bierze stąd) ----------
+    const SKORY = { X: -3, Z: 15.6, W: 3.4 };
+    w2mod({
+        key: 'skory',
+        defaults() { return { j: 0, d: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.j = Math.max(0, o.j | 0); o.d = Math.max(0, o.d | 0); state.w2.skory = o; },
+        R: null,
+        reset() { this.R = { f: null }; },
+        S() { return state.w2.skory; },
+        vis() { const S = this.S(); return !!(state.tentReqs && state.tentReqs.built) && (Areas.has('east') || S.j > 0 || S.d > 0); },
+        build() { this.R.f = mkFrame(SKORY.X, SKORY.Z, SKORY.W, SKORY.W, 0xBCAAA4); },
+        playerStep(now, pos) {
+            if (!this.vis() || state.dropLocked || now <= state.timers.nextDrop || !inRect(pos, SKORY.X, SKORY.Z, SKORY.W, SKORY.W)) return;
+            const p = state.player, S = this.S(), k = (p.skoraJ | 0) > 0 ? 'skoraJ' : (p.skoraD | 0) > 0 ? 'skoraD' : null; if (!k) return;
+            state.timers.nextDrop = now + config.dropCooldown;
+            Items2.take(k, new THREE.Vector3(SKORY.X, 0, SKORY.Z)); if (k === 'skoraJ') S.j++; else S.d++;
+        },
+        render() {
+            const R = this.R; if (!R.f) return;
+            const vis = this.vis(); R.f.vis = vis; if (!vis) return;
+            const S = this.S(); R.f.tp.update(['SKÓRY', { i: 'hideJ', t: S.j }, { i: 'hideD', t: S.d }], null);
+        }
+    });
+
     // ---------- v229: WARSZTATY jak Piła – po kupnie pracują, gdy stoisz obok; pomocnika trzeba kupić ----------
     // (kamieniarz, huta, tłocznia, kuchnia polowa, piekarnia – wcześniej pomocnik był od razu, za darmo)
     const WS_HELP = [];
     Object.keys(WSHOPS).forEach(k => WS_HELP.push({ key: 'ws_' + k, X: WSHOPS[k].X, Z: WSHOPS[k].Z, cost: () => Math.round(WSHOPS[k].cost * 0.5) }));
     Object.keys(WS2).forEach(k => WS_HELP.push({ key: 'ws2_' + k, X: WS2[k].X, Z: WS2[k].Z, cost: () => Math.round(WS2[k].cost * 0.5) }));
     WS_HELP.push({ key: 'bakery', X: BAKERY.X, Z: BAKERY.Z, cost: () => Math.round(BAKERY.COST * 0.5) });
+    WS_HELP.push({ key: 'pal', X: PAL.X, Z: PAL.Z, cost: () => Math.round(PAL.COST * 0.5) });
     const WS_HZ = 3.8;   // ramka POMOCNIK pod warsztatem
     WS_HELP.forEach(w => {
         const m = W2.mods.find(x => x.key === w.key); if (!m) return;
@@ -10125,6 +10255,29 @@ window.onerror = function(msg, src, line, col, err) {
             if (R.hw) { R.hw.visible = vis && !!S.hlp; R.hw.position.y = 0.75 + (S.busy ? Math.abs(Math.sin(now * 9)) * 0.08 : 0); }
         };
     });
+
+    // ---------- v230: KAMIENIARZ – rozbudowa (MAKS): więcej kamieni czeka na obróbkę (+15, do 105) ----------
+    (function masonExpand() {
+        const d = WSHOPS.mason, m = W2.mods.find(x => x.key === 'ws_mason'); if (!d || !m) return;
+        const XX = d.X - 4.2, XZ = d.Z + 3.8, W = 3.2;
+        Req.def('masonx', { lvl: () => state.w2.ws_mason.cap, need: () => ({ planks: 10 }) });
+        const _reset = m.reset, _build = m.build, _ps = m.playerStep, _rd = m.render;
+        m.reset = function () { _reset.call(this); this.R.fx = null; };
+        m.build = function () { _build.call(this); this.R.fx = mkFrame(XX, XZ, W, W, 0x90CAF9); };
+        m.playerStep = function (now, pos) {
+            const S = state.w2.ws_mason;
+            if (S && S.own && S.cap < d.capMax && d.vis())
+                buyStep({ x: XX, z: XZ, w: W, h: W }, now, pos, { rk: 'masonx', paid: () => S.xpaid, cost: () => S.xcost, done: () => S.cap >= d.capMax, add: () => { S.xpaid++; },
+                    finish: () => { S.cap = Math.min(d.capMax, S.cap + d.capStep); S.xpaid = 0; S.xcost *= 2; showToast('🪨 Kamieniarz mieści teraz ' + S.cap + ' kamieni!'); } });
+            return _ps.call(this, now, pos);
+        };
+        m.render = function (now) {
+            _rd.call(this, now);
+            const S = state.w2.ws_mason, R = this.R; if (!R || !R.fx || !S) return;
+            R.fx.vis = !!(R.fin && R.fin.vis) && !!S.own && S.cap < d.capMax;
+            if (R.fx.vis) R.fx.tp.update(['MAKS', ...Req.lines('masonx'), { i: 'coin', t: S.xcost - S.xpaid }], null);
+        };
+    })();
 
     init();
 
