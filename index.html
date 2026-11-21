@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v221</title>
+    <title>Gra Idle Drwal v222</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -373,6 +373,17 @@
         #ts-dev { max-height: none; overflow: visible; }
         #online-panel .op-close { position: sticky; top: -10px; right: auto; float: right; z-index: 6; margin: -10px -10px 0 6px; width: 42px; height: 42px;
             border-radius: 10px; background: rgba(40,52,36,0.98); box-shadow: 0 2px 6px rgba(0,0,0,0.45); font-size: 22px; line-height: 42px; padding: 0; }
+        /* v222: plakietka „gdzie gram” pod przyciskiem 🌐 i opis w okienku gry online */
+        #net-badge { position: fixed; top: 62px; right: 62px; z-index: 121; pointer-events: auto; cursor: pointer; color: #fff;
+            font: 800 11.5px/1.25 "Segoe UI", Roboto, Arial, sans-serif; padding: 3px 8px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.35);
+            white-space: nowrap; max-width: 52vw; overflow: hidden; text-overflow: ellipsis; background: rgba(0,0,0,0.6); box-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+        #net-badge.srv { background: rgba(21,101,192,0.9); } #net-badge.host { background: rgba(123,31,162,0.9); }
+        #net-badge.guest { background: rgba(46,125,50,0.9); } #net-badge.wait { background: rgba(230,81,0,0.9); }
+        #online-chip { top: 88px; }
+        #op-state { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; padding: 8px 10px; margin: 0 0 10px;
+            font-size: 13.5px; line-height: 1.38; }
+        #op-state .ops-who { margin-top: 6px; font-size: 12.5px; color: #FFE082; }
+        #op-session-text { display: none; }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -388,7 +399,9 @@
 window.onerror = function(msg, src, line, col, err) {
     var el = document.getElementById('err-overlay');
     el.style.display = 'block';
-    el.textContent = 'LINE ' + line + ': ' + msg + ' | ' + (err && err.stack ? err.stack.substring(0,300) : '');
+    el.textContent = 'LINE ' + line + ': ' + msg + ' | ' + (err && err.stack ? err.stack.substring(0,300) : '') + '   (dotknij, żeby zamknąć)';
+    el.onclick = function () { el.style.display = 'none'; };
+    clearTimeout(window.__errT); window.__errT = setTimeout(function () { el.style.display = 'none'; }, 15000);
     return false;
 };
 </script>
@@ -462,10 +475,10 @@ window.onerror = function(msg, src, line, col, err) {
         <label>Twoje imię</label>
         <input id="op-name" maxlength="12" placeholder="np. Maciek" autocomplete="off">
         <div id="op-main">
-            <button class="op-btn" onclick="Online.host('new')">🆕 Nowa wspólna gra</button>
-            <button class="op-btn" onclick="Online.host('mine')">🌲 Zagrajmy w moim świecie</button>
-            <div class="op-sep">— albo dołącz do kolegi —</div>
-            <label>Kod pokoju od kolegi</label>
+            <button class="op-btn" onclick="Online.host('new')">🆕 Nowa wspólna gra <small>(na moim telefonie)</small></button>
+            <button class="op-btn" onclick="Online.host('mine')">🌲 Zagrajmy w moim świecie <small>(na moim telefonie)</small></button>
+            <div class="op-sep">— albo dołącz do serwera lub kolegi —</div>
+            <label>Kod serwera (np. DRWAL) albo kod od kolegi</label>
             <input id="op-code" maxlength="6" placeholder="KOD" autocomplete="off" autocapitalize="characters">
             <button class="op-btn alt" onclick="Online.join()">🤝 Dołącz</button>
         </div>
@@ -742,7 +755,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v221';
+    const GAME_VERSION = 'v222';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -2294,7 +2307,13 @@ window.onerror = function(msg, src, line, col, err) {
             case 'tool':
                 if (c && ['axe', 'sickle', 'pickaxe'].includes(cmd.v)) withCtx(c, () => { state.activeTool = cmd.v; });
                 break;
-            case 'lock': if (c) withCtx(c, () => { state.dropLocked = !state.dropLocked; }); break;
+            case 'lock':
+                // v222: dziecko łatwo dotyka postaci – mówimy wprost, co się stało i jak to cofnąć
+                if (c) withCtx(c, () => {
+                    state.dropLocked = !state.dropLocked;
+                    if (c === localCtx()) showToast(state.dropLocked ? '🚫 Postać zablokowana: nic nie bierze i nic nie sprzedaje. Dotknij postaci, żeby odblokować.' : '✅ Odblokowane – znowu zbierasz i sprzedajesz.');
+                });
+                break;
             case 'unstuck': if (c) withCtx(c, unstuckPlayer); break;
             case 'cheat': if (c) withCtx(c, () => { state.player.coins += 100; }); break;
             case 'mv': applyMove(cmd.id, cmd.x, cmd.z); break;
@@ -2753,7 +2772,13 @@ window.onerror = function(msg, src, line, col, err) {
             const tryConnect = () => {
                 if (this.peer !== peer || this.conn || this.role !== 'guest' || tries >= 7) return;
                 tries++;
-                const conn = peer.connect('drwalgra-' + code, { reliable: true, serialization: 'json' });
+                let conn = null;
+                try { conn = peer.connect('drwalgra-' + code, { reliable: true, serialization: 'json' }); } catch (e) { conn = null; }
+                if (!conn) {   // v222: telefon chwilowo stracił łączność z serwerem połączeń – wróć i spróbuj za chwilę (wcześniej czerwony błąd)
+                    try { if (peer.disconnected && !peer.destroyed) peer.reconnect(); } catch (e) {}
+                    setTimeout(tryConnect, 3000);
+                    return;
+                }
                 conn.via = 'p2p';
                 this.watchP2P(conn);
                 this.guestCandidate(conn);
@@ -6811,7 +6836,7 @@ window.onerror = function(msg, src, line, col, err) {
                     `<div class="wc-hint">Dostaniesz kod pokoju – podaj go kolegom. Razem do 6 graczy.</div>`;
             } else if (kind === 'join') {
                 h = head('friends', 'Dołącz do kolegi') + nameRow +
-                    `<label class="wc-lab">Kod pokoju od kolegi</label><input id="wc-code" maxlength="6" placeholder="KOD" autocomplete="off" autocapitalize="characters" value="${Online.lastCode()}">` +
+                    `<label class="wc-lab">Kod serwera (np. DRWAL) albo kod od kolegi</label><input id="wc-code" maxlength="6" placeholder="KOD" autocomplete="off" autocapitalize="characters" value="${Online.lastCode()}">` +
                     `<button class="wc-btn" data-w="join">🤝 Dołącz</button><div id="wc-msg" class="wc-hint"></div>`;
             } else {
                 h = head('gear', 'Opcje') + nameRow +
@@ -7226,12 +7251,14 @@ window.onerror = function(msg, src, line, col, err) {
     RES_ICON.blocks = 'block';
 
     // ---------- STRAGAN: skupuje od razu za monety – nowe towary, a od v221 też kamień i wodę ----------
-    // v221: monety lecą prosto do sprzedającego (wcześniej leciały na stos przy skupie – wyglądało,
-    // jakby stragan rzucał kasę na odległość). Kamień i woda po 1 monecie – zawsze jest je gdzie oddać.
-    const STRAGAN = { X: 1.6, Z: -2.9, W: 3.6, H: 2.8 };
+    // v221: monety lecą prosto do sprzedającego (wcześniej leciały na stos przy skupie).
+    // v222: stragan stoi zawsze obok skupu (przesuwa się razem z nim), ma własny licznik – inne ramki
+    // (np. duże koło skupu) już go nie blokują; bloki i inne nowe towary kupuje też ramka SPRZEDAJ.
+    const STRAGAN = { DX: -5.4, DZ: -2.9, W: 3.6, H: 2.8 };
     const STRAGAN_BP = { stone: { icon: 'stone', price: 1 }, water: { icon: 'water', price: 1 } };
     function stInfo(k) { return STRAGAN_BP[k] || IT2[k]; }
     function stHave(k) { return k === 'water' ? (state.water ? state.water.collected | 0 : 0) : (state.player[k] | 0); }
+    function stPos() { const g = worldObjects.skupGroup; return { x: (g ? g.position.x : 7) + STRAGAN.DX, z: (g ? g.position.z : 0) + STRAGAN.DZ }; }
     // monety od kupca prosto do plecaka gracza (ten sam gracz, nawet gdy w grze jest kilka osób)
     function coinsToCtx(ctx, from, n) {
         for (let i = 0; i < n; i++) scheduleSim(i * 0.12, () => {
@@ -7251,25 +7278,37 @@ window.onerror = function(msg, src, line, col, err) {
             });
         });
     }
+    // sprzedaje 1 sztukę (najdroższą z listy); true – coś sprzedano
+    function stSellOne(keys, tp) {
+        let best = null;
+        keys.forEach(k => { if (stHave(k) > 0 && (!best || stInfo(k).price > stInfo(best).price)) best = k; });
+        if (!best) return false;
+        if (STRAGAN_BP[best]) giveItemTo(best, tp); else Items2.take(best, tp);
+        coinsToCtx(curCtx, tp, stInfo(best).price);
+        return true;
+    }
+    // ramka SPRZEDAJ na skupie: bloki, szkło i inne nowe towary – kupiec płaci od razu, jak na straganie
+    function skupSellNew(now, at) {
+        if (now <= (state.timers.nextStall || 0)) return false;
+        if (!stSellOne(IT2_KEYS().filter(k => IT2[k].price > 0), new THREE.Vector3(at.x, 0, at.z))) return false;
+        state.timers.nextStall = now + config.dropCooldown * 0.6;
+        return true;
+    }
     w2mod({
         key: 'stragan',
         R: null,
         reset() { this.R = { f: null }; },
         sell() { return IT2_KEYS().filter(k => IT2[k].price > 0).concat(['stone', 'water']); },
-        build() { this.R.f = mkFrame(STRAGAN.X, STRAGAN.Z, STRAGAN.W, STRAGAN.H, 0xFFB74D); },
+        build() { const p = stPos(); this.R.f = mkFrame(p.x, p.z, STRAGAN.W, STRAGAN.H, 0xFFB74D); },
         playerStep(now, pos) {
-            if (!this.R.f || state.dropLocked || !inRect(pos, STRAGAN.X, STRAGAN.Z, STRAGAN.W, STRAGAN.H) || now <= state.timers.nextDrop) return;
-            // najdroższe najpierw
-            let best = null;
-            this.sell().forEach(k => { if (stHave(k) > 0 && (!best || stInfo(k).price > stInfo(best).price)) best = k; });
-            if (!best) return;
-            state.timers.nextDrop = now + config.dropCooldown * 0.6;
-            const tp = new THREE.Vector3(STRAGAN.X, 0, STRAGAN.Z);
-            if (STRAGAN_BP[best]) giveItemTo(best, tp); else Items2.take(best, tp);
-            coinsToCtx(curCtx, tp, stInfo(best).price);
+            if (!this.R.f || state.dropLocked || now <= (state.timers.nextStall || 0)) return;
+            const p = stPos(); if (!inRect(pos, p.x, p.z, STRAGAN.W, STRAGAN.H)) return;
+            if (stSellOne(this.sell(), new THREE.Vector3(p.x, 0, p.z))) state.timers.nextStall = now + config.dropCooldown * 0.6;
         },
         render() {
             const f = this.R.f; if (!f) return;
+            const p = stPos();
+            if (f.x !== p.x || f.z !== p.z) { f.x = p.x; f.z = p.z; f.zone.position.set(p.x, 0.01, p.z); f.tp.mesh.position.set(p.x, 0.06, p.z); }
             // napis: „blok = 6 (moneta)” – cena za sztukę, a nie wymóg; najpierw to, co niesiesz
             const L = localCtx(), lp = L && L.player, lw = (L && L.water) ? (L.water.collected | 0) : 0;
             const have = k => k === 'water' ? lw : (lp ? (lp[k] | 0) : 0);
@@ -9524,6 +9563,65 @@ window.onerror = function(msg, src, line, col, err) {
         apply: () => { if (!state.porters) state.porters = {}; state.porters.water = 1; if (curCtx === localCtx()) showToast('💧 Tragarz wody zatrudniony – sam podlewa pole i napełnia balę!'); }
     });
 
+    // ---------- v222: ostatnie ulepszenia 2× droższe (pod koniec gra szła za łatwo: 200–300 monet na minutę) ----------
+    (function lateUpgrades() {
+        const K = 2;
+        AREAS.south.cost *= K; AREAS.east.cost *= K;                      // NOWY TEREN, LAS ŁOWIECKI
+        WS2.huta.cost *= K; WS2.winery.cost *= K; WS2.kuchnia.cost *= K;  // huta, tłocznia wina, kuchnia polowa
+        VINE.COST *= K; PORT.COST *= K; CARROT.COST *= K; HUNT.HELPER *= K;
+        ['okna', 'krzesla', 'dekor', 'zyrandol', 'kielichy', 'witraz'].forEach(k => { if (TAVUP[k]) TAVUP[k].cost *= K; });
+        HUT[1].price *= K; HUT[2].price *= K;                              // dom z kamienia, dwór
+    })();
+
+    // ---------- v222: „gdzie gram?” – plakietka pod 🌐 i opis w okienku gry online ----------
+    // sam na telefonie / gospodarz (gra na moim telefonie) / na serwerze (komputer) / u kolegi (na jego telefonie)
+    const NetInfo = {
+        last: '',
+        mode() {
+            const O = Online, code = cleanName(O.code || '');
+            if (Server.on) return { ic: '🖥️', short: 'SERWER · ' + code, cls: 'srv',
+                long: `<b>Ten komputer jest SERWEREM.</b> Kod: <b>${code}</b>. Telefony dołączają tym kodem (do ${MAXP} osób). Komputer musi zostać włączony.` };
+            if (O.active && O.role === 'host') return { ic: '👑', short: 'Gospodarz · ' + code, cls: 'host',
+                long: `<b>Jesteś GOSPODARZEM</b> – gra działa na <b>Twoim telefonie</b>. Kod: <b>${code}</b> (do ${MAXP} osób). Gdy wyjdziesz z gry, inni stracą połączenie.` };
+            if (O.active && O.srv) return { ic: '🖥️', short: 'Na serwerze · ' + code, cls: 'srv',
+                long: `<b>Grasz na SERWERZE</b> (komputer w domu), kod <b>${code}</b>. Możesz wyjść, kiedy chcesz – świat zostaje na serwerze, a Twoja postać na Ciebie czeka.` };
+            if (O.active) { const h = cleanName(O.names[0] || 'kolega');
+                return { ic: '🤝', short: 'U: ' + h, cls: 'guest',
+                    long: `<b>Jesteś u kolegi</b> – gra działa na telefonie: <b>${h}</b> (kod ${code}). Gdy ${h} wyjdzie z gry, gra się zatrzyma.` }; }
+            if (O.role === 'host') return { ic: '⏳', short: 'Czekam · ' + code, cls: 'wait',
+                long: `<b>Założyłeś grę na tym telefonie</b> – kod <b>${code}</b>. Czekam, aż ktoś dołączy.` };
+            if (O.role === 'guest') return { ic: '⏳', short: 'Łączę…', cls: 'wait', long: `<b>Łączę z kodem ${code}…</b>` };
+            const lc = cleanName(O.lastCode() || '');
+            return { ic: '📱', short: 'Grasz sam', cls: 'solo',
+                long: '<b>Grasz sam</b> – tylko na tym telefonie, nikt inny nie widzi tej gry.' + (O.lastCode() ? ` Żeby grać z innymi, wpisz kod <b>${lc}</b> i naciśnij „Dołącz”.` : '') };
+        },
+        who() {
+            const O = Online; if (!O.active) return '';
+            const out = [];
+            for (let q = 0; q < Math.min(O.slots, players.length); q++) {
+                if (!O.isPlayer(q)) continue;
+                const tags = [];
+                if (q === O.slot) tags.push('Ty');
+                if (q === 0 && !O.srv) tags.push('gospodarz');
+                if (isFinite(O.goneFrom[q])) tags.push(O.afkF && O.afkF[q] ? 'w tle' : 'wyszedł');
+                out.push(cleanName(O.names[q] || ('Gracz ' + (q + 1))) + (tags.length ? ' (' + tags.join(', ') + ')' : ''));
+            }
+            return `Gracze (${out.length}/${MAXP}): ` + out.join(', ');
+        },
+        update() {
+            let b = document.getElementById('net-badge');
+            if (!b) { b = document.createElement('div'); b.id = 'net-badge'; b.addEventListener('click', e => { e.stopPropagation(); Online.openPanel(); }); document.body.appendChild(b); }
+            let box = document.getElementById('op-state');
+            const panel = document.getElementById('online-panel');
+            if (!box && panel) { box = document.createElement('div'); box.id = 'op-state'; const h = panel.querySelector('h3'); if (h && h.nextSibling) panel.insertBefore(box, h.nextSibling); else panel.appendChild(box); }
+            const m = this.mode(), w = this.who(), key = m.short + '|' + m.long + '|' + w + '|' + m.cls;
+            if (key === this.last) return; this.last = key;
+            b.className = m.cls; b.textContent = m.ic + ' ' + m.short;
+            if (box) box.innerHTML = m.long + (w ? `<div class="ops-who">${w}</div>` : '');
+        }
+    };
+    w2mod({ key: 'netinfo', render() { NetInfo.update(); } });
+
     init();
 
     function init() {
@@ -10444,8 +10542,9 @@ window.onerror = function(msg, src, line, col, err) {
         if (state.dropLocked) return; // gracz zablokował zrzucanie I pobieranie
         if (!worldObjects.woodZone) return;
         worldObjects.woodZone.getWorldPosition(pWood);
-        let distLimit = 2 + state.skup.expansions * 2; // rośnie z poszerzeniami
-        if (pos.distanceTo(pWood) < distLimit) {
+        // v222: tylko na ramce SPRZEDAJ (+1 kratka) – wcześniej koło sięgało daleko poza ramkę i zabierało towar z odległości
+        const skHalf = 2 + state.skup.expansions * 2;
+        if (Math.abs(pos.x - pWood.x) < skHalf + 1 && Math.abs(pos.z - pWood.z) < 4) {
             if (now > state.timers.nextDrop) {
                 // Pierwszy towar (wg kolejności), dla którego jest miejsce na skupie
                 const sellOrder = [['gems', state.player.gems], ['wheatBags', state.player.wheatBags], ['snopki', state.player.snopki], ['roastedFish', state.player.roastedFish],
@@ -10458,6 +10557,8 @@ window.onerror = function(msg, src, line, col, err) {
                 if (dropType) {
                     state.timers.nextDrop = now + config.dropCooldown;
                     dropItemToSkup(dropType);
+                } else if (skupSellNew(now, pWood)) {
+                    // v222: bloki, szkło i inne nowe towary – kupiec na skupie płaci od razu
                 } else if (hasGoods && curCtx === localCtx() && (simNow - (window.__skupHintAt || -99)) > 12) {
                     window.__skupHintAt = simNow;
                     showToast('🧺 Skup pełny – kup POSZERZ albo poczekaj, aż klienci wykupią towar');
