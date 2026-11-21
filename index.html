@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v220</title>
+    <title>Gra Idle Drwal v221</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -366,6 +366,13 @@
         /* v220: ikony w namiocie i menu nie mogą się ściskać (reset stylów Tailwinda: img max-width 100%) */
         body img { max-width: none; display: inline-block; vertical-align: middle; }
         #tent-shop img, #ts-dev img, .dv-q img, #wl-menu img, .oc-row img { flex-shrink: 0; }
+        /* v221: „x” zamykający panel zostaje u góry przy przewijaniu (namiot, gra online) */
+        #tent-shop .ts-head { position: sticky; top: -10px; z-index: 6; margin: -10px -12px 6px; padding: 10px 12px 7px;
+            background: rgba(24,18,10,0.99); box-shadow: 0 3px 8px rgba(0,0,0,0.45); }
+        #tent-shop #ts-x { font-size: 20px; padding: 7px 15px; }
+        #ts-dev { max-height: none; overflow: visible; }
+        #online-panel .op-close { position: sticky; top: -10px; right: auto; float: right; z-index: 6; margin: -10px -10px 0 6px; width: 42px; height: 42px;
+            border-radius: 10px; background: rgba(40,52,36,0.98); box-shadow: 0 2px 6px rgba(0,0,0,0.45); font-size: 22px; line-height: 42px; padding: 0; }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -510,7 +517,7 @@ window.onerror = function(msg, src, line, col, err) {
         pickaxe: { unlocked: false },
         stoneHelper: { unlocked: false, cost: 150, nextMine: 0, maxOut: 30, expandCost: 100, expandPaid: 0, expanded: false }, // Pomocnik do kamieni za 150
         fishing: { unlocked: false, cost: 100, paid: 0, nextCatch: 0, maxOut: 15, helperUnlocked: false, helperPaid: 0, helperCost: 150, helperName: helperNames[Math.floor(Math.random()*helperNames.length)], expanded: false, expandCost: 80, expandPaid: 0 },
-        wheatField: { seedPaid: 0, seedCost: 50, seeded: false, grown: false, growTimer: 0, plants: [], helperPaid: 0, helperUnlocked: false, helperCost: 250, nextHarvest: 0 },
+        wheatField: { seedPaid: 0, seedCost: 100, seeded: false, grown: false, growTimer: 0, plants: [], helperPaid: 0, helperUnlocked: false, helperCost: 250, nextHarvest: 0 },
         timers: { nextChop: 0, nextDrop: 0, nextCollect: 0, nextNpc: 0, nextCollectOut: 0, nextSaw: 0 },
         activeTool: 'axe',
         isOptionsActive: false
@@ -735,7 +742,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v220';
+    const GAME_VERSION = 'v221';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -5805,7 +5812,7 @@ window.onerror = function(msg, src, line, col, err) {
                 let size = Math.min(avail / (n * 1.12 + (big ? 0.6 : 0)), W * (n === 1 ? 0.36 : 0.28), H * 0.42);
                 const width = (l, s) => {
                     c.font = `900 ${Math.round(s)}px ${FONT}`;
-                    if (typeof l === 'object') return c.measureText(String(l.t)).width + (l.i ? s * 1.15 : 0);
+                    if (typeof l === 'object') return c.measureText(String(l.t)).width + (l.i ? s * 1.15 : 0) + (l.i && l.i2 ? s * 1.25 : 0);
                     return c.measureText(String(l)).width;
                 };
                 for (let k = 0; k < 40; k++) {
@@ -5822,7 +5829,11 @@ window.onerror = function(msg, src, line, col, err) {
                     const cy = y + heights[i] / 2;
                     if (typeof l === 'object') {
                         const tw = width(l, s), x0 = W / 2 - tw / 2;
-                        if (l.i) { Icons.draw(c, l.i, x0 + s * 0.5, cy, s * 1.05); c.textAlign = 'left'; drawOutlined(c, String(l.t), x0 + s * 1.15, cy + s * 0.04, s, l.c); c.textAlign = 'center'; }
+                        if (l.i) {
+                            Icons.draw(c, l.i, x0 + s * 0.5, cy, s * 1.05); c.textAlign = 'left'; drawOutlined(c, String(l.t), x0 + s * 1.15, cy + s * 0.04, s, l.c); c.textAlign = 'center';
+                            // v221: druga ikona za liczbą – np. na straganie „blok = 6 [moneta]” (to cena, a nie wymóg)
+                            if (l.i2) { c.font = `900 ${Math.round(s)}px ${FONT}`; Icons.draw(c, l.i2, x0 + s * 1.15 + c.measureText(String(l.t)).width + s * 0.66, cy, s * 0.98); }
+                        }
                         else drawOutlined(c, String(l.t), W / 2, cy + s * 0.04, s, l.c);
                     } else drawOutlined(c, String(l), W / 2, cy + s * 0.04, s);
                     y += heights[i];
@@ -7214,29 +7225,57 @@ window.onerror = function(msg, src, line, col, err) {
     // stare funkcje gry: zrzut towaru na ramkę (giveItemTo) zna też nowe towary
     RES_ICON.blocks = 'block';
 
-    // ---------- STRAGAN: skupuje nowe towary od razu za monety (monety lecą na skup) ----------
+    // ---------- STRAGAN: skupuje od razu za monety – nowe towary, a od v221 też kamień i wodę ----------
+    // v221: monety lecą prosto do sprzedającego (wcześniej leciały na stos przy skupie – wyglądało,
+    // jakby stragan rzucał kasę na odległość). Kamień i woda po 1 monecie – zawsze jest je gdzie oddać.
     const STRAGAN = { X: 1.6, Z: -2.9, W: 3.6, H: 2.8 };
+    const STRAGAN_BP = { stone: { icon: 'stone', price: 1 }, water: { icon: 'water', price: 1 } };
+    function stInfo(k) { return STRAGAN_BP[k] || IT2[k]; }
+    function stHave(k) { return k === 'water' ? (state.water ? state.water.collected | 0 : 0) : (state.player[k] | 0); }
+    // monety od kupca prosto do plecaka gracza (ten sam gracz, nawet gdy w grze jest kilka osób)
+    function coinsToCtx(ctx, from, n) {
+        for (let i = 0; i < n; i++) scheduleSim(i * 0.12, () => {
+            if (!ctx || players.indexOf(ctx) < 0) return;
+            withCtx(ctx, () => {
+                state.player.coins++;
+                const m = new THREE.Mesh(geoCoin, matCoin), sp = from.clone(); sp.y = 1; scene.add(m); m.position.copy(sp);
+                const pg = playerGroup, arr = worldObjects.playerBackpackCoins;
+                if (arr.length >= COIN_VIS) {
+                    spawnJumpAnimation(m, sp, () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); pg.localToWorld(v); return v; }, 0.4, 2, () => { scene.remove(m); });
+                    return;
+                }
+                const idx = arr.length; arr.push(m);
+                spawnJumpAnimation(m, sp, () => { const v = getPlayerCoinPos(idx).clone(); pg.localToWorld(v); return v; }, 0.4, 2, () => {
+                    if (arr.indexOf(m) !== -1) { pg.add(m); m.position.copy(getPlayerCoinPos(arr.indexOf(m))); m.rotation.set(0, 0, 0); } else scene.remove(m);
+                });
+            });
+        });
+    }
     w2mod({
         key: 'stragan',
         R: null,
         reset() { this.R = { f: null }; },
-        sell() { return IT2_KEYS().filter(k => IT2[k].price > 0); },
+        sell() { return IT2_KEYS().filter(k => IT2[k].price > 0).concat(['stone', 'water']); },
         build() { this.R.f = mkFrame(STRAGAN.X, STRAGAN.Z, STRAGAN.W, STRAGAN.H, 0xFFB74D); },
         playerStep(now, pos) {
             if (!this.R.f || state.dropLocked || !inRect(pos, STRAGAN.X, STRAGAN.Z, STRAGAN.W, STRAGAN.H) || now <= state.timers.nextDrop) return;
             // najdroższe najpierw
             let best = null;
-            this.sell().forEach(k => { if ((state.player[k] | 0) > 0 && (!best || IT2[k].price > IT2[best].price)) best = k; });
+            this.sell().forEach(k => { if (stHave(k) > 0 && (!best || stInfo(k).price > stInfo(best).price)) best = k; });
             if (!best) return;
             state.timers.nextDrop = now + config.dropCooldown * 0.6;
             const tp = new THREE.Vector3(STRAGAN.X, 0, STRAGAN.Z);
-            Items2.take(best, tp);
-            spawnCoinsFromNPC(tp, IT2[best].price);
+            if (STRAGAN_BP[best]) giveItemTo(best, tp); else Items2.take(best, tp);
+            coinsToCtx(curCtx, tp, stInfo(best).price);
         },
         render() {
             const f = this.R.f; if (!f) return;
-            const known = this.sell().filter(k => k === 'blocks' || (state.w2.seen && state.w2.seen[k]));
-            f.tp.update(['STRAGAN', ...known.slice(0, 3).map(k => ({ i: IT2[k].icon, t: IT2[k].price }))], null);
+            // napis: „blok = 6 (moneta)” – cena za sztukę, a nie wymóg; najpierw to, co niesiesz
+            const L = localCtx(), lp = L && L.player, lw = (L && L.water) ? (L.water.collected | 0) : 0;
+            const have = k => k === 'water' ? lw : (lp ? (lp[k] | 0) : 0);
+            const known = k => k === 'blocks' || (k === 'stone' && !!(state.pickaxe && state.pickaxe.unlocked)) || (k === 'water' && !!worldObjects.waterZone) || !!(state.w2.seen && state.w2.seen[k]);
+            const list = this.sell().filter(k => known(k) || have(k) > 0).sort((a, b) => ((have(b) > 0) - (have(a) > 0)) || (stInfo(b).price - stInfo(a).price));
+            f.tp.update(['STRAGAN', ...list.slice(0, 3).map(k => ({ i: stInfo(k).icon, t: '= ' + stInfo(k).price, i2: 'coin', c: have(k) > 0 ? '#C5E1A5' : null }))], null);
         }
     });
     // które nowe towary gracze już widzieli (do napisu na straganie)
@@ -9327,6 +9366,164 @@ window.onerror = function(msg, src, line, col, err) {
         if (!Server.on && FullScr.want()) FullScr.enter();
     }, { capture: true, passive: true }));
 
+    // =====================================================================
+    // v221 – SIEW I WODA. Pierwszy siew kosztuje 100 monet. Kolejne – tylko
+    // woda (20 kropli): donosi ją gracz, BALA albo TRAGARZ WODY (kupowany
+    // w namiocie). Gdy woda dojdzie, pole zasiewa się samo – bez monet.
+    // Wszystko w kroku symulacji (simNow, rand()) – u każdego gracza tak samo.
+    // =====================================================================
+    const SEED_FIRST = 100;
+    w2mod({
+        key: 'siew',
+        update() {
+            const wf = state.wheatField; if (!wf) return;
+            if (!wf.hasBeenSeeded) {
+                if (wf.seedCost !== SEED_FIRST) { wf.seedCost = SEED_FIRST; wf.seedPaid = Math.max(0, Math.min(wf.seedPaid | 0, SEED_FIRST - 1)); }
+                return;
+            }
+            if (wf.seedPaid) wf.seedPaid = 0;          // stare zapisy: monety za kolejny siew nie są już potrzebne
+            const g = worldObjects.wheatFieldGroup;
+            if (wf.seeded || !g || !g.visible) return;
+            if (Object.keys(Req.need('wheatSeed')).length && Req.ok('wheatSeed')) {
+                sowWheatNow();
+                showToast('🌱 Pole zasiane wodą – pszenica rośnie!');
+            }
+        }
+    });
+
+    // ---------- TRAGARZ WODY: źródło → pole (gdy czeka na siew) → BALA ----------
+    const WPOR = { FILL: 0.45, POUR: 0.2, SHIRT: 0x1E88E5, HAT: 0x0D47A1, PRICE: 300 };
+    function wpWalk(p, tx, tz, sp) {
+        const dx = tx - p.x, dz = tz - p.z, d = Math.sqrt(dx * dx + dz * dz), step = sp * DT;
+        if (d <= step) { p.x = tx; p.z = tz; return true; }
+        p.x += dx / d * step; p.z += dz / d * step; p.face = Math.atan2(dx, dz); return false;
+    }
+    const WaterPorter = w2mod({
+        key: 'wporter',
+        R: null,
+        reset() {
+            const p = this.R && this.R.p;
+            if (p && p.mesh && p.mesh.parent) p.mesh.parent.remove(p.mesh);
+            this.R = { p: null };
+        },
+        owned() { return !!(state.porters && state.porters.water); },
+        src() { const z = worldObjects.waterZone; if (!z) return null; const v = new THREE.Vector3(); z.getWorldPosition(v); return v; },
+        cap() { const X = state.w2 && state.w2.shopx; return 6 + 3 * (X ? X.pcap | 0 : 0); },
+        speed() { const X = state.w2 && state.w2.shopx; return 4.2 * (0.8 + 0.2 * Wage.m()) * (1 + 0.2 * (X ? X.pspd | 0 : 0)); },
+        fieldNeed() {
+            const wf = state.wheatField, g = worldObjects.wheatFieldGroup;
+            if (!wf || !wf.hasBeenSeeded || wf.seeded || !g || !g.visible) return 0;
+            return Req.left('wheatSeed').water | 0;
+        },
+        balaRoom() {
+            const S = state.w2 && state.w2.bala, g = worldObjects.wheatFieldGroup;
+            if (!S || !S.own || !g || !g.visible || !Bala.pos()) return 0;
+            return Math.max(0, BALA.CAP - (S.w | 0));
+        },
+        dest() { return this.fieldNeed() > 0 ? 'field' : this.balaRoom() > 0 ? 'bala' : null; },
+        dpos(d) {
+            if (d === 'bala') { const b = Bala.pos(); return b ? { x: b.x + 1.6, z: b.z - 2.9 } : null; }
+            const z = worldObjects.wheatZone; if (!z) return null;
+            const v = new THREE.Vector3(); z.getWorldPosition(v);
+            return { x: v.x + 0.8, z: v.z - 3.5 };         // skraj pola
+        },
+        back(i) { return new THREE.Vector3(0, -0.12 + Math.max(0, i) * 0.26, -0.5); },
+        spawn() {
+            const s = this.src(); if (!s) return;
+            const mesh = createVillagerMesh(WPOR.SHIRT, WPOR.HAT);
+            const p = { mesh, x: s.x + 3.0, z: s.z + 2.6, st: 'HOME', t: 0, carry: [], dst: null };
+            mesh.position.set(p.x, 0.75, p.z); scene.add(mesh);
+            this.R.p = p;
+        },
+        addDrop(p, s) {
+            const m = waterDropMesh(); m.scale.setScalar(0.62);
+            p.carry.push(m);
+            const sp = new THREE.Vector3(s.x + 0.6, 0.4, s.z + 0.6); scene.add(m); m.position.copy(sp);
+            const pm = p.mesh;
+            spawnJumpAnimation(m, sp, () => { const v = this.back(p.carry.indexOf(m)); pm.localToWorld(v); return v; }, 0.3, 1.0, () => {
+                const k = p.carry.indexOf(m);
+                if (k !== -1) { scene.remove(m); pm.add(m); m.position.copy(this.back(k)); }   // już wylana – leci dalej sama
+            });
+        },
+        pourOne(p, d) {
+            const m = p.carry.pop(); if (!m) return;
+            const sp = new THREE.Vector3(); m.getWorldPosition(sp);
+            if (m.parent) m.parent.remove(m); scene.add(m); m.position.copy(sp);
+            let tp;
+            if (d === 'field') {
+                const st = Req.st('wheatSeed'); st.water = (st.water || 0) + 1;
+                const g = worldObjects.wheatFieldGroup.position;
+                tp = new THREE.Vector3(g.x + (rand() - 0.5) * 4, 0.2, g.z + (rand() - 0.5) * 4);
+            } else {
+                const S = state.w2.bala; S.w = Math.min(BALA.CAP, (S.w | 0) + 1);
+                const b = Bala.pos(); tp = new THREE.Vector3(b.x, 0.6, b.z - 2.9);
+            }
+            spawnJumpAnimation(m, sp, () => tp, 0.35, 1.2, () => { scene.remove(m); });
+        },
+        step(now) {
+            const p = this.R.p, s = this.src(); if (!p || !s) return;
+            const sp = this.speed();
+            switch (p.st) {
+                case 'HOME': {
+                    if (!wpWalk(p, s.x + 3.0, s.z + 2.6, sp)) break;
+                    if (now < p.t) break;
+                    p.t = now + 1.0;
+                    if (!this.dest()) break;
+                    p.st = p.carry.length ? 'GO' : 'FETCH';
+                    break;
+                }
+                case 'FETCH':
+                    if (wpWalk(p, s.x + 1.2, s.z + 1.2, sp)) { p.st = 'FILL'; p.t = now + WPOR.FILL; }
+                    break;
+                case 'FILL':
+                    if (now < p.t) break;
+                    if (p.carry.length < this.cap()) { this.addDrop(p, s); p.t = now + WPOR.FILL; }
+                    else p.st = 'GO';
+                    break;
+                case 'GO': {
+                    const d = this.dest(), q = d ? this.dpos(d) : null;
+                    if (!q) { p.st = 'HOME'; break; }
+                    p.dst = d;
+                    if (wpWalk(p, q.x, q.z, sp)) { p.st = 'POUR'; p.t = now + WPOR.POUR; }
+                    break;
+                }
+                case 'POUR': {
+                    if (now < p.t) break;
+                    const d = this.dest();
+                    if (!p.carry.length) { p.st = d ? 'FETCH' : 'HOME'; break; }
+                    if (!d) { p.st = 'HOME'; break; }
+                    if (d !== p.dst) { p.st = 'GO'; break; }
+                    this.pourOne(p, d); p.t = now + WPOR.POUR;
+                    break;
+                }
+            }
+        },
+        update(now) {
+            if (!this.R) this.reset();
+            if (!this.owned() || !worldObjects.waterZone) return;
+            if (!this.R.p) this.spawn();
+            this.step(now);
+        },
+        render() {
+            const p = this.R && this.R.p; if (!p) return;
+            if (p.mesh.parent !== scene) scene.add(p.mesh);
+            const moving = p.st === 'FETCH' || p.st === 'GO' || (p.st === 'HOME' && (Math.abs(p.mesh.position.x - p.x) > 0.001 || Math.abs(p.mesh.position.z - p.z) > 0.001));
+            p.mesh.position.set(p.x, 0.75 + (moving ? Math.abs(Math.sin(simNow * 10 + 3)) * 0.1 : 0), p.z);
+            if (p.face !== undefined) p.mesh.rotation.y = p.face;
+            p.mesh.rotation.z = (p.st === 'POUR' || p.st === 'FILL') ? Math.sin(simNow * 14) * 0.05 : 0;
+        },
+        hash() { const p = this.R && this.R.p; return p ? p.x.toFixed(3) + ',' + p.z.toFixed(3) + ',' + p.st + ',' + p.carry.length : ''; }
+    });
+    // w namiocie, obok innych tragarzy (przed „Podwyżką”)
+    SHOP_ITEMS.splice(Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage')), 0, {
+        k: 'por_water', ext: true, icon: 'water', name: 'Tragarz wody',
+        desc: () => 'Nosi wodę ze źródła na pole do siewu, a potem do BALI – nie musisz już sam nosić',
+        price: () => WPOR.PRICE,
+        status: () => (state.porters && state.porters.water) ? 'own' : worldObjects.waterZone ? 'ok' : 'lock',
+        lockText: 'najpierw pierwszy siew na polu', ownText: '✔ nosi wodę',
+        apply: () => { if (!state.porters) state.porters = {}; state.porters.water = 1; if (curCtx === localCtx()) showToast('💧 Tragarz wody zatrudniony – sam podlewa pole i napełnia balę!'); }
+    });
+
     init();
 
     function init() {
@@ -10392,7 +10589,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
             }
         }
-        if (worldObjects.wheatFieldGroup && worldObjects.wheatFieldGroup.visible && !state.wheatField.seeded) {
+        if (worldObjects.wheatFieldGroup && worldObjects.wheatFieldGroup.visible && !state.wheatField.seeded && !state.wheatField.hasBeenSeeded) {
             const waterOK = Req.coinOk('wheatSeed', state.wheatField.seedPaid, state.wheatField.seedCost);
             let pWF = new THREE.Vector3(); worldObjects.wheatZone.getWorldPosition(pWF);
             if (pos.distanceTo(pWF) < 3 && state.player.coins > 0 && now > state.timers.nextDrop && waterOK) {
@@ -10775,6 +10972,46 @@ window.onerror = function(msg, src, line, col, err) {
         });
     }
 
+    // v221: zasiew pola (monetami przy pierwszym razie, wodą przy kolejnych)
+    function sowWheatNow() {
+                    state.wheatField.sowN = (state.wheatField.sowN | 0) + 1;
+                    state.wheatField.hasBeenSeeded = true;
+                    state.wheatField.seedPaid = 0;
+                    state.wheatField.seeded = true; state.wheatField.growTimer = 0;
+                    // Usuń stare rośliny
+                    state.wheatField.plants.forEach(p => { if(p.mesh.parent) p.mesh.parent.remove(p.mesh); else scene.remove(p.mesh); });
+                    state.wheatField.plants = [];
+                    // 6x6 = 36 roślin w siatce pasującej do ramki 6x6
+                    for (let r = 0; r < 6; r++) {
+                        for (let c = 0; c < 6; c++) {
+                            const wm = createWheatMesh(false);
+                            const lx = -2.5 + c * 1.0 + (rand()-0.5)*0.15;
+                            const lz = -2.5 + r * 1.0 + (rand()-0.5)*0.15;
+                            wm.position.set(lx, 0, lz); wm.scale.setScalar(0.4);
+                            worldObjects.wheatFieldGroup.add(wm);
+                            state.wheatField.plants.push({mesh: wm, grown: false});
+                        }
+                    }
+                    worldObjects.wheatHelperZone.visible = state.hireGate.unlocked ? true : false;
+                    if(worldObjects.textPlanes.wheatHelper) worldObjects.textPlanes.wheatHelper.mesh.visible = state.hireGate.unlocked ? true : false;
+                    if (worldObjects.wheatOutZone) { worldObjects.wheatOutZone.visible = true; if(worldObjects.textPlanes.wheatOut) worldObjects.textPlanes.wheatOut.mesh.visible = true; }
+                    worldObjects.threshingGroup.visible = true;
+                    // Nie ukrywaj pomocnika młyna przy ponownym zasiewie – tylko jeśli jeszcze nie widoczny
+                    if (state.hireGate && state.hireGate.unlocked && facilities.threshing && facilities.threshing.unlocked) {
+                        if(worldObjects.threshingHelperZone) worldObjects.threshingHelperZone.visible = true;
+                        if(worldObjects.textPlanes.threshingHelper) worldObjects.textPlanes.threshingHelper.mesh.visible = true;
+                    }
+
+                    // Ramka wody – pojawia się przy zasiewie
+                    if (!worldObjects.waterZone) {
+                        worldObjects.waterGroup = new THREE.Group(); worldObjects.waterGroup.position.set(-38, 0, -38); scene.add(worldObjects.waterGroup);
+                        worldObjects.waterZone = createZone(4, 4, 0x1E90FF, 0, 0, worldObjects.waterGroup);
+                        worldObjects.textPlanes.water = createGroundText(3.8, 3.8);
+                        worldObjects.textPlanes.water.mesh.position.set(0, 0.06, 0);
+                        worldObjects.waterGroup.add(worldObjects.textPlanes.water.mesh);
+                        state.water = { collected: 0, max: Infinity };
+                    }
+    }
     function payForUpgrade(typeKey, targetGlobalPos) {
         state.payStreak = (state.payStreak||0) + 1;
         state._lastPayTime = simNow;
@@ -10865,45 +11102,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
             } else if (typeKey === 'wheatSeed') {
                 state.wheatField.seedPaid++;
-                if (state.wheatField.seedPaid >= state.wheatField.seedCost) {
-                    state.wheatField.sowN = (state.wheatField.sowN | 0) + 1;
-                    state.wheatField.hasBeenSeeded = true;
-                    state.wheatField.seedPaid = 0;
-                    state.wheatField.seeded = true; state.wheatField.growTimer = 0;
-                    // Usuń stare rośliny
-                    state.wheatField.plants.forEach(p => { if(p.mesh.parent) p.mesh.parent.remove(p.mesh); else scene.remove(p.mesh); });
-                    state.wheatField.plants = [];
-                    // 6x6 = 36 roślin w siatce pasującej do ramki 6x6
-                    for (let r = 0; r < 6; r++) {
-                        for (let c = 0; c < 6; c++) {
-                            const wm = createWheatMesh(false);
-                            const lx = -2.5 + c * 1.0 + (rand()-0.5)*0.15;
-                            const lz = -2.5 + r * 1.0 + (rand()-0.5)*0.15;
-                            wm.position.set(lx, 0, lz); wm.scale.setScalar(0.4);
-                            worldObjects.wheatFieldGroup.add(wm);
-                            state.wheatField.plants.push({mesh: wm, grown: false});
-                        }
-                    }
-                    worldObjects.wheatHelperZone.visible = state.hireGate.unlocked ? true : false;
-                    if(worldObjects.textPlanes.wheatHelper) worldObjects.textPlanes.wheatHelper.mesh.visible = state.hireGate.unlocked ? true : false;
-                    if (worldObjects.wheatOutZone) { worldObjects.wheatOutZone.visible = true; if(worldObjects.textPlanes.wheatOut) worldObjects.textPlanes.wheatOut.mesh.visible = true; }
-                    worldObjects.threshingGroup.visible = true;
-                    // Nie ukrywaj pomocnika młyna przy ponownym zasiewie – tylko jeśli jeszcze nie widoczny
-                    if (state.hireGate && state.hireGate.unlocked && facilities.threshing && facilities.threshing.unlocked) {
-                        if(worldObjects.threshingHelperZone) worldObjects.threshingHelperZone.visible = true;
-                        if(worldObjects.textPlanes.threshingHelper) worldObjects.textPlanes.threshingHelper.mesh.visible = true;
-                    }
-
-                    // Ramka wody – pojawia się przy zasiewie
-                    if (!worldObjects.waterZone) {
-                        worldObjects.waterGroup = new THREE.Group(); worldObjects.waterGroup.position.set(-38, 0, -38); scene.add(worldObjects.waterGroup);
-                        worldObjects.waterZone = createZone(4, 4, 0x1E90FF, 0, 0, worldObjects.waterGroup);
-                        worldObjects.textPlanes.water = createGroundText(3.8, 3.8);
-                        worldObjects.textPlanes.water.mesh.position.set(0, 0.06, 0);
-                        worldObjects.waterGroup.add(worldObjects.textPlanes.water.mesh);
-                        state.water = { collected: 0, max: Infinity };
-                    }
-                }
+                if (state.wheatField.seedPaid >= state.wheatField.seedCost) sowWheatNow();
             } else if (typeKey === 'wheatHelper') {
                 state.wheatField.helperPaid = (state.wheatField.helperPaid||0) + 1;
                 if (state.wheatField.helperPaid >= state.wheatField.helperCost && !state.wheatField.helperUnlocked) {
@@ -11502,7 +11701,7 @@ window.onerror = function(msg, src, line, col, err) {
 
         if (worldObjects.textPlanes.wheat) {
             if (!state.wheatField.seeded) {
-                worldObjects.textPlanes.wheat.update(['ZASIEJ', ...Req.lines('wheatSeed'), { i: 'coin', t: state.wheatField.seedCost - state.wheatField.seedPaid }]);
+                worldObjects.textPlanes.wheat.update(['ZASIEJ', ...Req.lines('wheatSeed'), ...(state.wheatField.hasBeenSeeded ? [] : [{ i: 'coin', t: state.wheatField.seedCost - state.wheatField.seedPaid }])]);
             } else if (!state.wheatField.grown) {
                 const pct = Math.floor(Math.min(state.wheatField.growTimer/200,1)*100);
                 worldObjects.textPlanes.wheat.update(['ROŚNIE', `${pct}%`]);
