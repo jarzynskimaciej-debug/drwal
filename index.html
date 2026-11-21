@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v225</title>
+    <title>Gra Idle Drwal v226</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -762,7 +762,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v225';
+    const GAME_VERSION = 'v226';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -1864,7 +1864,7 @@ window.onerror = function(msg, src, line, col, err) {
     }
 
     function restoreBackpack() {
-        const LIM = 30;   // v224: na plecach widać najwyżej 30 sztuk każdego towaru
+        const LIM = 25;   // v226: na plecach widać najwyżej 25 sztuk każdego towaru (reszta: licznik ×N)
         const add = (key, n, type, posFn, rotX) => {
             worldObjects[key] = worldObjects[key] || [];
             for (let i = 0, L = key === 'playerBackpackCoins' ? COIN_VIS : LIM; i < Math.min(n | 0, L); i++) {
@@ -5262,7 +5262,7 @@ window.onerror = function(msg, src, line, col, err) {
         run() {
             // liczniki ×N nad przyciętymi stosami (co klatkę – stos może się ruszać)
             Badges.begin();
-            for (const t of this.cut) if (t.arr.length > t.cap && t.arr[t.cap - 1]) Badges.show(t.id, t.arr[t.cap - 1], t.arr.length);
+            for (const t of this.cut) { const n = t.real ? t.real() : t.arr.length; if (n > t.cap && t.arr[t.cap - 1]) Badges.show(t.id, t.arr[t.cap - 1], n); }
             Badges.end();
             // to, co właśnie leci (zrzut, sprzedaż), zawsze widać
             for (let i = 0; i < animations.length; i++) {
@@ -5274,9 +5274,9 @@ window.onerror = function(msg, src, line, col, err) {
             for (let i = 0; i < animations.length; i++) if (animations[i].mesh) flying.add(animations[i].mesh);
             let hid = 0;
             this.cut = [];
-            const cut = (arr, cap, id) => {
+            const cut = (arr, cap, id, real) => {
                 if (!arr || !arr.length) return;
-                if (arr.length > cap && id && !(state.isOptionsActive)) this.cut.push({ arr, cap, id });
+                if ((real ? real() : arr.length) > cap && id && !(state.isOptionsActive)) this.cut.push({ arr, cap, id, real });
                 for (let i = 0; i < arr.length; i++) {
                     const m = arr[i]; if (!m || !m.userData) continue;
                     if (i >= cap && !flying.has(m)) {
@@ -5287,7 +5287,7 @@ window.onerror = function(msg, src, line, col, err) {
             };
             this.ZONE.forEach(k => cut(worldObjects[k], this.ZONE_CAP, 'z' + k));
             Object.keys(facilities).forEach(k => { const f = facilities[k]; cut(f.visualsIn, this.FAC_CAP, 'i' + k); cut(f.visualsOut, this.FAC_CAP, 'o' + k); });
-            players.forEach(c => BP_KEYS.forEach(k => cut(c === curCtx ? worldObjects[k] : c.bp[k], k === 'playerBackpackCoins' ? 1e9 : this.BP_CAP, 'b' + c.slot + k)));
+            players.forEach(c => BP_KEYS.forEach(k => cut(c === curCtx ? worldObjects[k] : c.bp[k], k === 'playerBackpackCoins' ? 1e9 : this.BP_CAP, 'b' + c.slot + k, () => bpRealOf(c, k))));
             this.hidden = hid;
         }
     };
@@ -9657,7 +9657,7 @@ window.onerror = function(msg, src, line, col, err) {
     // ---------- v224: na plecach widać najwyżej 30 sztuk każdego towaru (monety 40, nowe towary 12) ----------
     // Ponad to towar trafia do plecaka bez „rzucania” (drzewo dalej się trzęsie). Kolumna zawsze pokazuje
     // tyle, ile masz (do 30) – także po oddaniu części. Liczone w kroku gry: u wszystkich graczy tak samo.
-    const BP_CAP = 30;
+    const BP_CAP = 25;   // v226: tyle samo, ile rysuje licznik ×N (PileTrim.BP_CAP)
     const BPV = [
         ['playerBackpackWood', 'wood', i => getPlayerWoodPos(i)], ['playerBackpackPlanks', 'planks', i => getPlayerPlankPos(i)],
         ['playerBackpackPlants', 'plants', i => getPlayerPlantPos(i)], ['playerBackpackTwine', 'twine', i => getPlayerTwinePos(i), Math.PI / 2],
@@ -9667,6 +9667,11 @@ window.onerror = function(msg, src, line, col, err) {
         ['playerBackpackSnopki', 'snopki', i => new THREE.Vector3(0.3, 0.3 + i * 0.35, -0.4)], ['playerBackpackBeer', 'beer', i => getPlayerBeerPos(i)],
         ['playerBackpackGems', 'gems', i => getPlayerGemPos(i)], ['playerBackpackWater', 'water', i => new THREE.Vector3(-0.1, 0.5 + i * 0.3, 0.3)]
     ];
+    // v226: prawdziwa liczba sztuk na plecach gracza c (do licznika ×N)
+    function bpRealOf(c, k) {
+        for (let j = 0; j < BPV.length; j++) if (BPV[j][0] === k) { const ty = BPV[j][1]; return ty === 'water' ? ((c.water && c.water.collected) | 0) : ((c.player && c.player[ty]) | 0); }
+        const a = c === curCtx ? worldObjects[k] : (c.bp && c.bp[k]); return a ? a.length : 0;
+    }
     function bpCount(type) { return type === 'water' ? (state.water ? state.water.collected | 0 : 0) : (state.player[type] | 0); }
     // nowy towar dołożony ponad widoczne? – wyjmij go z kolumny (zostaje w liczniku plecaka)
     function bpOver(mesh) {
