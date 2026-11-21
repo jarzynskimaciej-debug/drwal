@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v228</title>
+    <title>Gra Idle Drwal v229</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -401,6 +401,9 @@
             touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
         #fix-btn .fb-i { display: block; font-size: 24px; line-height: 1.1; }
         #fix-btn .fb-n { display: block; font-size: 9.5px; font-weight: 800; opacity: 0.92; margin-top: 2px; overflow-wrap: anywhere; }
+        /* v229: wersja gry na dole opcji */
+        #opt-ver { font: 800 10px/1.25 "Segoe UI", Roboto, Arial, sans-serif; color: #FFF; text-align: center; text-shadow: 0 1px 2px #000, 0 0 3px #000; padding: 2px 0 0; pointer-events: none; }
+        #options-panel .arw-cap { display: block; font: 800 8.5px/1 "Segoe UI", Roboto, Arial, sans-serif; color: #FFF; margin-top: -1px; text-transform: uppercase; }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -772,7 +775,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v228';
+    const GAME_VERSION = 'v229';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -1915,6 +1918,12 @@ window.onerror = function(msg, src, line, col, err) {
                 const local = getSkupPileLocal(stack.length, type); if (!local) break;
                 const m = meshForItem(type); m.position.copy(local); wo.skupGroup.add(m); stack.push(m);
             }
+        });
+        // v229: nowe towary leżące na skupie (bloki, chleb, dziczyzna…)
+        Object.keys(state.dropZone).forEach(k => {
+            if (!IT2[k]) return; const n = Math.min(state.dropZone[k] | 0, LIM); if (n <= 0) return;
+            const stack = wo['skupIt2_' + k] = [];
+            for (let i = 0; i < n; i++) { const local = getSkupPileLocal(stack.length, k); if (!local) break; const m = Items2.mesh(k); if (!m) break; m.position.copy(local); wo.skupGroup.add(m); stack.push(m); }
         });
         // Monety do odebrania
         for (let i = 0; i < Math.min(state.dropZone.coins | 0, COIN_VIS); i++) {
@@ -3438,7 +3447,7 @@ window.onerror = function(msg, src, line, col, err) {
         SPICE_CAP: 20, SPICE_PER_HERB: 3, SPICE: [-3.4, -9.3], BREW_W_CAP: 12,
         PRICE: 6, VIP_PRICE: 10, PATIENCE: 110, VIP_PATIENCE: 90, SPEED: 5.5, WSPEED: 7.0,
         // browar: pszenica z pola -> piwo pszeniczne
-        BREW_COST: 450, BREW_IN: [-9.4, 4.3], BREW_OUT: [-1.9, 4.3], BAR_PICK: [0.2, 4.3], BREW_DROP: [-9.4, 2.6],
+        BREW_COST: 450, BREW_IN: [-9.4, 3.1], BREW_OUT: [-1.9, 3.1], BAR_PICK: [0.2, 3.1], BREW_DROP: [-11.6, 3.1],   // v229: ramki odsunięte od płotu
         BREW_TIME: 3.0, BREW_CAP_IN: 12, BREW_CAP_OUT: 30, BEER_PRICE: 4, VIP_BEER: 6,
         HATS: [0x8B5A2B, 0x2E7D32, 0x37474F, 0xB71C1C, 0xF9A825],
         // v213: barman (piwo osobno), kamienne murki, renoma -> goście
@@ -4392,6 +4401,7 @@ window.onerror = function(msg, src, line, col, err) {
         function buildBrewery(pop) {
             if (!R.grp || R.brewBuilt) return;
             R.brewBuilt = true;
+            R.steam = []; return;   // v229: bez kotła, beczek i szynkwasu – przy grillu było za ciasno
             const g = new THREE.Group(); g.userData.brew = true;
             const CU = 0xC1793A, BR = 0x9E5B3C, DK = 0x4E342E;
             const p = [box(1.9, 0.45, 1.5, -6.0, 0.22, 4.75, BR), box(2.0, 0.08, 1.6, -6.0, 0.47, 4.75, 0x7B4A2E),
@@ -5296,6 +5306,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
             };
             this.ZONE.forEach(k => cut(worldObjects[k], this.ZONE_CAP, 'z' + k));
+            Object.keys(worldObjects).forEach(k => { if (k.indexOf('skupIt2_') === 0) cut(worldObjects[k], this.ZONE_CAP, 'z' + k, () => state.dropZone[k.slice(8)] | 0); });
             Object.keys(facilities).forEach(k => { const f = facilities[k]; cut(f.visualsIn, this.FAC_CAP, 'i' + k); cut(f.visualsOut, this.FAC_CAP, 'o' + k); });
             players.forEach(c => BP_KEYS.forEach(k => cut(c === curCtx ? worldObjects[k] : c.bp[k], k === 'playerBackpackCoins' ? 1e9 : this.BP_CAP, 'b' + c.slot + k, () => bpRealOf(c, k))));
             this.hidden = hid;
@@ -6610,6 +6621,11 @@ window.onerror = function(msg, src, line, col, err) {
     // Zdjęcia stref robione raz na starcie z wbudowanego „pokazowego” świata.
     // Gra stoi, dopóki ekran jest otwarty.
     // =====================================================================
+    // v229: ikony zapisu – czerwona strzałka w dół (zapis do pliku), zielona w górę (wczytanie)
+    function arrowSvg(up) {
+        return '<svg class="arw" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" style="vertical-align:-5px"><path d="' + (up ? 'M12 2.5 L21.5 12.5 H15.6 V21.5 H8.4 V12.5 H2.5 Z' : 'M12 21.5 L2.5 11.5 H8.4 V2.5 H15.6 V11.5 H21.5 Z')
+            + '" fill="' + (up ? '#43A047' : '#E53935') + '" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+    }
     const SHOWCASE = {"v":6,"seed":777,"mySlot":0,"dropZone":{"wood":9,"planks":9,"twine":6,"herbs":0,"coins":30,"stone":0,"fish":6,"roastedFish":0,"wheat":0,"wheatBags":0,"snopki":0,"gems":3},"skup":{"expansions":3,"expandPaid":0,"currentExpandCost":675,"slots":["wood","plank","fish","gems",null,null,null,null]},"tavern":{"landPaid":500,"landCost":500,"landUnlocked":true,"resPaid":{"stone":5,"wood":5,"planks":5,"twine":5},"resRequired":{"stone":5,"wood":5,"planks":5,"twine":5},"built":true,"kominekPaid":250,"kominekBuilt":true},"hireGate":{"paid":100,"cost":100,"unlocked":true},"fishing":{"unlocked":true,"cost":100,"paid":100,"maxOut":30,"helperUnlocked":true,"helperPaid":150,"helperCost":150,"expanded":false,"expandCost":80,"expandPaid":0},"pickaxe":{"unlocked":true},"stoneHelper":{"unlocked":true,"cost":150,"maxOut":45,"expandCost":200,"expandPaid":0,"expanded":false,"lvl":2,"gemCnt":10,"gemAt":28},"wheatField":{"seedPaid":0,"seedCost":50,"seeded":true,"grown":true,"hasBeenSeeded":true,"helperPaid":250,"helperUnlocked":true,"growTimer":200,"sowN":2},"tentReqs":{"stone":20,"wood":20,"twine":20,"plants":20,"built":true},"facilities":{"sawmill":{"paid":20,"unlocked":true,"helperPaid":150,"helperUnlocked":true,"input":8,"output":10},"sickle":{"paid":40,"unlocked":true,"helperPaid":200,"helperUnlocked":true,"input":6,"output":6},"herb":{"paid":120,"unlocked":true,"helperPaid":150,"helperUnlocked":true,"input":6,"output":6},"threshing":{"paid":80,"unlocked":true,"helperPaid":150,"helperUnlocked":true,"input":4,"output":4},"kominek":{"paid":0,"unlocked":true,"helperPaid":200,"helperUnlocked":true,"input":10,"output":6}},"piles":{"v5":1,"fishOut":12,"stoneOut":24,"wheatStack":9,"snopki":6,"gems":[0,1,0,1,1]},"players":[{"player":{"wood":5,"planks":0,"coins":0,"plants":0,"twine":0,"herbs":0,"stone":0,"fish":0,"roastedFish":0,"wheat":0,"wheatBags":0,"beer":0,"gems":0},"tool":"axe","water":0,"x":0,"z":30,"block":{}}],"tavern2":{"tables":[1,1,1,1,1,1,1,1,1,1],"tablePaid":[0,0,0,0,0,0,0,0,0,0],"level":2,"expPaid":0,"grillLvl":3,"grillPaid":0,"waiters":3,"waiterPaid":0,"porter":1,"porterPaid":0,"music":1,"musicPaid":0,"cash":60,"fame":120,"served":300,"seq":400,"spice":12,"spiceLeft":2,"brew":{"own":1,"paid":0,"in":8,"out":12,"water":10}},"porters":{"sawmill":1,"sickle":1,"herb":1,"threshing":1,"stone":1},"wage":3,"bank":1200,"player":{"wood":5,"planks":0,"coins":0,"plants":0,"twine":0,"herbs":0,"stone":0,"fish":0,"roastedFish":0,"wheat":0,"wheatBags":0,"beer":0,"gems":0}};
     // x,z – co ma być w środku kadru, zoom – przybliżenie (dla telefonu w pionie), px,pz – gdzie stoi drwal
     const WL_SHOTS = [
@@ -6868,7 +6884,7 @@ window.onerror = function(msg, src, line, col, err) {
                 h = head('gear', 'Opcje') + nameRow +
                     `<label class="wc-lab">Grafika</label><div class="wc-seg">` +
                     [['auto', 'Auto'], ['2', 'Pełna'], ['1', 'Średnia'], ['0', 'Oszczędna'], ['-1', 'Bez cieni']].map(([v, t]) => `<button data-q="${v}">${t}</button>`).join('') + `</div>` +
-                    `<label class="wc-lab">Zapis w pliku</label><div class="wc-seg two"><button data-f="exp">📤 Zapisz plik</button><button data-f="imp">📥 Wczytaj plik</button></div>` +
+                    `<label class="wc-lab">Zapis w pliku</label><div class="wc-seg two"><button data-f="exp">${arrowSvg(false)} Zapisz plik</button><button data-f="imp">${arrowSvg(true)} Wczytaj plik</button></div>` +
                     `<label class="wc-lab">Pełny ekran (telefon)</label><div class="wc-seg two"><button data-fs="1">Włączony</button><button data-fs="0">Wyłączony</button></div>` +
                     `<label class="wc-lab">Komputer jako serwer (dla laptopa)</label><button class="wc-btn alt" data-f="srv">🖥️ Uruchom serwer na tym komputerze</button>` +
                     `<div class="wc-hint">Świat działa cały czas, a telefony tylko dołączają stałym kodem. Komputer musi być <b>włączony, nieuśpiony i z internetem</b>, a okno serwera otwarte – inaczej nikt nie zagra.</div>`;
@@ -7317,6 +7333,34 @@ window.onerror = function(msg, src, line, col, err) {
         if (!stSellOne(IT2_KEYS().filter(k => IT2[k].price > 0).concat(['stone', 'water']), new THREE.Vector3(at.x, 0, at.z))) return false;
         state.timers.nextStall = now + config.dropCooldown * 0.6;
         return true;
+    }
+    // ---------- v229: nowe towary kładzie się na wolne miejsce ramki SPRZEDAJ – płacą dopiero kupujący mieszkańcy ----------
+    function skupStackIt2(type) { const k = 'skupIt2_' + type; return worldObjects[k] || (worldObjects[k] = []); }
+    function skupHasRoom(type) {
+        updateSkupSlots();
+        const lim = 1 + state.skup.expansions, i = state.skup.slots.indexOf(type);
+        if (i !== -1 && i < lim) return true;
+        for (let j = 0; j < lim; j++) if (state.skup.slots[j] === null) return true;
+        return false;
+    }
+    // 1 sztuka na skup (lot z punktu sp); false = nie ma wolnego miejsca
+    function skupPutIt2(type, sp) {
+        const st = skupStackIt2(type);
+        const lp = getSkupPileLocal(st.length, type); if (!lp) return false;
+        state.dropZone[type] = (state.dropZone[type] | 0) + 1;
+        if (st.length >= 120) return true;   // ponad widoczne – sam licznik
+        const m = Items2.mesh(type); if (!m) return true;
+        scene.add(m); m.position.copy(sp); st.push(m);
+        spawnJumpAnimation(m, sp, () => worldObjects.skupGroup.localToWorld(lp.clone()), 0.3, 2, () => {
+            if (st.indexOf(m) === -1) { if (m.parent) m.parent.remove(m); return; }
+            worldObjects.skupGroup.add(m); m.position.copy(lp); m.rotation.set(0, 0, 0);
+        });
+        return true;
+    }
+    function dropIt2ToSkup(type) {
+        if ((state.player[type] | 0) <= 0) return;
+        const sp = new THREE.Vector3(0.45, 1.2, 0.5); playerGroup.localToWorld(sp);
+        if (skupPutIt2(type, sp)) state.player[type]--;
     }
     w2mod({
         key: 'stragan',
@@ -8241,17 +8285,19 @@ window.onerror = function(msg, src, line, col, err) {
     };
 
     // ---------- polowanie ----------
-    const HUNT = { X: 63, Z: -12, OX: 63, OZ: -6.4, BX: 67.6, BZ: -12, CX: 70, CZ: -18, R: 14, N: 5, HELPER: 900, HREQ: { planks: 15, twine: 10 }, HT: 18, CAP: 20,
+    const HUNT = { X: 63, Z: -12, OX: 63, OZ: -6.4, BX: 68, BZ: -12, FX: 67.6, FPX: 58.4, CAPMAX: 60, XCOST: 300, POR: 700, CX: 70, CZ: -18, R: 14, N: 5, HELPER: 900, HREQ: { planks: 15, twine: 10 }, HT: 18, CAP: 20,
                    LIE: 45, SKIN: 1.2, SKIN_R: 1.9 };
     Req.def('hunter', { lvl: () => state.w2.hunt.helper, need: () => HUNT.HREQ });
+    Req.def('huntx', { lvl: () => state.w2.hunt.cap, need: () => ({ planks: 10 }) });
     const Hunt = w2mod({
         key: 'hunt',
-        defaults() { return { helper: 0, paid: 0, out: 0, next: 0, an: [] }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.helper = o.helper ? 1 : 0; o.out = Math.max(0, Math.min(HUNT.CAP, o.out | 0)); o.an = []; o.next = 0; state.w2.hunt = o; },
+        defaults() { return { helper: 0, paid: 0, out: 0, next: 0, an: [], cap: HUNT.CAP, xpaid: 0, xcost: HUNT.XCOST, por: 0, ppaid: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.helper = o.helper ? 1 : 0; o.por = o.por ? 1 : 0; o.cap = Math.max(HUNT.CAP, Math.min(HUNT.CAPMAX, o.cap | 0)); o.out = Math.max(0, Math.min(o.cap, o.out | 0)); o.an = []; o.next = 0; state.w2.hunt = o; },
         R: null,
         reset() { this.R = { f: null, fo: null, stand: null, an: [], helperMesh: null, piles: {}, inT: 0, ui: null }; },
         S() { return state.w2.hunt; },
-        build() { this.R.f = mkFrame(HUNT.X, HUNT.Z, 4.2, 4.2, 0xA1887F); this.R.fo = mkFrame(HUNT.OX, HUNT.OZ, 3.4, 3.4, 0xEF9A9A); this.R.fb = mkFrame(HUNT.BX, HUNT.BZ, 3.4, 3.4, 0xFFCC80); },
+        build() { this.R.f = mkFrame(HUNT.X, HUNT.Z, 4.2, 4.2, 0xA1887F); this.R.fo = mkFrame(HUNT.OX, HUNT.OZ, 3.4, 3.4, 0xEF9A9A); this.R.fb = mkFrame(HUNT.BX, HUNT.BZ, 4, 4, 0xFFCC80);
+            this.R.fx = mkFrame(HUNT.FX, HUNT.OZ, 3.4, 3.4, 0x90CAF9); this.R.fp = mkFrame(HUNT.FPX, HUNT.OZ, 3.4, 3.4, 0xFFCC80); },
         // zwierzęta chodzą po lesie (los z ziarna świata – u wszystkich tak samo)
         spawnAnimals() { const S = this.S(); while (S.an.length < HUNT.N) S.an.push({ x: HUNT.CX + (rand() - 0.5) * HUNT.R * 2, z: HUNT.CZ + (rand() - 0.5) * HUNT.R * 2, tx: 0, tz: 0, st: 'W', t: 0, k: rand() < 0.6 ? 0 : 1 }); },
         update(now) {
@@ -8266,7 +8312,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (d > st) { a.x += dx / d * st; a.z += dz / d * st; }
             }
             // myśliwy-pomocnik: co jakiś czas dziczyzna na ramce
-            if (S.helper && S.out < HUNT.CAP && now >= S.next) { S.next = now + HUNT.HT / Wage.m(); S.out++; this.kill(now); }
+            if (S.helper && S.out < S.cap && now >= S.next) { S.next = now + HUNT.HT / Wage.m(); S.out++; this.kill(now); }
         },
         kill(now) {
             const S = this.S(); let best = null, bd = Infinity;
@@ -8289,8 +8335,14 @@ window.onerror = function(msg, src, line, col, err) {
             const S = this.S(); if (!Areas.has('east')) return;
             // osobna ramka: kup myśliwego (poluje sam, wolniej niż Ty)
             if (!S.helper) {
-                buyStep({ x: HUNT.BX, z: HUNT.BZ, w: 3.4, h: 3.4 }, now, pos, { rk: 'hunter', paid: () => S.paid, cost: () => HUNT.HELPER, done: () => !!S.helper, add: () => { S.paid++; },
+                buyStep({ x: HUNT.BX, z: HUNT.BZ, w: 4, h: 4 }, now, pos, { rk: 'hunter', paid: () => S.paid, cost: () => HUNT.HELPER, done: () => !!S.helper, add: () => { S.paid++; },
                     finish: () => { S.helper = 1; S.paid = 0; S.next = simNow + 5; showToast('🏹 Myśliwy zatrudniony – sam przynosi dziczyznę na ramkę obok'); } });
+            }
+            else {   // v229: rozbudowa (MAKS jak u rybaka i w kopalni) i tragarz mięsa
+                if (S.cap < HUNT.CAPMAX) buyStep({ x: HUNT.FX, z: HUNT.OZ, w: 3.4, h: 3.4 }, now, pos, { rk: 'huntx', paid: () => S.xpaid, cost: () => S.xcost, done: () => S.cap >= HUNT.CAPMAX, add: () => { S.xpaid++; },
+                    finish: () => { S.cap = Math.min(HUNT.CAPMAX, S.cap + 10); S.xpaid = 0; S.xcost *= 2; showToast('🦌 Maks dziczyzny: ' + S.cap + '!'); } });
+                if (!S.por) buyStep({ x: HUNT.FPX, z: HUNT.OZ, w: 3.4, h: 3.4 }, now, pos, { rk: null, paid: () => S.ppaid, cost: () => HUNT.POR, done: () => !!S.por, add: () => { S.ppaid++; },
+                    finish: () => { S.por = 1; S.ppaid = 0; showToast('🥩 Tragarz mięsa zatrudniony – nosi dziczyznę na grill w karczmie, a gdy tam pełno – na SPRZEDAJ'); } });
             }
             const p = state.player;
             let near = -1, nd = HUNT.SKIN_R * HUNT.SKIN_R;
@@ -8309,11 +8361,13 @@ window.onerror = function(msg, src, line, col, err) {
         render(now) {
             const S = this.S(), R = this.R; if (!R.f) return;
             const vis = Areas.has('east');
-            R.f.vis = vis; R.fo.vis = vis && (S.helper || S.out > 0); R.fb.vis = vis && !S.helper;
+            R.f.vis = vis; R.fo.vis = vis; R.fb.vis = vis && !S.helper; R.fx.vis = vis && !!S.helper && S.cap < HUNT.CAPMAX; R.fp.vis = vis && !!S.helper && !S.por;
             if (!vis) { this.ui(false); return; }
             R.f.tp.update(['AMBONA', 'stań i poluj'], 'bow');
             if (R.fb.vis) R.fb.tp.update(buyLines('MYŚLIWY', 'hunter', HUNT.HELPER - S.paid), 'helper');
-            if (R.fo.vis) { R.fo.tp.update(S.out ? [] : ['DZICZYZNA'], S.out ? null : 'meat'); Items2.pile(R.piles, 'meat', HUNT.OX, HUNT.OZ, S.out, 16); if (S.out) FloatLab.show('meatO', HUNT.OX, 1.8, HUNT.OZ, 'meat', S.out, 0.8); }
+            if (R.fx.vis) R.fx.tp.update(['MAKS', ...Req.lines('huntx'), { i: 'coin', t: S.xcost - S.xpaid }], null);
+            if (R.fp.vis) R.fp.tp.update(buyLines('TRAGARZ', null, HUNT.POR - S.ppaid), 'helper');
+            if (R.fo.vis) { R.fo.tp.update(['MAX ' + S.cap], 'meat'); Items2.pile(R.piles, 'meat', HUNT.OX, HUNT.OZ, S.out, 16); if (S.out) FloatLab.show('meatO', HUNT.OX, 1.8, HUNT.OZ, 'meat', S.out, 0.8); }
             if (!R.stand) {
                 const g = bakeItem('ambona', () => {
                     const r = new THREE.Group(), wd = new THREE.MeshLambertMaterial({ color: 0x6D4C41 }), rf = new THREE.MeshLambertMaterial({ color: 0x4E342E });
@@ -8440,7 +8494,7 @@ window.onerror = function(msg, src, line, col, err) {
         R: null,
         reset() { this.R = { f: null, fh: null, plants: [], herbs: [] }; },
         S() { return state.w2.carrot; },
-        build() { this.R.f = mkFrame(CARROT.X, CARROT.Z, CARROT.W, CARROT.H, 0xA1887F); this.R.fh = mkFrame(WILDHERB.X, WILDHERB.Z, WILDHERB.W, WILDHERB.H, 0x81C784); },
+        build() { this.R.f = mkFrame(CARROT.X, CARROT.Z, CARROT.W, CARROT.H, 0xA1887F); this.R.fh = null; },   // v229: bez dzikich przypraw
         playerStep(now, pos) {
             const S = this.S(); if (!Areas.has('east')) return;
             if (!S.own) {
@@ -8449,28 +8503,22 @@ window.onerror = function(msg, src, line, col, err) {
             } else if (S.ripe > 0 && !PB('carrot') && inRect(pos, CARROT.X, CARROT.Z, CARROT.W, CARROT.H) && now > state.timers.nextChop) {
                 state.timers.nextChop = now + 0.25; S.ripe--; Items2.give('carrot', new THREE.Vector3(pos.x, 0.4, pos.z));
             }
-            if (S.herb > 0 && !PB('spice') && inRect(pos, WILDHERB.X, WILDHERB.Z, WILDHERB.W, WILDHERB.H) && now > state.timers.nextChop) {
-                state.timers.nextChop = now + 0.35; S.herb--;
-                Items2.give('spice', new THREE.Vector3(pos.x, 0.3, pos.z));
-            }
         },
         update(now) {
             const S = this.S(); if (!Areas.has('east')) return;
             if (S.own && S.ripe < CARROT.MAX && now >= S.next) { S.ripe++; S.next = now + CARROT.GROW / Wage.m(); }
-            if (S.herb < WILDHERB.MAX && now >= S.hnext) { S.herb++; S.hnext = now + WILDHERB.GROW; }
         },
         render() {
             const S = this.S(), R = this.R; if (!R.f) return;
             const vis = Areas.has('east');
-            R.f.vis = vis; R.fh.vis = vis;
+            R.f.vis = vis;
             if (!vis) return;
             if (!S.own) { R.f.zone.scale.set(4 / CARROT.W, 4 / CARROT.H, 1); R.f.tp.mesh.scale.set(4 / CARROT.W, 4 / CARROT.H, 1); R.f.tp.update(buyLines('MARCHEW', 'carrot', CARROT.COST - S.paid), 'carrot'); }
             else { R.f.zone.scale.set(1, 1, 1); R.f.tp.mesh.scale.set(1, 1, 1); R.f.tp.update(S.ripe ? [] : ['MARCHEW', 'rośnie…'], S.ripe ? null : 'carrot'); }
-            R.fh.tp.update(S.herb ? [] : ['DZIKIE PRZYPRAWY', 'odrastają…'], S.herb ? null : 'spice2');
             const sync = (arr, n, mk, place) => { while (arr.length < n) { const m = mk(); scene.add(m); arr.push(m); place(m, arr.length - 1); } while (arr.length > n) { const m = arr.pop(); if (m.parent) m.parent.remove(m); } };
             sync(R.plants, S.own ? Math.min(S.ripe, CARROT.MAX) : 0, () => bakeItem('carrotTop', () => { const g = new THREE.Group(); [-0.08, 0.08].forEach(x => { const l = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.45, 5), new THREE.MeshLambertMaterial({ color: 0x43A047 })); l.position.set(x, 0.22, 0); l.rotation.z = x * 3; g.add(l); }); const c = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.06, 8), new THREE.MeshLambertMaterial({ color: 0xF57C00 })); c.position.y = 0.03; g.add(c); return g; }),
                 (m, i) => m.position.set(CARROT.X - 3.6 + (i % 6) * 1.45, 0, CARROT.Z - 2.2 + Math.floor(i / 6) * 1.1));
-            sync(R.herbs, Math.min(S.herb, WILDHERB.MAX), () => bakeItem('wildherb', () => { const g = new THREE.Group(); for (let k = 0; k < 5; k++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.6, 5), new THREE.MeshLambertMaterial({ color: k % 2 ? 0x2E7D32 : 0x66BB6A })); l.position.set(Math.cos(k) * 0.15, 0.3, Math.sin(k) * 0.15); l.rotation.set(Math.sin(k) * 0.4, 0, Math.cos(k) * 0.4); g.add(l); } const f = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 4), new THREE.MeshLambertMaterial({ color: 0xCE93D8 })); f.position.y = 0.62; g.add(f); return g; }),
+            sync(R.herbs, 0, () => bakeItem('wildherb', () => { const g = new THREE.Group(); for (let k = 0; k < 5; k++) { const l = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.6, 5), new THREE.MeshLambertMaterial({ color: k % 2 ? 0x2E7D32 : 0x66BB6A })); l.position.set(Math.cos(k) * 0.15, 0.3, Math.sin(k) * 0.15); l.rotation.set(Math.sin(k) * 0.4, 0, Math.cos(k) * 0.4); g.add(l); } const f = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 4), new THREE.MeshLambertMaterial({ color: 0xCE93D8 })); f.position.y = 0.62; g.add(f); return g; }),
                 (m, i) => m.position.set(WILDHERB.X - 2.4 + (i % 5) * 1.2, 0, WILDHERB.Z - 2.4 + Math.floor(i / 5) * 1.2));
         }
     });
@@ -8945,14 +8993,7 @@ window.onerror = function(msg, src, line, col, err) {
     // kolejne elementy karczmy (kielichy, witraż), dzikie przyprawy z lasu
     // łowieckiego (mocniejsze od ziół, potrzebne do dekoracji dań).
     // =====================================================================
-    IT2.spice = { name: 'Dzikie przyprawy', icon: 'spice2', price: 8, h: 0.2, make: mkItem('spice', () => { const g = new THREE.Group();
-        const b = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 0.16, 8), new THREE.MeshLambertMaterial({ color: 0x9E9E9E })); b.position.y = 0.08; g.add(b);
-        const t = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 8), new THREE.MeshLambertMaterial({ color: 0xE65100 })); t.position.y = 0.16; g.add(t); return g; }) };
-    RES_ICON.spice = 'spice2';
-    BLOCKABLE.push(['spice', 'Dzikie przyprawy']);
-    Collecting.keys.push('spice');
-    // dekoracje dań: zioła + dzikie przyprawy
-    TAVUP.dekor.req = { herbs: 10, spice: 8 };
+    // v229: dzikie przyprawy usunięte – dekoracje dań biorą zioła z suszarni (jak dawniej)
     // kryształy na kolejne elementy karczmy
     TAVUP.kielichy = { lx: -28.6, title: 'KIELICHY', icon: 'crystal', cost: 800, req: { crystal: 4 }, lvl: 2, toast: '🥂 Kryształowe kielichy – wino w karczmie +6 monet' };
     TAVUP.witraz = { lx: -32.8, title: 'WITRAŻ', icon: 'window', cost: 1000, req: { crystal: 5, glass: 10 }, lvl: 2, toast: '🔷 Witraż z kryształów – każdy statek wiezie 2 szlachciców więcej' };
@@ -9294,7 +9335,7 @@ window.onerror = function(msg, src, line, col, err) {
                 <div class="sp-stat">Działa od ${this.ago(Date.now() - this.t0)} · zapis ${this.saveT ? this.ago(Date.now() - this.saveT) + ' temu' : '—'} · sieć: ${net} · przestoje serwera: ${Online.stallsMin()}/min</div>
                 <div class="sp-list">${rows.join('') || '<div class="sp-none">Nikt jeszcze nie dołączył – świat i tak działa.</div>'}</div>
                 ${inArch.length ? `<div class="sp-arch">Postacie czekające na powrót: ${inArch.slice(0, 12).join(', ')}${inArch.length > 12 ? '…' : ''}</div>` : ''}
-                <div class="sp-btns"><button data-s="exp">📤 Kopia do pliku</button><button data-s="imp">📥 Wczytaj z pliku</button>${bk}<button data-s="new">🆕 Nowy świat</button><button data-s="stop">⏹ Zatrzymaj</button></div>
+                <div class="sp-btns"><button data-s="exp">${arrowSvg(false)} Kopia do pliku</button><button data-s="imp">${arrowSvg(true)} Wczytaj z pliku</button>${bk}<button data-s="new">🆕 Nowy świat</button><button data-s="stop">⏹ Zatrzymaj</button></div>
                 <div class="sp-own">Imię gracza z wczytywanego zapisu: <input id="sp-owner" maxlength="12" value="${this.ownerName()}" placeholder="np. Maciek"></div>
                 <div class="sp-warn">Zostaw to okno otwarte, laptop na zasilaczu i bez usypiania. Zamknięcie okna = koniec serwera (świat zostaje zapisany).</div>
                 <input type="file" id="sp-file" accept=".json,application/json" style="display:none">`;
@@ -9936,6 +9977,153 @@ window.onerror = function(msg, src, line, col, err) {
             }
             if (b.style.display !== 'block') b.style.display = 'block';
         }
+    });
+
+    // ---------- v229: OPCJE – zapis czerwoną strzałką w dół, wczytanie zieloną w górę, wersja gry na dole ----------
+    (function optionsPanel() {
+        const go = () => {
+            const P = document.getElementById('options-panel'); if (!P) return;
+            P.querySelectorAll('button').forEach(b => {
+                const oc = b.getAttribute('onclick') || '';
+                if (/(^|[^\w])saveGame\(\)/.test(oc)) { b.innerHTML = arrowSvg(false); b.title = 'Zapisz grę'; }
+                else if (/(^|[^\w])loadGame\(\)/.test(oc)) { b.innerHTML = arrowSvg(true); b.title = 'Wczytaj grę'; }
+                else if (/exportSaveFile\(\)/.test(oc)) b.innerHTML = arrowSvg(false) + '<span class="arw-cap">plik</span>';
+                else if (/save-file-input/.test(oc)) b.innerHTML = arrowSvg(true) + '<span class="arw-cap">plik</span>';
+            });
+            if (!document.getElementById('opt-ver')) { const v = document.createElement('div'); v.id = 'opt-ver'; v.innerHTML = 'wersja<br>' + GAME_VERSION; P.appendChild(v); }
+        };
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+    })();
+
+    // ---------- v229: TRAGARZ MIĘSA – dziczyzna z ramki myśliwego na grill w karczmie, a gdy tam pełno – na SPRZEDAJ ----------
+    const MPOR = { CAP: 6, PICK: 0.35, DROP: 0.3, SHIRT: 0x8D6E63, HAT: 0x33691E };
+    w2mod({
+        key: 'mpor',
+        defaults() { return { x: 0, z: 0, st: 0, n: 0, t: 0, d: 0, face: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.st = 0; o.t = 0; o.n = Math.max(0, Math.min(MPOR.CAP, o.n | 0)); state.w2.mpor = o; },
+        R: null,
+        reset() {
+            const R = this.R;
+            if (R && R.mesh && R.mesh.parent) R.mesh.parent.remove(R.mesh);
+            this.R = { mesh: null, carry: [] };
+        },
+        S() { return state.w2.mpor; },
+        owned() { const H = state.w2.hunt; return !!(H && H.por) && Areas.has('east'); },
+        home() { return { x: HUNT.FPX, z: HUNT.OZ + 3.0 }; },
+        tav() { return W2.mods.find(m => m.key === 'tavstock'); },
+        grillRoom() {
+            const T = Tavern.T, tv = this.tav();
+            if (!T || !tv || !TAVSTOCK.meat || !tv.vis('meat')) return 0;
+            return Math.max(0, TAVSTOCK.meat.cap() - (T.meatRaw | 0));
+        },
+        dest() { return this.grillRoom() > 0 ? 1 : skupHasRoom('meat') ? 2 : 0; },
+        dpos(d) {
+            if (d === 1) { const p = this.tav().pos('meat'); return p ? { x: p.x + 2.4, z: p.z } : null; }
+            const z = worldObjects.woodZone; if (!z) return null;
+            const v = new THREE.Vector3(); z.getWorldPosition(v); return { x: v.x - 2.5, z: v.z + 2.2 };
+        },
+        toss(from, p) {
+            if (!p) return; const m = Items2.mesh('meat'); if (!m) return;
+            scene.add(m); m.position.copy(from); const t = new THREE.Vector3(p.x, 0.3, p.z);
+            spawnJumpAnimation(m, from, () => t, 0.35, 1.2, () => { scene.remove(m); });
+        },
+        update(now) {
+            if (!this.owned()) return;
+            const S = this.S(), H = state.w2.hunt, sp = 4.2 * (0.8 + 0.2 * Wage.m()), hm = this.home();
+            if (S.x === 0 && S.z === 0) { S.x = hm.x; S.z = hm.z; }
+            switch (S.st) {
+                case 0:   // w domu, czeka na dziczyznę
+                    if (!wpWalk(S, hm.x, hm.z, sp)) break;
+                    if (now < S.t) break;
+                    S.t = now + 1;
+                    if (!this.dest()) break;
+                    if (S.n > 0) S.st = 3; else if (H.out > 0) S.st = 1;
+                    break;
+                case 1:   // po mięso na ramkę myśliwego
+                    if (wpWalk(S, HUNT.OX + 1.2, HUNT.OZ + 1.6, sp)) { S.st = 2; S.t = now + MPOR.PICK; }
+                    break;
+                case 2:   // ładuje na plecy
+                    if (now < S.t) break;
+                    if (S.n < MPOR.CAP && H.out > 0) { H.out--; S.n++; S.t = now + MPOR.PICK; }
+                    else S.st = S.n > 0 ? 3 : 0;
+                    break;
+                case 3: { // niesie
+                    const d = this.dest(), q = d ? this.dpos(d) : null;
+                    if (!q) { S.st = 0; break; }
+                    S.d = d;
+                    if (wpWalk(S, q.x, q.z, sp)) { S.st = 4; S.t = now + MPOR.DROP; }
+                    break;
+                }
+                case 4: { // oddaje po sztuce
+                    if (now < S.t) break;
+                    if (S.n <= 0) { S.st = H.out > 0 ? 1 : 0; break; }
+                    const d = this.dest();
+                    if (!d) { S.st = 0; break; }
+                    if (d !== S.d) { S.st = 3; break; }
+                    const from = new THREE.Vector3(S.x, 1.3, S.z);
+                    if (d === 1) { const T = Tavern.T; T.meatRaw = (T.meatRaw | 0) + 1; S.n--; this.toss(from, this.tav().pos('meat')); }
+                    else if (skupPutIt2('meat', from)) S.n--;
+                    else { S.st = 0; break; }
+                    S.t = now + MPOR.DROP;
+                    break;
+                }
+            }
+        },
+        render() {
+            const S = this.S(), R = this.R; if (!R) return;
+            if (!this.owned()) { if (R.mesh) R.mesh.visible = false; return; }
+            if (!R.mesh) { R.mesh = createVillagerMesh(MPOR.SHIRT, MPOR.HAT); R.carry = []; }
+            if (R.mesh.parent !== scene) scene.add(R.mesh);
+            R.mesh.visible = true;
+            const moving = S.st === 1 || S.st === 3 || (S.st === 0 && (Math.abs(R.mesh.position.x - S.x) > 0.001 || Math.abs(R.mesh.position.z - S.z) > 0.001));
+            R.mesh.position.set(S.x, 0.75 + (moving ? Math.abs(Math.sin(simNow * 10 + 1)) * 0.1 : 0), S.z);
+            R.mesh.rotation.y = S.face || 0;
+            while (R.carry.length > S.n) { const m = R.carry.pop(); if (m.parent) m.parent.remove(m); }
+            while (R.carry.length < S.n) { const m = Items2.mesh('meat'); if (!m) break; m.scale.setScalar(0.8); R.mesh.add(m); R.carry.push(m); }
+            R.carry.forEach((m, i) => m.position.set(0, -0.1 + i * 0.2, -0.5));
+        },
+        hash() { const S = this.S(); return S ? S.x.toFixed(3) + ',' + S.z.toFixed(3) + ',' + S.st + ',' + S.n : ''; }
+    });
+
+    // ---------- v229: WARSZTATY jak Piła – po kupnie pracują, gdy stoisz obok; pomocnika trzeba kupić ----------
+    // (kamieniarz, huta, tłocznia, kuchnia polowa, piekarnia – wcześniej pomocnik był od razu, za darmo)
+    const WS_HELP = [];
+    Object.keys(WSHOPS).forEach(k => WS_HELP.push({ key: 'ws_' + k, X: WSHOPS[k].X, Z: WSHOPS[k].Z, cost: () => Math.round(WSHOPS[k].cost * 0.5) }));
+    Object.keys(WS2).forEach(k => WS_HELP.push({ key: 'ws2_' + k, X: WS2[k].X, Z: WS2[k].Z, cost: () => Math.round(WS2[k].cost * 0.5) }));
+    WS_HELP.push({ key: 'bakery', X: BAKERY.X, Z: BAKERY.Z, cost: () => Math.round(BAKERY.COST * 0.5) });
+    const WS_HZ = 3.8;   // ramka POMOCNIK pod warsztatem
+    WS_HELP.forEach(w => {
+        const m = W2.mods.find(x => x.key === w.key); if (!m) return;
+        const _def = m.defaults, _reset = m.reset, _build = m.build, _ps = m.playerStep, _up = m.update, _rd = m.render;
+        const hx = w.X, hz = w.Z + WS_HZ;
+        m.defaults = function () { return Object.assign(_def.call(this), { hlp: 0, hpaid: 0 }); };
+        m.reset = function () { _reset.call(this); this.R.fh = null; this.R.hw = null; };
+        m.build = function () { _build.call(this); this.R.fh = mkFrame(hx, hz, 3.2, 3.2, 0x4682B4); };
+        m.playerStep = function (now, pos) {
+            const S = state.w2[w.key];
+            if (S && S.own && !S.hlp)
+                buyStep({ x: hx, z: hz, w: 3.2, h: 3.2 }, now, pos, { rk: null, paid: () => S.hpaid, cost: w.cost, done: () => !!S.hlp, add: () => { S.hpaid++; },
+                    finish: () => { S.hlp = 1; S.hpaid = 0; showToast('👷 Pomocnik zatrudniony – warsztat pracuje sam'); } });
+            return _ps.call(this, now, pos);
+        };
+        m.update = function (now) {
+            const S = state.w2[w.key];
+            if (S && S.own && !S.hlp && !players.some(c => { const dx = c.group.position.x - w.X, dz = c.group.position.z - w.Z; return dx * dx + dz * dz < 36; })) {
+                if (S.busy) S.next += DT;   // bez pomocnika i bez gracza praca stoi (jak przy Pile)
+                return;
+            }
+            return _up.call(this, now);
+        };
+        m.render = function (now) {
+            _rd.call(this, now);
+            const S = state.w2[w.key], R = this.R; if (!R || !R.fh || !S) return;
+            const vis = !!(R.fin && R.fin.vis) && !!S.own;
+            R.fh.vis = vis && !S.hlp;
+            if (R.fh.vis) R.fh.tp.update(buyLines('POMOCNIK', null, w.cost() - S.hpaid), 'helper');
+            if (R.worker) R.worker.visible = vis && !!S.hlp;
+            else if (vis && S.hlp && !R.hw) { const v = createVillagerMesh(0x8D6E63, 0x5D4037); v.position.set(w.X + 1.7, 0.75, w.Z + 1.3); v.rotation.y = Math.PI; scene.add(v); R.hw = v; }
+            if (R.hw) { R.hw.visible = vis && !!S.hlp; R.hw.position.y = 0.75 + (S.busy ? Math.abs(Math.sin(now * 9)) * 0.08 : 0); }
+        };
     });
 
     init();
@@ -10677,6 +10865,8 @@ window.onerror = function(msg, src, line, col, err) {
         if ((state.dropZone.snopki||0) === 0) freeSkupSlot('snopki');
         if ((state.dropZone.wheatBags||0) === 0) freeSkupSlot('wheatBags');
         if ((state.dropZone.water||0) === 0) freeSkupSlot('water');
+        if ((state.dropZone.gems||0) === 0) freeSkupSlot('gems');
+        IT2_KEYS().forEach(k => { if ((state.dropZone[k] | 0) === 0) freeSkupSlot(k); });
     }
     function freeSkupSlot(type) {
         let idx = state.skup.slots.indexOf(type);
@@ -10863,7 +11053,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (Math.abs(pos.x - pWood.x) < skHalf + 1 && Math.abs(pos.z - pWood.z) < 4) {
             if (now > state.timers.nextDrop) {
                 // Pierwszy towar (wg kolejności), dla którego jest miejsce na skupie
-                const sellOrder = [['gems', state.player.gems], ['wheatBags', state.player.wheatBags], ['snopki', state.player.snopki], ['roastedFish', state.player.roastedFish],
+                const sellOrder = [['gems', state.player.gems], ...IT2_KEYS().filter(k => IT2[k].price > 0).sort((a, b) => IT2[b].price - IT2[a].price).map(k => [k, state.player[k] | 0]), ['wheatBags', state.player.wheatBags], ['snopki', state.player.snopki], ['roastedFish', state.player.roastedFish],
                     ['herb', state.player.herbs], ['twine', state.player.twine], ['plank', state.player.planks], ['stone', state.player.stone],
                     ['fish', state.player.fish], ['wood', state.player.wood], ['wheat', state.player.wheat], ['water', state.water ? state.water.collected : 0]];
                 let dropType = null, hasGoods = false;
@@ -10873,8 +11063,6 @@ window.onerror = function(msg, src, line, col, err) {
                 if (dropType) {
                     state.timers.nextDrop = now + config.dropCooldown;
                     dropItemToSkup(dropType);
-                } else if (skupSellNew(now, pWood)) {
-                    // v222: bloki, szkło i inne nowe towary – kupiec na skupie płaci od razu
                 } else if (hasGoods && curCtx === localCtx() && (simNow - (window.__skupHintAt || -99)) > 12) {
                     window.__skupHintAt = simNow;
                     showToast('🧺 Skup pełny – kup POSZERZ albo poczekaj, aż klienci wykupią towar');
@@ -11732,6 +11920,7 @@ window.onerror = function(msg, src, line, col, err) {
     }
 
     function dropItemToSkup(type) {
+        if (IT2[type]) { dropIt2ToSkup(type); return; }   // v229: bloki, chleb, dziczyzna… na wolne miejsce ramki
         // Pszenica może być sprzedana ręcznie (gracz stoi na ramce sprzedaj)
         // ale NIE jest automatycznie wrzucana do sprzedaj przy przejściu
         let mesh, dropStack;
@@ -11904,7 +12093,7 @@ window.onerror = function(msg, src, line, col, err) {
     }
 
     function updateNPCs(delta, now) {
-        const hasAnythingToSell = state.dropZone.wood>0||state.dropZone.planks>0||state.dropZone.twine>0||state.dropZone.herbs>0||state.dropZone.stone>0||state.dropZone.fish>0||state.dropZone.roastedFish>0||state.dropZone.wheat>0||state.dropZone.wheatBags>0||(state.dropZone.snopki||0)>0||(state.dropZone.water||0)>0||(state.dropZone.gems||0)>0;
+        const hasAnythingToSell = state.dropZone.wood>0||state.dropZone.planks>0||state.dropZone.twine>0||state.dropZone.herbs>0||state.dropZone.stone>0||state.dropZone.fish>0||state.dropZone.roastedFish>0||state.dropZone.wheat>0||state.dropZone.wheatBags>0||(state.dropZone.snopki||0)>0||(state.dropZone.water||0)>0||(state.dropZone.gems||0)>0||IT2_KEYS().some(k => (state.dropZone[k] | 0) > 0);
         if (now > state.timers.nextNpc && hasAnythingToSell && npcs.length < 15) {
             state.timers.nextNpc = now + (1 + rand() * 3); 
             spawnNPC();
@@ -11942,6 +12131,7 @@ window.onerror = function(msg, src, line, col, err) {
                         if ((state.dropZone.snopki||0) > 0 && !boughtTypes.has('snopki')) available.push('snopki');
                         if ((state.dropZone.water||0) > 0 && !boughtTypes.has('water')) available.push('water');
                         if ((state.dropZone.gems||0) > 0 && !boughtTypes.has('gems')) available.push('gems');
+                        IT2_KEYS().forEach(k => { if ((state.dropZone[k] | 0) > 0 && !boughtTypes.has(k)) available.push(k); });
                         
                         if (available.length === 0) break; 
                         
@@ -11961,6 +12151,7 @@ window.onerror = function(msg, src, line, col, err) {
                         else if (choice === 'snopki') { state.dropZone.snopki--; totalCoinsToGive += 3; itemMesh = (worldObjects.visualSnopkiSkupStack||[]).pop(); }
                         else if (choice === 'water') { state.dropZone.water=(state.dropZone.water||0)-1; totalCoinsToGive += 1; itemMesh = (worldObjects.visualWaterStack||[]).pop(); }
                         else if (choice === 'gems') { state.dropZone.gems--; totalCoinsToGive += MINE.GEM_PRICE; itemMesh = (worldObjects.visualGemDropStack||[]).pop(); }
+                        else if (IT2[choice]) { state.dropZone[choice]--; totalCoinsToGive += IT2[choice].price; itemMesh = skupStackIt2(choice).pop() || null; }
                         
                         if (itemMesh) {
                             const startPos = new THREE.Vector3(); itemMesh.getWorldPosition(startPos);
