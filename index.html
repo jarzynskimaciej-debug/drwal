@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v222</title>
+    <title>Gra Idle Drwal v223</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -384,6 +384,12 @@
             font-size: 13.5px; line-height: 1.38; }
         #op-state .ops-who { margin-top: 6px; font-size: 12.5px; color: #FFE082; }
         #op-session-text { display: none; }
+        /* v223: stan łącza */
+        #op-state .ops-link { margin-top: 6px; font-size: 12px; color: #B3E5FC; }
+        .sp-net { display: block; width: 100%; font-size: 11px; color: #A5D6A7; margin: -2px 0 2px 14px; }
+        .sp-net.bad { color: #FFAB91; }
+        #srv-panel .sp-row { flex-wrap: wrap; }
+        #srv-panel .sp-row .sp-net { flex-basis: 100%; margin: 0 0 0 20px; font-size: 12px; }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -755,7 +761,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v222';
+    const GAME_VERSION = 'v223';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -2622,6 +2628,15 @@ window.onerror = function(msg, src, line, col, err) {
                 next();
             });
         },
+        // v223: stan łącza (do okienka 🌐 i panelu serwera)
+        stallsMin() { const L = this.stallLog || [], t = performance.now() - 60000; let n = 0; for (let i = L.length - 1; i >= 0 && L[i] > t; i--) n++; return n; },
+        via() { const c = this.conn; return c && c.via ? c.via : ''; },
+        netPing() {
+            const now = performance.now();
+            if (!this.active || this.role !== 'guest' || now - (this._npAt || 0) < 2000) return;
+            this._npAt = now;
+            this.send({ k: 'pq', t: now, r: Math.round(this.rtt2 || 0), st: this.stallsMin() });
+        },
         peerOpts() { const o = { debug: 1 }; if (window.DRWAL_PEER_OPTS) Object.assign(o, window.DRWAL_PEER_OPTS); return o; },
         genCode() {
             const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -2699,6 +2714,8 @@ window.onerror = function(msg, src, line, col, err) {
             if (d.k === 'ping') { this.sendTo(rec, { k: 'pong', id: d.id }); return; }
             if (d.k === 'hello') { this.onHello(rec, d); return; }
             if (d.k === 'pong') { if (rec === this.firstRec) this.onPong(d); return; }
+            // v223: pomiar łącza – gość co 2 s pyta (pq), gospodarz odpowiada (pa) i zapamiętuje raport gościa
+            if (d.k === 'pq') { this.sendTo(rec, { k: 'pa', t: d.t }); rec.net = { r: d.r | 0, st: d.st | 0, at: performance.now() }; return; }
             if (rec.state !== 'live') return;
             switch (d.k) {
                 case 'i': {
@@ -2859,6 +2876,7 @@ window.onerror = function(msg, src, line, col, err) {
             this.lastMsgAt = performance.now();
             switch (d.k) {
                 case 'i': if (this.active) { const q = d.s | 0, t = d.t | 0; if (q !== this.slot && q >= 0 && q < MAXP) { const inp = sanitizeInput(d); this.logIn(q, t, inp); if (t > simTick) this.inputs[q].set(t, inp); } } break;
+                case 'pa': { const v = performance.now() - (+d.t || 0); if (v >= 0 && v < 60000) this.rtt2 = this.rtt2 ? this.rtt2 * 0.6 + v * 0.4 : v; } break;
                 case 'ib': if (this.active && Array.isArray(d.a)) { const q = d.s | 0; if (q !== this.slot && q >= 0 && q < MAXP) d.a.slice(0, 400).forEach(e => { const t = e && (e.t | 0); if (!t) return; const inp = sanitizeInput(e); this.logIn(q, t, inp); if (t > simTick) this.inputs[q].set(t, inp); }); } break;
                 case 'need': if (this.active) this.resend(null, this.slot, d.t | 0); break;
                 case 'dly': if (this.active) { const nd = Math.min(45, d.d | 0); if (nd > this.D) this.D = nd; } break;
@@ -3204,6 +3222,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
                 return null;
             }
+            if (this.stallStart) { const nowS = performance.now(), dur = nowS - this.stallStart; if (dur > 120) { const L = this.stallLog || (this.stallLog = []); L.push(nowS); if (L.length > 300) L.splice(0, L.length - 300); } }
             this.stallStart = 0;
             // sieć się uspokoiła – powoli wracaj do mniejszego opóźnienia sterowania
             if (this.D > this.D0) { const t = performance.now(); if (t - this.lastStallAt > 5000 && t - this.lastDecAt > 800) { this.D--; this.lastDecAt = t; } }
@@ -3251,6 +3270,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!ok) { this.desyncs++; console.warn('Rozjazd świata w ticku', t); }
         },
         frameUI() {
+            this.netPing();
             if (this.active) {
                 const rows = [];
                 for (let q = 0; q < Math.min(this.slots, players.length); q++) {
@@ -9231,18 +9251,20 @@ window.onerror = function(msg, src, line, col, err) {
                 const n = Online.names[q]; if (!n) continue;
                 const gone = isFinite(Online.goneFrom[q]), afk = gone && Online.afkF && Online.afkF[q];
                 const c = players[q] && players[q].player ? (players[q].player.coins | 0) : 0;
-                rows.push(`<div class="sp-row${gone ? ' off' : ''}"><i style="background:${(PLAYER_LOOKS[q] || PLAYER_LOOKS[0]).label}"></i><span>${n}</span><b>${gone ? (afk ? 'w tle' : 'poza grą') : 'gra'}</b><em>${c} 🪙</em></div>`);
+                const r = Online.peers.find(x => x.slot === q && x.state === 'live'), via = r && r.conn ? r.conn.via : '', nt = r && r.net && performance.now() - r.net.at < 10000 ? r.net : null;
+                const ln = gone ? '' : `<small class="sp-net${via === 'relay' ? ' bad' : ''}">${via === 'relay' ? '📡 przez przekaźnik' : via === 'p2p' ? '📶 bezpośrednio' : '…'}${nt && nt.r ? ' · ping ' + nt.r + ' ms' : ''}${nt ? ' · przycięcia ' + nt.st + '/min' : ''}</small>`;
+                rows.push(`<div class="sp-row${gone ? ' off' : ''}"><i style="background:${(PLAYER_LOOKS[q] || PLAYER_LOOKS[0]).label}"></i><span>${n}</span><b>${gone ? (afk ? 'w tle' : 'poza grą') : 'gra'}</b><em>${c} 🪙</em>${ln}</div>`);
             }
             const inArch = Object.keys(this.data.archive).filter(n => !Online.names.some((m, q) => q > 0 && m === n && !isFinite(Online.goneFrom[q])));
             const d = Online.diag || {};
             const net = (d.p2p === 'gotowe' ? 'gotowe' : (d.p2p || '-')) + ' · przekaźnik: ' + Relay.summary();
-            const key = [rows.join(''), inArch.join(','), net, Math.floor((Date.now() - this.t0) / 60000), Math.floor((Date.now() - this.saveT) / 10000), !!this.data.backup].join('|');
+            const key = [rows.join(''), inArch.join(','), net, Online.stallsMin(), Math.floor((Date.now() - this.t0) / 60000), Math.floor((Date.now() - this.saveT) / 10000), !!this.data.backup].join('|');
             if (key === this._key && !force) return; this._key = key;
             const bk = this.data.backup ? `<button data-s="undo">↩ Cofnij zmianę świata (${this.data.backupBy || ''})</button>` : '';
             p.innerHTML = `<div class="sp-head">🖥️ SERWER DRWALA <small>${GAME_VERSION}</small></div>
                 <div class="sp-lab">Kod pokoju</div><div class="sp-code">${this.data.code}</div>
                 <div class="sp-hint">Na telefonie: <b>Dołącz</b> → wpisz ten kod. Każdy wraca do swojej postaci po imieniu.</div>
-                <div class="sp-stat">Działa od ${this.ago(Date.now() - this.t0)} · zapis ${this.saveT ? this.ago(Date.now() - this.saveT) + ' temu' : '—'} · sieć: ${net}</div>
+                <div class="sp-stat">Działa od ${this.ago(Date.now() - this.t0)} · zapis ${this.saveT ? this.ago(Date.now() - this.saveT) + ' temu' : '—'} · sieć: ${net} · przestoje serwera: ${Online.stallsMin()}/min</div>
                 <div class="sp-list">${rows.join('') || '<div class="sp-none">Nikt jeszcze nie dołączył – świat i tak działa.</div>'}</div>
                 ${inArch.length ? `<div class="sp-arch">Postacie czekające na powrót: ${inArch.slice(0, 12).join(', ')}${inArch.length > 12 ? '…' : ''}</div>` : ''}
                 <div class="sp-btns"><button data-s="exp">📤 Kopia do pliku</button><button data-s="imp">📥 Wczytaj z pliku</button>${bk}<button data-s="new">🆕 Nowy świat</button><button data-s="stop">⏹ Zatrzymaj</button></div>
@@ -9608,16 +9630,23 @@ window.onerror = function(msg, src, line, col, err) {
             }
             return `Gracze (${out.length}/${MAXP}): ` + out.join(', ');
         },
+        // v223: jak dobre jest łącze (bezpośrednio / przez przekaźnik, ping, przycięcia)
+        link() {
+            const O = Online; if (!O.active || O.role !== 'guest') return '';
+            const v = O.via(), st = O.stallsMin(), r = Math.round(O.rtt2 || 0), dl = Math.round(O.D * 1000 / 60);
+            const path = v === 'relay' ? '📡 <b>przez przekaźnik</b> – wolniej: ta sieć (np. hotelowe Wi-Fi) nie pozwala na połączenie bezpośrednie' : v === 'p2p' ? '📶 <b>bezpośrednie</b>' : '…';
+            return `Łącze: ${path}${r ? ' · ping ' + r + ' ms' : ''} · opóźnienie sterowania ${dl} ms · przycięcia w ostatniej minucie: ${st}`;
+        },
         update() {
             let b = document.getElementById('net-badge');
             if (!b) { b = document.createElement('div'); b.id = 'net-badge'; b.addEventListener('click', e => { e.stopPropagation(); Online.openPanel(); }); document.body.appendChild(b); }
             let box = document.getElementById('op-state');
             const panel = document.getElementById('online-panel');
             if (!box && panel) { box = document.createElement('div'); box.id = 'op-state'; const h = panel.querySelector('h3'); if (h && h.nextSibling) panel.insertBefore(box, h.nextSibling); else panel.appendChild(box); }
-            const m = this.mode(), w = this.who(), key = m.short + '|' + m.long + '|' + w + '|' + m.cls;
+            const m = this.mode(), w = this.who(), ln = this.link(), key = m.short + '|' + m.long + '|' + w + '|' + m.cls + '|' + ln;
             if (key === this.last) return; this.last = key;
             b.className = m.cls; b.textContent = m.ic + ' ' + m.short;
-            if (box) box.innerHTML = m.long + (w ? `<div class="ops-who">${w}</div>` : '');
+            if (box) box.innerHTML = m.long + (w ? `<div class="ops-who">${w}</div>` : '') + (ln ? `<div class="ops-link">${ln}</div>` : '');
         }
     };
     w2mod({ key: 'netinfo', render() { NetInfo.update(); } });
