@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v233</title>
+    <title>Gra Idle Drwal v234</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,11 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v233';
+    const GAME_VERSION = 'v234';
+    // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
+    // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
+    function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
+    function qtyK(n) { n = n | 0; return n > 200 ? 8 : n > 150 ? 5 : n > 100 ? 3 : n > 50 ? 2 : 1; }
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -1769,7 +1773,7 @@ window.onerror = function(msg, src, line, col, err) {
             wo.woodZone.add(createRoundedRectLine(newWidth, 6, 0.5, 0xffffff));
             wo.woodZone.position.x = (newWidth / 2) - 2;
             const expandX = newWidth + 2; wo.expandZone.position.x = expandX; wo.textPlanes.expand.mesh.position.x = expandX;
-            if (st.skup.expansions >= 5) { wo.expandZone.visible = false; wo.textPlanes.expand.mesh.visible = false; }
+            if (st.skup.expansions >= 7) { wo.expandZone.visible = false; wo.textPlanes.expand.mesh.visible = false; }
         }
         // Namiot
         if (st.tentReqs && st.tentReqs.built) {
@@ -1928,6 +1932,8 @@ window.onerror = function(msg, src, line, col, err) {
                 const m = meshForItem(type); m.position.copy(local); wo.skupGroup.add(m); stack.push(m);
             }
         });
+        // v234: piwo na skupie
+        { const n = Math.min(state.dropZone.beer | 0, LIM); if (n > 0) { const st = wo.skupIt2_beer = []; for (let i = 0; i < n; i++) { const local = getSkupPileLocal(st.length, 'beer'); if (!local) break; const m = Tavern.beerMesh(); m.position.copy(local); wo.skupGroup.add(m); st.push(m); } } }
         // v229: nowe towary leżące na skupie (bloki, chleb, dziczyzna…)
         Object.keys(state.dropZone).forEach(k => {
             if (!IT2[k]) return; const n = Math.min(state.dropZone[k] | 0, LIM); if (n <= 0) return;
@@ -2237,7 +2243,7 @@ window.onerror = function(msg, src, line, col, err) {
     function isPurchaseDone(typeKey) {
         const f = facilities, st = state;
         switch (typeKey) {
-            case 'expand': return st.skup.expansions >= 5;
+            case 'expand': return st.skup.expansions >= 7;
             case 'stoneExpand': case 'fishingExpand': return false;
             case 'fishing': return st.fishing.unlocked;
             case 'fishingHelper': return st.fishing.helperUnlocked;
@@ -2300,7 +2306,8 @@ window.onerror = function(msg, src, line, col, err) {
         const obj = resolveDragId(id);
         if (!obj || typeof x !== 'number' || typeof z !== 'number' || !isFinite(x) || !isFinite(z)) return;
         const start = obj.position.clone();
-        obj.position.x = Math.max(-60, Math.min(60, x)); obj.position.z = Math.max(-60, Math.min(60, z));
+        if (obj !== worldObjects.kominekZone && typeof Areas !== 'undefined') { if (!Areas.rects().some(r => x >= r[0] - 2 && x <= r[1] + 2 && z >= r[2] - 2 && z <= r[3] + 2)) return; obj.position.x = x; obj.position.z = z; }   // v234
+        else { obj.position.x = Math.max(-60, Math.min(60, x)); obj.position.z = Math.max(-60, Math.min(60, z)); }
         clampToLake(obj); clampStoneOut(obj); clampKominek(obj);
         const groups = [worldObjects.skupGroup, worldObjects.sawmillGroup, worldObjects.sickleGroup, worldObjects.herbGroup, worldObjects.fishingGroup,
             worldObjects.campfireGroup, worldObjects.threshingGroup, worldObjects.tentGroup, worldObjects.wheatFieldGroup, worldObjects.tavernGroup]
@@ -3827,7 +3834,7 @@ window.onerror = function(msg, src, line, col, err) {
             });
             addZone({
                 key: 'exp2', rk: 'tav_exp2', x: 13.2, z: TAV.FZ, w: 3.8, h: 3.8, color: 0xFFCC80, icon: 'expand', label: () => 'KARCZMA III',
-                visible: () => T.level === 2 && levelTablesDone(2) && Areas.has('south'),
+                visible: () => T.level === 2 && levelTablesDone(2),   // v234: sala w dół bez kupowania nowego terenu
                 total: () => TAV.EXP_COST[2], paid: () => T.expPaid, add: () => { T.expPaid++; },
                 done: () => {
                     T.level = 3; T.expPaid = 0; buildLevel3(); buildFence(R.grp); clearPlants(); maskDeco();
@@ -4158,7 +4165,7 @@ window.onerror = function(msg, src, line, col, err) {
             const wine = nb > 0 && (T.wine | 0) > 0 && (noble || vip || rand() < 0.3);
             const rare = nf > 0 && (T.rare | 0) > 0 && (noble || rand() < 0.15);
             const stew = !rare && nf > 0 && (T.stew | 0) > 0 && (noble || rand() < 0.25);
-            const roast = !rare && !stew && nf > 0 && (T.roast | 0) > 0 && (noble || rand() < 0.3);
+            const roast = !rare && !stew && nf > 0 && (T.roast | 0) > 0 && (noble || rand() < 0.6);   // v234: pieczeń zamawia ponad połowa gości
             const port = !!noble && portGate();
             const east = rand() < 0.5;
             const shirt = noble ? 0x4A148C : vip ? 0x6A1B9A : VILLAGER_SHIRTS[Math.floor(rand() * VILLAGER_SHIRTS.length)];
@@ -4186,11 +4193,19 @@ window.onerror = function(msg, src, line, col, err) {
             if (item === 'b') return new THREE.Vector3(g.s.plateX + 0.5 + k * 0.22, 0.8, g.s.plateZ);
             return new THREE.Vector3(g.s.plateX - 0.1 + (k - (g.nf - 1) / 2) * 0.2, 0.86, g.s.plateZ);
         }
+        // v234: talerz pod pieczeń
+        let PLATE = null;
+        function plated(m) {
+            if (!m) return m;
+            if (!PLATE) PLATE = [new THREE.CylinderGeometry(0.36, 0.28, 0.05, 14), new THREE.MeshLambertMaterial({ color: 0xFAFAFA })];
+            const g = new THREE.Group(), p = new THREE.Mesh(PLATE[0], PLATE[1]); p.position.y = 0.025; g.add(p);
+            m.position.set(0, 0.04, 0); m.scale.multiplyScalar(0.9); g.add(m); g.userData.upright = true; return g;
+        }
         function flyToPlate(m, sp, g, item) {
             const lp = plateLocal(g, item, (item === 'b' ? g.gb : g.gf) - 1);
             spawnJumpAnimation(m, sp, () => lp.clone().add(R.grp.position), 0.35, 1.2, () => {
                 scene.remove(m);
-                if (g.state === 'WAIT' || g.state === 'EAT') { m.position.copy(lp); m.rotation.set(0, 0, item === 'b' ? 0 : Math.PI / 2); m.scale.setScalar(1); R.grp.add(m); g.plate.push(m); }
+                if (g.state === 'WAIT' || g.state === 'EAT') { m.position.copy(lp); m.rotation.set(0, 0, (item === 'b' || m.userData.upright) ? 0 : Math.PI / 2); m.scale.setScalar(1); R.grp.add(m); g.plate.push(m); }
             });
         }
         function needLeft(g, item) { return item === 'b' ? g.nb - g.gb : g.nf - g.gf; }
@@ -4276,20 +4291,25 @@ window.onerror = function(msg, src, line, col, err) {
         }
 
         // ---------- kelnerzy: ryby z grilla i piwo z nalewaka ----------
-        function pickPoint(item) { return item === 'b' ? TAV.BAR_PICK : TAV.PICKUP; }
+        // v234: wino kelnerzy biorą z półki przy ramce wina, piwo – od nalewaka
+        function winePick() { const d = (typeof TAVSTOCK !== 'undefined') && TAVSTOCK.wine; return d ? [d.lx, (d.lz !== undefined ? d.lz : TAV.FZ) + 2.3] : TAV.BAR_PICK; }
+        // v234: barman z namiotu: szybszy (+30% na poziom)
+        function barK(w) { return w && w.bar ? 1 + 0.3 * ((state.w2 && state.w2.barx && state.w2.barx.lvl) | 0) : 1; }
+        function wspd(w) { return TAV.WSPEED * (1 + 0.1 * (state.wage | 0)) * barK(w); }
+        function pickPoint(item, g) { return item === 'b' ? ((g && g.wine) ? winePick() : TAV.BAR_PICK) : TAV.PICKUP; }
         function stock(item) { return item === 'b' ? T.brew.out : (facilities.kominek ? facilities.kominek.output : 0); }
         function stockFor(item, g) { return (item === 'b' && g && g.wine) ? (T.wine | 0) : (item !== 'b' && g && g.rare) ? (T.rare | 0) : (item !== 'b' && g && g.stew) ? (T.stew | 0) : (item !== 'b' && g && g.roast) ? (T.roast | 0) : stock(item); }
         function takeItem(w) {
             let m = null; const sp = new THREE.Vector3();
             w.cw = null;
             if (w.item === 'b' && w.guest && w.guest.wine) {
-                T.wine--; w.cw = 'w'; m = Items2.mesh('wine'); sp.set(R.grp.position.x + TAV.WINE[0], 0.6, R.grp.position.z + TAV.WINE[1]);
+                T.wine--; w.cw = 'w'; m = Items2.mesh('wine'); { const wp = winePick(); sp.set(R.grp.position.x + wp[0], 0.9, R.grp.position.z + wp[1] - 2.0); }
             } else if (w.item !== 'b' && w.guest && w.guest.rare) {
                 T.rare--; w.cw = 'r'; m = Items2.mesh('rareFish'); sp.set(R.grp.position.x + TAV.RARE[0], 0.5, R.grp.position.z + TAV.RARE[1]);
             } else if (w.item !== 'b' && w.guest && w.guest.stew) {
-                T.stew--; w.cw = 's'; m = Items2.mesh('stew'); sp.set(R.grp.position.x + TAV.STEW[0], 0.5, R.grp.position.z + TAV.STEW[1]);
+                T.stew--; w.cw = 's'; m = Items2.mesh('stew'); if (m) m.userData.upright = true; sp.set(R.grp.position.x + TAV.STEW[0], 0.5, R.grp.position.z + TAV.STEW[1]);
             } else if (w.item !== 'b' && w.guest && w.guest.roast) {
-                T.roast--; w.cw = 'm'; m = Items2.mesh('pieczen') || Items2.mesh('meat'); sp.set(R.grp.position.x - 5, 1.0, R.grp.position.z + 0.6);
+                T.roast--; w.cw = 'm'; m = plated(Items2.mesh('pieczen') || Items2.mesh('meat')); sp.set(R.grp.position.x - 5, 1.0, R.grp.position.z + 0.6);
             } else if (w.item === 'b') {
                 T.brew.out--;
                 m = R.brewOut.pop();
@@ -4307,7 +4327,7 @@ window.onerror = function(msg, src, line, col, err) {
             const tray = new THREE.Vector3(0, w.item === 'b' ? 0.73 : 0.63, 0.58);
             spawnJumpAnimation(m, sp, () => { w.pp.body.updateWorldMatrix(true, false); return w.pp.body.localToWorld(tray.clone()); }, 0.3, 1.0, () => {
                 scene.remove(m);
-                if (w.carry === m) { m.position.copy(tray); m.rotation.set(0, 0, w.item === 'b' ? 0 : Math.PI / 2); w.pp.body.add(m); }
+                if (w.carry === m) { m.position.copy(tray); m.rotation.set(0, 0, (w.item === 'b' || m.userData.upright) ? 0 : Math.PI / 2); w.pp.body.add(m); }
             });
         }
         function returnItem(w) {
@@ -4331,37 +4351,41 @@ window.onerror = function(msg, src, line, col, err) {
                 switch (w.state) {
                     case 'HOME': {
                         let best = null, item = null;
+                        // v234: kto stoi bezczynnie, pomaga innym (kelner nosi piwo/wino, barman dania)
+                        const freeBar = R.waiters.some(x => x !== w && x.bar && x.state === 'HOME');
+                        const freeWait = R.waiters.some(x => x !== w && !x.bar && x.state === 'HOME');
+                        const okF = !w.bar || !freeWait, okB = w.bar || !T.barman || !freeBar;
                         for (const g of R.guests) {
                             if (g.state !== 'WAIT' || (best && g.sitAt >= best.sitAt)) continue;
                             let it = null;
-                            if (!w.bar && g.nf - g.gf - g.inf > 0 && stockFor('f', g) > 0) it = 'f';
-                            else if ((w.bar || !T.barman) && g.nb - g.gb - g.inb > 0 && stockFor('b', g) > 0) it = 'b';
+                            const nF = okF && g.nf - g.gf - g.inf > 0 && stockFor('f', g) > 0, nB = okB && g.nb - g.gb - g.inb > 0 && stockFor('b', g) > 0;
+                            it = w.bar ? (nB ? 'b' : nF ? 'f' : null) : (nF ? 'f' : nB ? 'b' : null);
                             if (it) { best = g; item = it; }
                         }
                         if (best) {
                             if (item === 'b') best.inb++; else best.inf++;
-                            w.guest = best; w.item = item; w.path = [pickPoint(item).slice()]; w.state = 'TO_PICK';
+                            w.guest = best; w.item = item; w.pk = pickPoint(item, best).slice(); w.path = [w.pk.slice()]; w.state = 'TO_PICK';
                         }
                         break;
                     }
                     case 'TO_PICK':
-                        if (followPath(w, TAV.WSPEED * (1 + 0.1 * (state.wage | 0)))) {
+                        if (followPath(w, wspd(w))) {
                             const g = w.guest;
-                            if (stockFor(w.item, g) > 0 && g && g.state === 'WAIT' && needLeft(g, w.item) > 0) { takeItem(w); w.state = 'PICK'; w.t = 0.35; w.face = -Math.PI / 2; }
+                            if (stockFor(w.item, g) > 0 && g && g.state === 'WAIT' && needLeft(g, w.item) > 0) { takeItem(w); w.state = 'PICK'; w.t = 0.35 / barK(w); w.face = -Math.PI / 2; }
                             else { if (g) { if (w.item === 'b') g.inb = Math.max(0, g.inb - 1); else g.inf = Math.max(0, g.inf - 1); } w.guest = null; w.path = [[h[0], h[1]]]; w.state = 'TO_HOME'; }
                         }
                         break;
                     case 'PICK':
                         w.t -= DT;
                         if (w.t <= 0) {
-                            const s = w.guest.s, sx = s.sx + 1.0, pz = pickPoint(w.item)[1];
+                            const s = w.guest.s, sx = s.sx + 1.0, pz = (w.pk || pickPoint(w.item))[1];
                             w.path = [[TAV.AX, pz], [TAV.AX, s.cz], [sx, s.cz], [sx, s.sz]];
                             w.back = [[sx, s.cz], [TAV.AX, s.cz]];
                             w.state = 'TO_GUEST';
                         }
                         break;
                     case 'TO_GUEST':
-                        if (followPath(w, TAV.WSPEED * (1 + 0.1 * (state.wage | 0)))) {
+                        if (followPath(w, wspd(w))) {
                             const g = w.guest; w.guest = null;
                             if (g) { if (w.item === 'b') g.inb = Math.max(0, g.inb - 1); else g.inf = Math.max(0, g.inf - 1); }
                             if (g && g.state === 'WAIT' && needLeft(g, w.item) > 0 && w.carry) {
@@ -4373,7 +4397,7 @@ window.onerror = function(msg, src, line, col, err) {
                                 w.state = 'SERVE'; w.t = 0.3; w.face = -Math.PI / 2;
                             } else {
                                 // gość już wyszedł albo dostał od gracza – wraca na ladę
-                                const pp = pickPoint(w.item);
+                                const pp = w.pk || pickPoint(w.item);
                                 w.path = w.back.concat([[TAV.AX, pp[1]], [pp[0], pp[1]]]);
                                 w.state = 'RETURN';
                             }
@@ -4384,10 +4408,10 @@ window.onerror = function(msg, src, line, col, err) {
                         if (w.t <= 0) { w.path = w.back.concat([[TAV.AX, h[1]], [h[0], h[1]]]); w.state = 'TO_HOME'; }
                         break;
                     case 'RETURN':
-                        if (followPath(w, TAV.WSPEED * (1 + 0.1 * (state.wage | 0)))) { returnItem(w); w.path = [[h[0], h[1]]]; w.state = 'TO_HOME'; }
+                        if (followPath(w, wspd(w))) { returnItem(w); w.path = [[h[0], h[1]]]; w.state = 'TO_HOME'; }
                         break;
                     case 'TO_HOME':
-                        if (followPath(w, TAV.WSPEED * (1 + 0.1 * (state.wage | 0)))) { w.state = 'HOME'; w.face = Math.PI / 2; }
+                        if (followPath(w, wspd(w))) { w.state = 'HOME'; w.face = Math.PI / 2; }
                         break;
                 }
             }
@@ -4441,6 +4465,17 @@ window.onerror = function(msg, src, line, col, err) {
             if (!T || !T.brew || !T.brew.own) return;
             if (kind === 'wheat') { T.brew.in++; const m = createWheatMesh(true); m.position.copy(brewInPos(R.brewIn.length)); R.grp.add(m); R.brewIn.push(m); }
             else T.brew.water = (T.brew.water | 0) + 1;
+        }
+        // v234: ramki karczmy można przestawiać – po zmianie pozycji (tablice TAV) poprawia meshe i stosy
+        const MOVE_ARR = { brewIn: 'BREW_IN', brewWater: 'BREW_WIN', brewOut: 'BREW_OUT', spice: 'SPICE', kasa: 'KASA' };
+        function applyLayout() {
+            if (!R.grp || !R.zones) return;
+            TAV.BAR_PICK[0] = TAV.BREW_OUT[0] + 2.1; TAV.BAR_PICK[1] = TAV.BREW_OUT[1];
+            TAV.BREW_DROP[0] = TAV.BREW_IN[0] - 1.8; TAV.BREW_DROP[1] = TAV.BREW_IN[1];
+            R.zones.forEach(z => { const a = MOVE_ARR[z.key] && TAV[MOVE_ARR[z.key]]; if (!a) return; z.x = a[0]; z.z = a[1]; z.mesh.position.x = a[0]; z.mesh.position.z = a[1]; z.tp.mesh.position.x = a[0]; z.tp.mesh.position.z = a[1]; });
+            R.brewIn.forEach((m, i) => { if (m.parent === R.grp) m.position.copy(brewInPos(i)); });
+            R.brewOut.forEach((m, i) => { if (m.parent === R.grp) m.position.copy(brewOutPos(i)); });
+            R.kasaStack.forEach((m, i) => { if (m.parent === R.grp) m.position.copy(kasaPos(i)); });
         }
         function restoreBrewPiles() {
             for (let i = 0; i < Math.min(T.brew.in, 24); i++) { const m = createWheatMesh(true); m.position.copy(brewInPos(i)); R.grp.add(m); R.brewIn.push(m); }
@@ -4629,7 +4664,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!T.brew.own) return;
             // pszenica do browaru
             if ((state.player.wheat || 0) > 0 && T.brew.in < TAV.BREW_CAP_IN && now > state.timers.nextDrop && inZone(lx, lz, TAV.BREW_IN, 2.6, 2.6)) {
-                state.timers.nextDrop = now + config.dropCooldown;
+                state.timers.nextDrop = now + config.dropCooldown / qtyK(state.player.wheat);
                 state.player.wheat--;
                 let m = worldObjects.playerBackpackWheat.pop(); const sp = new THREE.Vector3();
                 if (m) { m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); } else { m = createWheatMesh(true); playerGroup.getWorldPosition(sp); sp.y += 1; }
@@ -4644,7 +4679,7 @@ window.onerror = function(msg, src, line, col, err) {
             }
             // piwo z nalewaka na plecy
             if (T.brew.out > 0 && !PB('beer') && now > state.timers.nextCollectOut && inZone(lx, lz, TAV.BREW_OUT, 2.8, 2.6)) {
-                state.timers.nextCollectOut = now + 0.15;
+                state.timers.nextCollectOut = now + 0.15 / qtyK(Math.max(T.brew.out, state.player.beer | 0));
                 T.brew.out--; state.player.beer = (state.player.beer || 0) + 1;
                 let m = R.brewOut.pop(); const sp = new THREE.Vector3();
                 if (m) { m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); } else { m = beerMesh(); sp.set(R.grp.position.x + TAV.BREW_OUT[0], 0.4, R.grp.position.z + TAV.BREW_OUT[1]); }
@@ -4944,7 +4979,7 @@ window.onerror = function(msg, src, line, col, err) {
                 T.spice = s.spice === undefined ? 12 : int(s.spice, 0, 60); T.spiceLeft = int(s.spiceLeft, 0, TAV.SPICE_PER_HERB);
                 T.barman = s.barman ? 1 : 0; T.barmanPaid = int(s.barmanPaid, 0, TAV.BARMAN_COST);
                 T.walls = s.walls ? 1 : 0; T.wallsPaid = int(s.wallsPaid, 0, TAV.WALLS_COST);
-                T.wine = int(s.wine, 0, TAV.WINE_CAP); T.rare = int(s.rare, 0, TAV.RARE_CAP); T.nobles = int(s.nobles, 0, 1e6); T.stew = int(s.stew, 0, 20); T.meatRaw = int(s.meatRaw, 0, TAV.ROAST_CAP); T.roast = int(s.roast, 0, TAV.ROAST_CAP);
+                T.wine = int(s.wine, 0, TAV.WINE_CAP); T.rare = 0;   // v234: bez rzadkich ryb T.nobles = int(s.nobles, 0, 1e6); T.stew = int(s.stew, 0, 20); T.meatRaw = int(s.meatRaw, 0, TAV.ROAST_CAP); T.roast = int(s.roast, 0, TAV.ROAST_CAP);
                 if (s.spice === undefined && T.brew.own) T.brew.water = Math.max(T.brew.water, 8);
             }
             T.nextGuest = simNow + 2;
@@ -4966,7 +5001,7 @@ window.onerror = function(msg, src, line, col, err) {
 
         return {
             reset, restore, serialize, hash, onDeckBuilt, onGrillBuilt, buildFence, playerStep, update, updateTexts,
-            grillCap, grillOutCap, brewPut, spiceCap, maskDeco, afterDeco, underDeck, onMoved, beerMesh: () => beerMesh(), deckFloor: (cx, w) => deckFloor(cx, w), spiceOk, useSpice,
+            grillCap, grillOutCap, brewPut, spiceCap, applyLayout, level: () => (T ? T.level | 0 : 0), waitersInfo: () => (R.waiters || []).map(w => ({ bar: !!w.bar, st: w.state, item: w.item, cw: w.cw, up: !!(w.carry && w.carry.userData && w.carry.userData.upright) })), zoneRects: () => (R.zones || []).filter(z => z.vis).map(z => ({ key: z.key, x: z.x, z: z.z, w: z.w, h: z.h })), maskDeco, afterDeco, underDeck, onMoved, beerMesh: () => beerMesh(), deckFloor: (cx, w) => deckFloor(cx, w), spiceOk, useSpice,
             makeLabel: (w, h) => tavText(w, h),
             brewTeamPos: () => (T && T.brew.own && T.brew.busy && T.brew.in > 0 && brewTeam() >= 2) ? new THREE.Vector3(R.grp.position.x + (TAV.BREW_IN[0] + TAV.BREW_OUT[0]) / 2, 0, R.grp.position.z + TAV.BREW_IN[1]) : null,
             wantPerMin: () => wantPerMin(), groupMax: () => groupMax(), spawnNoble, buildLevel3: () => buildLevel3(),
@@ -6064,7 +6099,7 @@ window.onerror = function(msg, src, line, col, err) {
     Req.def('tav_brew', { lvl: () => Tavern.T.brew.own, need: () => TAV.BREW_REQ });
     // ramki z oryginalnej gry: najpierw materiały, potem monety
     Req.def('expand', { zone: () => worldObjects.expandZone, r: 2.4, lvl: () => state.skup.expansions,
-        vis: () => !!(worldObjects.expandZone && worldObjects.expandZone.visible) && state.skup.expansions < 5, need: () => ({ planks: 8 + state.skup.expansions * 6 }) });
+        vis: () => !!(worldObjects.expandZone && worldObjects.expandZone.visible) && state.skup.expansions < 7, need: () => ({ planks: 8 + state.skup.expansions * 6 }) });
     Req.def('stoneExpand', { zone: () => worldObjects.stoneExpandZone, r: 2.3, lvl: () => state.stoneHelper.maxOut,
         vis: () => !!(worldObjects.stoneOutGroup && worldObjects.stoneOutGroup.visible), need: () => ({ planks: 12 }) });
     Req.def('fishingExpand', { zone: () => worldObjects.fishingExpandZone, r: 2.0, lvl: () => state.fishing.maxOut,
@@ -6269,8 +6304,9 @@ window.onerror = function(msg, src, line, col, err) {
             P[k] = p;
         }
         function buy(k) { if (!state.porters) state.porters = {}; state.porters[k] = 1; spawn(k); }
-        function reset() { P = {}; }
-        function restore() { P = {}; Object.keys(DEF).forEach(k => { if (owned(k)) spawn(k); }); }
+        function wipe() { Object.values(P).forEach(p => { if (p.mesh && p.mesh.parent) p.mesh.parent.remove(p.mesh); (p.carry || []).forEach(m => { if (m && m.parent) m.parent.remove(m); }); }); P = {}; }   // v234: bez duchów
+        function reset() { wipe(); }
+        function restore() { wipe(); Object.keys(DEF).forEach(k => { if (owned(k)) spawn(k); }); }
         function walk(p, tx, tz, sp) {
             const dx = tx - p.x, dz = tz - p.z, d = Math.sqrt(dx * dx + dz * dz), step = sp * DT;
             if (d <= step) { p.x = tx; p.z = tz; return true; }
@@ -6638,7 +6674,7 @@ window.onerror = function(msg, src, line, col, err) {
             c.textAlign = 'center'; c.textBaseline = 'middle'; drawOutlined(c, 'SKUP', 256, 84, 100, '#FFE082');
             const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.75), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) }));
             sign.position.set(0, 3.45, -0.62); g.add(sign);
-            g.position.set(-4.6, 0, -6.6); sg.add(g); this.g = g;
+            g.position.set(4.6, 0, -7.4); sg.add(g); this.g = g;   // v234: po prawej od ramki monet
         }
     };
 
@@ -7384,6 +7420,20 @@ window.onerror = function(msg, src, line, col, err) {
         });
         return true;
     }
+    // v234: piwo z plecaka na skup (mieszkańcy płacą jak w karczmie)
+    function dropBeerToSkup() {
+        if ((state.player.beer | 0) <= 0) return;
+        const st = skupStackIt2('beer'), lp = getSkupPileLocal(st.length, 'beer'); if (!lp) return;
+        state.player.beer--; state.dropZone.beer = (state.dropZone.beer | 0) + 1;
+        const bp = worldObjects.playerBackpackBeer || []; let m = bp.pop(); const sp = new THREE.Vector3();
+        if (m) { m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); } else { m = Tavern.beerMesh(); sp.set(0.45, 1.2, 0.5); playerGroup.localToWorld(sp); }
+        if (st.length >= 120) return;
+        scene.add(m); m.position.copy(sp); st.push(m);
+        spawnJumpAnimation(m, sp, () => worldObjects.skupGroup.localToWorld(lp.clone()), 0.3, 2, () => {
+            if (st.indexOf(m) === -1) { if (m.parent) m.parent.remove(m); return; }
+            worldObjects.skupGroup.add(m); m.position.copy(lp); m.rotation.set(0, 0, 0);
+        });
+    }
     function dropIt2ToSkup(type) {
         if ((state.player[type] | 0) <= 0) return;
         const sp = new THREE.Vector3(0.45, 1.2, 0.5); playerGroup.localToWorld(sp);
@@ -7502,7 +7552,7 @@ window.onerror = function(msg, src, line, col, err) {
                 R.fout.tp.update(S.out ? [] : [d.title], S.out ? null : IT2[d.out].icon);
                 Items2.pile(R.piles, d.inKey, d.X - 4.2, d.Z, S.in, 24);
                 Items2.pile(R.piles, d.out, d.X + 4.2, d.Z, S.out, 30);
-                if (S.out > 24) FloatLab.show(sk + 'o', d.X + 4.2, 2.0, d.Z, IT2[d.out].icon, S.out, 0.85);
+                if (S.out > 0) FloatLab.show(sk + 'o', d.X + 4.2, 2.0, d.Z, IT2[d.out].icon, S.out, 0.85);
                 if (R.worker) { R.worker.position.y = 0.75 + (S.busy ? Math.abs(Math.sin(now * 9)) * 0.08 : 0); R.worker.rotation.z = S.busy ? Math.sin(now * 14) * 0.08 : 0; }
             }
         });
@@ -7629,6 +7679,7 @@ window.onerror = function(msg, src, line, col, err) {
             const r = [[-48, 48, -48, 48]];
             for (const k in AREAS) if (this.has(k)) r.push(AREAS[k].rect);
             if (this.has('south') && state.w2.port && state.w2.port.own) r.push([-1.6, 1.6, 78, 96]);   // pomost portu
+            { const g = worldObjects.tavernGroup; if (g && Tavern.level && Tavern.level() >= 3) r.push([g.position.x - 18, g.position.x + 30, g.position.z, g.position.z + TAV.DECK_Z3]); }   // v234: sala karczmy w dół
             return r;
         },
         clamp(p) {
@@ -7785,7 +7836,7 @@ window.onerror = function(msg, src, line, col, err) {
         return w2mod({
             key: sk,
             defaults() { const o = { own: 0, paid: 0, out: 0, busy: 0, next: 0, inv: {} }; IN.forEach(k => o.inv[k] = 0); return o; },
-            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(d.cap, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(k === 'water' ? d.cap + 30 : d.cap, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
             R: null,
             reset() { this.R = { buy: null, fin: null, fout: null, model: null, piles: {} }; },
             S() { return state.w2[sk]; },
@@ -7804,7 +7855,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!state.dropLocked && now > state.timers.nextDrop && inRect(pos, d.X - 4.4, d.Z, 4, 4)) {
                     // najpierw ten surowiec, którego brakuje najbardziej
                     let best = null, bv = Infinity;
-                    IN.forEach(k => { const v = S.inv[k] / d.ins[k]; if (S.inv[k] < d.cap && haveItem(k) > 0 && v < bv) { bv = v; best = k; } });
+                    IN.forEach(k => { const v = S.inv[k] / d.ins[k]; if (S.inv[k] < (k === 'water' ? wcap(key, d.cap) : d.cap) && haveItem(k) > 0 && v < bv) { bv = v; best = k; } });
                     if (best) { state.timers.nextDrop = now + config.dropCooldown; dropItem(best, new THREE.Vector3(d.X - 4.4, 0, d.Z)); S.inv[best]++; return; }
                 }
                 if (S.out > 0 && !PB(d.out) && inRect(pos, d.X + 4.4, d.Z, 3.6, 3.6) && now > state.timers.nextCollectOut) {
@@ -7847,7 +7898,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!vis) return;
                 if (!S.own) { R.buy.tp.update(buyLines(d.title, sk, d.cost - S.paid), d.icon); return; }
                 this.ensureModel();
-                R.fin.tp.update([d.title.split(' ')[0], ...IN.map(k => ({ i: k === 'water' ? 'water' : IT2[k].icon, t: S.inv[k] + '/' + d.cap }))], null);
+                R.fin.tp.update([d.title.split(' ')[0], ...IN.map(k => ({ i: k === 'water' ? 'water' : IT2[k].icon, t: S.inv[k] + '/' + (k === 'water' ? wcap(key, d.cap) : d.cap) }))], null);
                 R.fout.tp.update(S.out ? [] : ['ODBIÓR'], S.out ? null : IT2[d.out].icon);
                 Items2.pile(R.piles, d.out, d.X + 4.4, d.Z, S.out, 24);
                 if (S.out > 0) FloatLab.show(sk + 'o', d.X + 4.4, 1.9, d.Z, IT2[d.out].icon, S.out, 0.85);
@@ -7918,7 +7969,7 @@ window.onerror = function(msg, src, line, col, err) {
         key: 'tavstock',
         R: null,
         reset() { this.R = { f: {} }; },
-        pos(k) { const g = worldObjects.tavernGroup; return g ? { x: g.position.x + TAVSTOCK[k].lx, z: g.position.z + TAV.FZ } : null; },
+        pos(k) { const g = worldObjects.tavernGroup, d = TAVSTOCK[k]; return g ? { x: g.position.x + d.lx, z: g.position.z + (d.lz !== undefined ? d.lz : TAV.FZ) } : null; },
         vis(k) { const T = Tavern.T; if (!T || !state.tavern || !state.tavern.kominekBuilt) return false; return k === 'wine' ? (!!T.brew.own || (state.w2.seen && state.w2.seen.wine)) : !!(state.w2.seen && state.w2.seen.rareFish); },
         build() { for (const k in TAVSTOCK) { const p = this.pos(k); if (p) this.R.f[k] = mkFrame(p.x, p.z, 3.8, 3.8, 0xCE93D8); } },
         playerStep(now, pos) {
@@ -8047,7 +8098,7 @@ window.onerror = function(msg, src, line, col, err) {
                 S.nob = Math.min(6, 1 + (T ? T.level : 0) + (TavUp.has('zyrandol') ? 1 : 0)); S.nobT = now + 9;
             }
             S.next = now + S.stay + 16 + 90 + Math.floor(rand() * 90);
-            showToast(S.kind === 'm' ? '⛵ Statek kupców w porcie! Zamówienie za 3x cenę, mają też kryształy i rzadkie ryby' : '⛵ Statek ze szlachtą! Idą zjeść w karczmie (płacą 3x)');
+            showToast(S.kind === 'm' ? '⛵ Statek kupców w porcie! Zamówienie za 3x cenę, mają też kryształy' : '⛵ Statek ze szlachtą! Idą zjeść w karczmie (płacą 3x)');
         },
         update(now) {
             const S = this.S(); if (!S.own) return;
@@ -8202,7 +8253,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (S.st === 'BUY') {
                     if (now >= S.t) {
                         const n = Math.max(0, Math.min(3, (fac.output | 0) - S.min));
-                        for (let i = 0; i < n; i++) { fac.output--; const m = fac.visualsOut.pop(); if (m && m.parent) m.parent.remove(m); }
+                        for (let i = 0; i < n; i++) { fac.output--; const m = fac.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } }
                         S.k = n; S.cash += n * d.price;
                         S.st = 'OUT'; S.ox = p.x + (rand() < 0.5 ? -30 : 30);
                     }
@@ -9876,7 +9927,7 @@ window.onerror = function(msg, src, line, col, err) {
     const Bakery = w2mod({
         key: 'bakery',
         defaults() { return { own: 0, paid: 0, fl: 0, wa: 0, out: 0, busy: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP, o.fl | 0); o.wa = Math.min(BAKERY.CAP, o.wa | 0); state.w2.bakery = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP, o.fl | 0); o.wa = Math.min(BAKERY.CAP + 30, o.wa | 0); state.w2.bakery = o; },
         R: null,
         reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
         S() { return state.w2.bakery; },
@@ -9896,7 +9947,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!state.dropLocked && now > state.timers.nextDrop && inRect(pos, B.X - 4.2, B.Z, 3.6, 3.6)) {
                 const hf = state.player.wheatBags | 0, hw = state.water ? state.water.collected | 0 : 0;
                 // najpierw to, czego w piecu mniej
-                const k = (hf > 0 && S.fl < B.CAP && (S.fl <= S.wa || hw <= 0 || S.wa >= B.CAP)) ? 'wheatBags' : (hw > 0 && S.wa < B.CAP) ? 'water' : null;
+                const k = (hf > 0 && S.fl < B.CAP && (S.fl <= S.wa || hw <= 0 || S.wa >= wcap('bake', B.CAP))) ? 'wheatBags' : (hw > 0 && S.wa < wcap('bake', B.CAP)) ? 'water' : null;
                 if (k) {
                     state.timers.nextDrop = now + config.dropCooldown;
                     giveItemTo(k, new THREE.Vector3(B.X - 4.2, 0, B.Z));
@@ -9939,7 +9990,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!vis) return;
             if (!S.own) { R.buy.tp.update(buyLines('PIEKARNIA', 'ws_bakery', B.COST - S.paid), 'bakery'); return; }
             this.ensureModel();
-            R.fin.tp.update(['PIEKARNIA', { i: 'wbag', t: S.fl + '/' + B.CAP }, { i: 'water', t: S.wa + '/' + B.CAP }], null);
+            R.fin.tp.update(['PIEKARNIA', { i: 'wbag', t: S.fl + '/' + B.CAP }, { i: 'water', t: S.wa + '/' + wcap('bake', B.CAP) }], null);
             R.fout.tp.update(S.out ? [] : ['CHLEB'], S.out ? null : 'bread');
             Items2.pile(R.piles, 'bread', B.X + 4.2, B.Z, S.out, 30);
             if (S.out > 0) FloatLab.show('bakeryo', B.X + 4.2, 1.9, B.Z, 'bread', S.out, 0.85);
@@ -10237,22 +10288,21 @@ window.onerror = function(msg, src, line, col, err) {
     // ---------- v229: WARSZTATY jak Piła – po kupnie pracują, gdy stoisz obok; pomocnika trzeba kupić ----------
     // (kamieniarz, huta, tłocznia, kuchnia polowa, piekarnia – wcześniej pomocnik był od razu, za darmo)
     const WS_HELP = [];
-    Object.keys(WSHOPS).forEach(k => WS_HELP.push({ key: 'ws_' + k, X: WSHOPS[k].X, Z: WSHOPS[k].Z, cost: () => Math.round(WSHOPS[k].cost * 0.5) }));
-    Object.keys(WS2).forEach(k => WS_HELP.push({ key: 'ws2_' + k, X: WS2[k].X, Z: WS2[k].Z, cost: () => Math.round(WS2[k].cost * 0.5) }));
-    WS_HELP.push({ key: 'bakery', X: BAKERY.X, Z: BAKERY.Z, cost: () => Math.round(BAKERY.COST * 0.5) });
-    WS_HELP.push({ key: 'pal', X: PAL.X, Z: PAL.Z, cost: () => Math.round(PAL.COST * 0.5) });
+    Object.keys(WSHOPS).forEach(k => WS_HELP.push({ key: 'ws_' + k, get X() { return WSHOPS[k].X; }, get Z() { return WSHOPS[k].Z; }, cost: () => Math.round(WSHOPS[k].cost * 0.5) }));
+    Object.keys(WS2).forEach(k => WS_HELP.push({ key: 'ws2_' + k, get X() { return WS2[k].X; }, get Z() { return WS2[k].Z; }, cost: () => Math.round(WS2[k].cost * 0.5) }));
+    WS_HELP.push({ key: 'bakery', get X() { return BAKERY.X; }, get Z() { return BAKERY.Z; }, cost: () => Math.round(BAKERY.COST * 0.5) });
+    WS_HELP.push({ key: 'pal', get X() { return PAL.X; }, get Z() { return PAL.Z; }, cost: () => Math.round(PAL.COST * 0.5) });
     const WS_HZ = 3.8;   // ramka POMOCNIK pod warsztatem
     WS_HELP.forEach(w => {
         const m = W2.mods.find(x => x.key === w.key); if (!m) return;
         const _def = m.defaults, _reset = m.reset, _build = m.build, _ps = m.playerStep, _up = m.update, _rd = m.render;
-        const hx = w.X, hz = w.Z + WS_HZ;
         m.defaults = function () { return Object.assign(_def.call(this), { hlp: 0, hpaid: 0 }); };
         m.reset = function () { _reset.call(this); this.R.fh = null; this.R.hw = null; };
-        m.build = function () { _build.call(this); this.R.fh = mkFrame(hx, hz, 3.2, 3.2, 0x4682B4); };
+        m.build = function () { _build.call(this); this.R.fh = mkFrame(w.X, w.Z + WS_HZ, 3.2, 3.2, 0x4682B4); };
         m.playerStep = function (now, pos) {
             const S = state.w2[w.key];
             if (S && S.own && !S.hlp)
-                buyStep({ x: hx, z: hz, w: 3.2, h: 3.2 }, now, pos, { rk: null, paid: () => S.hpaid, cost: w.cost, done: () => !!S.hlp, add: () => { S.hpaid++; },
+                buyStep({ x: w.X, z: w.Z + WS_HZ, w: 3.2, h: 3.2 }, now, pos, { rk: null, paid: () => S.hpaid, cost: w.cost, done: () => !!S.hlp, add: () => { S.hpaid++; },
                     finish: () => { S.hlp = 1; S.hpaid = 0; showToast('👷 Pomocnik zatrudniony – warsztat pracuje sam'); } });
             return _ps.call(this, now, pos);
         };
@@ -10279,15 +10329,15 @@ window.onerror = function(msg, src, line, col, err) {
     // ---------- v230: KAMIENIARZ – rozbudowa (MAKS): więcej kamieni czeka na obróbkę (+15, do 105) ----------
     (function masonExpand() {
         const d = WSHOPS.mason, m = W2.mods.find(x => x.key === 'ws_mason'); if (!d || !m) return;
-        const XX = d.X - 4.2, XZ = d.Z + 3.8, W = 3.2;
+        const W = 3.2, XXf = () => d.X - 4.2, XZf = () => d.Z + 3.8;
         Req.def('masonx', { lvl: () => state.w2.ws_mason.cap, need: () => ({ planks: 10 }) });
         const _reset = m.reset, _build = m.build, _ps = m.playerStep, _rd = m.render;
         m.reset = function () { _reset.call(this); this.R.fx = null; };
-        m.build = function () { _build.call(this); this.R.fx = mkFrame(XX, XZ, W, W, 0x90CAF9); };
+        m.build = function () { _build.call(this); this.R.fx = mkFrame(XXf(), XZf(), W, W, 0x90CAF9); };
         m.playerStep = function (now, pos) {
             const S = state.w2.ws_mason;
             if (S && S.own && S.cap < d.capMax && d.vis())
-                buyStep({ x: XX, z: XZ, w: W, h: W }, now, pos, { rk: 'masonx', paid: () => S.xpaid, cost: () => S.xcost, done: () => S.cap >= d.capMax, add: () => { S.xpaid++; },
+                buyStep({ x: XXf(), z: XZf(), w: W, h: W }, now, pos, { rk: 'masonx', paid: () => S.xpaid, cost: () => S.xcost, done: () => S.cap >= d.capMax, add: () => { S.xpaid++; },
                     finish: () => { S.cap = Math.min(d.capMax, S.cap + d.capStep); S.xpaid = 0; S.xcost *= 2; showToast('🪨 Kamieniarz mieści teraz ' + S.cap + ' kamieni!'); } });
             return _ps.call(this, now, pos);
         };
@@ -10305,12 +10355,14 @@ window.onerror = function(msg, src, line, col, err) {
     const RP_SRC = {
         mine: { t: 0.22, pos() { const g = worldObjects.stoneOutGroup; return g ? RP_PT(g.position.x - 1.9, g.position.z + 1.6) : null; },
                 avail() { return (state.stoneHelper && state.stoneHelper.unlocked && worldObjects.visualStoneOutStack) ? worldObjects.visualStoneOutStack.length : 0; },
-                take() { const m = worldObjects.visualStoneOutStack.pop(); if (m && m.parent) m.parent.remove(m); } },
+                take() { const m = worldObjects.visualStoneOutStack.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
         mill: { t: 0.22, pos() { const p = wpos(worldObjects.threshingZoneOut) || wpos(worldObjects.threshingGroup); return p ? RP_PT(p.x, p.z + 2.2) : null; },
                 avail() { const f = facilities.threshing; return f && f.unlocked ? f.output | 0 : 0; },
                 take() { const f = facilities.threshing; f.output--; const m = f.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
         water: { t: 0.45, pos() { const p = wpos(worldObjects.waterZone); return p ? RP_PT(p.x + 1.2, p.z + 1.2) : null; }, avail() { return worldObjects.waterZone ? 99 : 0; }, take() {} },
-        sand: { t: 0.45, pos() { return RP_PT(SANDPIT.X + 1.5, SANDPIT.Z + 1.5); }, avail() { return Areas.has('south') ? 99 : 0; }, take() {} },
+        // v234: z kopaczem – z jego kupki GOTOWE; bez kopacza tragarz kopie sam
+        sand: { t: 0.45, pos() { const D = state.w2.sanddig; return D && D.own ? RP_PT(SANDPIT.X + 6.2, SANDPIT.Z + 2.2) : RP_PT(SANDPIT.X + 1.5, SANDPIT.Z + 1.5); },
+                avail() { if (!Areas.has('south')) return 0; const D = state.w2.sanddig; return D && D.own ? D.out | 0 : 99; }, take() { const D = state.w2.sanddig; if (D && D.own && D.out > 0) D.out--; } },
         vine: { t: 0.3, pos() { return RP_PT(VINE.X, VINE.Z + VINE.H / 2 - 0.8); }, avail() { const S = state.w2.vine; return S && S.own ? S.ripe | 0 : 0; }, take() { state.w2.vine.ripe--; } },
         carrot: { t: 0.25, pos() { return RP_PT(CARROT.X, CARROT.Z + 1.5); }, avail() { const S = state.w2.carrot; return S && S.own && Areas.has('east') ? S.ripe | 0 : 0; }, take() { state.w2.carrot.ripe--; } },
         hunt: { t: 0.3, pos() { return RP_PT(HUNT.OX + 1.2, HUNT.OZ + 1.6); }, avail() { const S = state.w2.hunt; return S && Areas.has('east') ? S.out | 0 : 0; }, take() { state.w2.hunt.out--; } },
@@ -10319,13 +10371,22 @@ window.onerror = function(msg, src, line, col, err) {
         kuchnia: { t: 0.2, pos() { return RP_PT(WS2.kuchnia.X + 4.4, WS2.kuchnia.Z + 2.2); }, avail() { const S = state.w2.ws2_kuchnia; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.ws2_kuchnia.out--; } },
         fish: { t: 0.22, pos() { const p = wpos(worldObjects.fishingZoneOut); return p ? RP_PT(p.x, p.z + 2.0) : null; },
                 avail() { return (state.fishing && state.fishing.unlocked && worldObjects.visualFishStack) ? worldObjects.visualFishStack.length : 0; },
-                take() { const m = worldObjects.visualFishStack.pop(); if (m && m.parent) m.parent.remove(m); } },
+                take() { const m = worldObjects.visualFishStack.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
         field: { t: 0.22, pos() { const p = wpos(worldObjects.wheatOutZone); return p ? RP_PT(p.x - 1.6, p.z + 1.2) : null; },
                  avail() { return worldObjects.visualWheatStack ? worldObjects.visualWheatStack.length : 0; },
-                 take() { const m = worldObjects.visualWheatStack.pop(); if (m && m.parent) m.parent.remove(m); } },
-        pal: { t: 0.2, pos() { return RP_PT(PAL.X + 4.2, PAL.Z + 2.2); }, avail() { const S = state.w2.pal; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.pal.out--; } }
+                 take() { const m = worldObjects.visualWheatStack.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
+        herbs: { t: 0.22, pos() { const p = wpos(worldObjects.herbZoneOut) || wpos(worldObjects.herbGroup); return p ? RP_PT(p.x, p.z + 2.2) : null; },
+                 avail() { const f = facilities.herb; return f && f.unlocked ? f.output | 0 : 0; },
+                 take() { const f = facilities.herb; f.output--; const m = f.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
+        bakery: { t: 0.2, pos() { return RP_PT(BAKERY.X + 4.2, BAKERY.Z + 2.2); }, avail() { const S = state.w2.bakery; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.bakery.out--; } },
+        pal: { t: 0.2, pos() { return RP_PT(PAL.X + 4.2, PAL.Z + 2.2); }, avail() { const S = state.w2.pal; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.pal.out--; } },
+        // v234
+        masonOut: { t: 0.2, pos() { return RP_PT(WSHOPS.mason.X + 4.2, WSHOPS.mason.Z + 2.2); }, avail() { const S = state.w2.ws_mason; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.ws_mason.out--; } },
+        camp: { t: 0.22, pos() { const p = wpos(worldObjects.campfireZoneOut) || wpos(worldObjects.campfireGroup); return p ? RP_PT(p.x, p.z + 2.2) : null; },
+                avail() { const f = facilities.campfire; return f && f.unlocked ? f.output | 0 : 0; },
+                take() { const f = facilities.campfire; f.output--; const m = f.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } }
     };
-    const rpWs2 = (w, k) => ({ pos() { return RP_PT(WS2[w].X - 4.4, WS2[w].Z + 2.4); }, room() { const S = state.w2['ws2_' + w]; return S && S.own ? Math.max(0, WS2[w].cap - (S.inv[k] | 0)) : 0; }, put() { state.w2['ws2_' + w].inv[k]++; } });
+    const rpWs2 = (w, k) => ({ pos() { return RP_PT(WS2[w].X - 4.4, WS2[w].Z + 2.4); }, room() { const S = state.w2['ws2_' + w]; return S && S.own ? Math.max(0, (k === 'water' ? wcap(w, WS2[w].cap) : WS2[w].cap) - (S.inv[k] | 0)) : 0; }, put() { state.w2['ws2_' + w].inv[k]++; } });
     const rpTav = k => ({
         pos() { const tv = W2.mods.find(m => m.key === 'tavstock'), p = tv && tv.pos(k); return p ? RP_PT(p.x, p.z + 2.4) : null; },
         room() { const T = Tavern.T, tv = W2.mods.find(m => m.key === 'tavstock'), d = TAVSTOCK[k]; if (!T || !tv || !d || !tv.vis(k)) return 0; return Math.max(0, d.cap() - (T[d.field || k] | 0)); },
@@ -10334,7 +10395,7 @@ window.onerror = function(msg, src, line, col, err) {
     const RP_DST = {
         mason: { pos() { return RP_PT(WSHOPS.mason.X - 4.2, WSHOPS.mason.Z + 2.4); }, room() { const S = state.w2.ws_mason; return S && S.own ? Math.max(0, S.cap - (S.in | 0)) : 0; }, put() { state.w2.ws_mason.in++; } },
         bakeFl: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, BAKERY.CAP - (S.fl | 0)) : 0; }, put() { state.w2.bakery.fl++; } },
-        bakeWa: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, BAKERY.CAP - (S.wa | 0)) : 0; }, put() { state.w2.bakery.wa++; } },
+        bakeWa: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, wcap('bake', BAKERY.CAP) - (S.wa | 0)) : 0; }, put() { state.w2.bakery.wa++; } },
         hutaSand: rpWs2('huta', 'sand'), hutaWater: rpWs2('huta', 'water'),
         winGrapes: rpWs2('winery', 'grapes'), winGlass: rpWs2('winery', 'glass'),
         kuchCarrot: rpWs2('kuchnia', 'carrot'), kuchMeat: rpWs2('kuchnia', 'meat'),
@@ -10344,8 +10405,22 @@ window.onerror = function(msg, src, line, col, err) {
                  put() { const f = facilities.kominek, g = worldObjects.kominekGroup || worldObjects.tavernGroup, m = meshForItem(f.inType); f.input++; if (m && g) { m.position.copy(getFacilityPileLocal(f.visualsIn.length, false, 'kominek')); g.add(m); f.visualsIn.push(m); } } },
         brewWheat: { pos() { const g = worldObjects.tavernGroup; return g ? RP_PT(g.position.x + TAV.BREW_IN[0], g.position.z + TAV.BREW_IN[1] - 1.6) : null; },
                      room() { const T = Tavern.T; return T && T.brew && T.brew.own ? Math.max(0, TAV.BREW_CAP_IN - (T.brew.in | 0)) : 0; }, put() { Tavern.brewPut('wheat'); } },
+        tavSpice: { pos() { const g = worldObjects.tavernGroup; return g ? RP_PT(g.position.x + TAV.SPICE[0], g.position.z + TAV.SPICE[1] + 2.4) : null; },
+                    room() { const T = Tavern.T; return T && state.tavern && state.tavern.kominekBuilt ? Math.max(0, Tavern.spiceCap() - (T.spice | 0)) : 0; }, put() { Tavern.T.spice = (Tavern.T.spice | 0) + 1; } },
+        palIn: { pos() { return RP_PT(PAL.X - 4.2, PAL.Z + 2.4); }, room() { const S = state.w2.pal; return S && S.own ? Math.max(0, PAL.CAP - (S.in | 0)) : 0; }, put() { state.w2.pal.in++; } },
+        skupBread: { pos() { const p = wpos(worldObjects.woodZone); return p ? RP_PT(p.x - 2.5, p.z + 2.2) : null; }, room() { return skupHasRoom('bread') ? 99 : 0; },
+                     put() { const q = this.pos(); if (q) skupPutIt2('bread', new THREE.Vector3(q.x, 1.3, q.z)); } },
+        campfire: { pos() { const p = wpos(worldObjects.campfireZoneIn); return p ? RP_PT(p.x, p.z + 2.2) : null; },
+                    room() { const f = facilities.campfire; return f && f.unlocked ? Math.max(0, 30 - (f.input | 0)) : 0; },
+                    put() { const f = facilities.campfire, g = worldObjects.campfireGroup, m = meshForItem(f.inType); f.input++; if (m && g) { m.position.copy(getFacilityPileLocal(f.visualsIn.length, false, 'campfire')); g.add(m); f.visualsIn.push(m); } } },
         brewWater: { pos() { const g = worldObjects.tavernGroup; return g ? RP_PT(g.position.x + TAV.BREW_WIN[0], g.position.z + TAV.BREW_WIN[1] - 1.6) : null; },
-                     room() { const T = Tavern.T; return T && T.brew && T.brew.own ? Math.max(0, TAV.BREW_W_CAP - (T.brew.water | 0)) : 0; }, put() { Tavern.brewPut('water'); } }
+                     room() { const T = Tavern.T; return T && T.brew && T.brew.own ? Math.max(0, TAV.BREW_W_CAP - (T.brew.water | 0)) : 0; }, put() { Tavern.brewPut('water'); } },
+        // v234
+        skupBlocks: { pos() { const p = wpos(worldObjects.woodZone); return p ? RP_PT(p.x - 2.5, p.z + 2.2) : null; }, room() { return skupHasRoom('blocks') ? 99 : 0; },
+                      put() { const q = this.pos(); if (q) skupPutIt2('blocks', new THREE.Vector3(q.x, 1.3, q.z)); } },
+        grillOut: { pos() { const p = wpos(worldObjects.kominekZoneOut); return p ? RP_PT(p.x, p.z - 2.0) : null; },
+                    room() { const f = facilities.kominek; return (f && f.unlocked && state.tavern && state.tavern.kominekBuilt) ? Math.max(0, (Tavern.grillOutCap ? Tavern.grillOutCap() : 20) - (f.output | 0)) : 0; },
+                    put() { const f = facilities.kominek, g = worldObjects.kominekGroup || worldObjects.tavernGroup, m = createRoastedFishMesh(); f.output++; if (m && g) { m.position.copy(getFacilityPileLocal(f.visualsOut.length, true, 'kominek')); g.add(m); f.visualsOut.push(m); } } }
     };
     const own2 = k => !!(state.w2[k] && state.w2[k].own);
     const tavOK = () => !!(state.tavern && state.tavern.kominekBuilt);
@@ -10367,7 +10442,14 @@ window.onerror = function(msg, src, line, col, err) {
         { key: 'karP', it: 'pieczen', src: 'pal', dst: 'tavRoast', name: 'pieczeń: palenisko → karczma', price: 400, shirt: 0xC62828, hat: 0x212121, old: 'kar', ok: () => tavOK() && own2('pal'), lock: 'najpierw karczma z grillem i palenisko' },
         { key: 'karF', it: 'fish', src: 'fish', dst: 'grill', name: 'ryby: rybak → grill w karczmie', price: 400, shirt: 0x0277BD, hat: 0xFFFFFF, ok: () => tavOK() && !!(state.fishing && state.fishing.unlocked), lock: 'najpierw karczma z grillem i rybak' },
         { key: 'karZ', it: 'wheat', src: 'field', dst: 'brewWheat', name: 'pszenica: pole → browar', price: 400, shirt: 0xF9A825, hat: 0x212121, ok: () => tavOK() && brewOK(), lock: 'najpierw browar w karczmie' },
-        { key: 'karH', it: 'water', src: 'water', dst: 'brewWater', name: 'woda → browar', price: 300, shirt: 0x1E88E5, hat: 0x212121, ok: () => tavOK() && brewOK(), lock: 'najpierw browar w karczmie' }
+        { key: 'karH', it: 'water', src: 'water', dst: 'brewWater', name: 'woda → browar', price: 300, shirt: 0x1E88E5, hat: 0x212121, ok: () => tavOK() && brewOK(), lock: 'najpierw browar w karczmie' },
+        // v234: brakujące połączenia
+        { key: 'karS', it: 'herbs', src: 'herbs', dst: 'tavSpice', name: 'zioła: suszarnia → przyprawy w karczmie', price: 400, shirt: 0x7CB342, hat: 0x33691E, ok: () => tavOK() && !!(facilities.herb && facilities.herb.unlocked), lock: 'najpierw karczma z grillem i suszarnia' },
+        { key: 'palM', it: 'meat', src: 'hunt', dst: 'palIn', name: 'dziczyzna: myśliwy → palenisko', price: 400, shirt: 0x6D4C41, hat: 0xD84315, ok: () => own2('pal') && Areas.has('east'), lock: 'najpierw palenisko' },
+        { key: 'sprC', it: 'bread', src: 'bakery', dst: 'skupBread', name: 'chleb: piekarnia → SPRZEDAJ', price: 400, shirt: 0xD7963F, hat: 0x5D4037, ok: () => own2('bakery'), lock: 'najpierw piekarnia' },
+        { key: 'ognF', it: 'fish', src: 'fish', dst: 'campfire', name: 'ryby: rybak → ognisko', price: 400, shirt: 0x0277BD, hat: 0xFF7043, ok: () => !!(facilities.campfire && facilities.campfire.unlocked && state.fishing && state.fishing.unlocked), lock: 'najpierw ognisko i rybak' },
+        { key: 'sprK', it: 'blocks', src: 'masonOut', dst: 'skupBlocks', name: 'bloki: kamieniarz → SPRZEDAJ', price: 400, shirt: 0x9E9E9E, hat: 0x5D4037, ok: () => own2('ws_mason'), lock: 'najpierw kamieniarz' },
+        { key: 'karO', it: 'roastedFish', src: 'camp', dst: 'grillOut', name: 'pieczone ryby: ognisko → karczma', price: 400, shirt: 0xFF7043, hat: 0x212121, ok: () => tavOK() && !!(facilities.campfire && facilities.campfire.unlocked), lock: 'najpierw karczma z grillem i ognisko' },
     ];
     const RP_MAX = 3, RP_LV = 3;
     const rpX = k => { const A = state.w2 && state.w2.rpx; return (A && A[k]) || { c: 0, s: 0, k: 0 }; };
@@ -10401,6 +10483,7 @@ window.onerror = function(msg, src, line, col, err) {
             const o = this.defaults();
             RP.forEach(r => {
                 const src = (v && Array.isArray(v[r.key])) ? v[r.key] : [];
+                o[r.key] = [];   // v234: bez tego wczytany ładunek tragarza przepadał (dopisywało się za domyślnymi)
                 for (let i = 0; i < RP_MAX; i++) { const q = mergeNum({ x: 0, z: 0, st: 0, n: 0, t: 0, face: 0 }, src[i]); q.st = 0; q.t = 0; q.n = Math.max(0, Math.min(15, q.n | 0)); o[r.key].push(q); }
             });
             state.w2.rp = o;
@@ -10514,15 +10597,303 @@ window.onerror = function(msg, src, line, col, err) {
             vis() { return !!(state.tavern && state.tavern.kominekBuilt) && state.w2.spicex.lvl < MAXL; },
             build() { const p = pos(); this.R.f = mkFrame(p.x, p.z, W, W, 0x90CAF9); },
             playerStep(now, pos2) {
-                const S = state.w2.spicex; if (!this.vis()) return; const p = pos();
+                const S = state.w2.spicex; if (!this.vis()) return; const p = pos();   // pozycja liczona z ramki PRZYPRAWY
                 buyStep({ x: p.x, z: p.z, w: W, h: W }, now, pos2, { rk: 'spicex', paid: () => S.paid, cost: () => S.cost, done: () => S.lvl >= MAXL, add: () => { S.paid++; },
                     finish: () => { S.lvl++; S.paid = 0; S.cost *= 2; showToast('🌿 Przyprawy: mieści się teraz ' + Tavern.spiceCap() + '!'); } });
             },
             render() {
                 const f = this.R.f; if (!f) return; const vis = this.vis(); f.vis = vis; if (!vis) return;
+                { const q = pos(); if (f.x !== q.x || f.z !== q.z) { f.x = q.x; f.z = q.z; f.zone.position.x = q.x; f.zone.position.z = q.z; f.tp.mesh.position.x = q.x; f.tp.mesh.position.z = q.z; } }
                 const S = state.w2.spicex; f.tp.update(['MAKS', ...Req.lines('spicex'), { i: 'coin', t: S.cost - S.paid }], null);
             }
         });
+    })();
+
+    // ---------- v234: SZYBSZY RYBAK (namiot) ----------
+    w2mod({ key: 'fishx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(3, o.lvl | 0)); state.w2.fishx = o; } });
+    (function fishShop() {
+        const L = () => (state.w2 && state.w2.fishx ? state.w2.fishx.lvl | 0 : 0);
+        const at = Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage'));
+        SHOP_ITEMS.splice(at, 0, { k: 'x_fishx', ext: true, icon: 'fish2d', name: 'Szybszy rybak',
+            desc: () => 'Pomocnik rybaka łowi szybciej: +30% za poziom (poziom ' + L() + '/3)',
+            price: () => 300 * (L() + 1), status: () => L() >= 3 ? 'max' : (state.fishing && state.fishing.helperUnlocked) ? 'ok' : 'lock', lockText: 'najpierw pomocnik rybaka',
+            apply: () => { if (!state.w2.fishx) state.w2.fishx = { lvl: 0 }; state.w2.fishx.lvl = Math.min(3, L() + 1); if (curCtx === localCtx()) showToast('🎣 Rybak łowi szybciej (' + state.w2.fishx.lvl + '/3)'); } });
+    })();
+
+    // ---------- v234: PRZYSPIESZENIE OD ILOŚCI – zrzucanie i podnoszenie każdego surowca (>50: 2×, >100: 3×, >150: 5×, >200: 8×) ----------
+    const QF = {};
+    function qtyFast(tk, n) {
+        const k = qtyK(n); if (k <= 1) return;
+        const t = state.timers[tk]; if (!(t > simNow)) return;
+        const mk = QF[tk]; if (mk && mk[0] === simNow && mk[1] === t) return;   // to już przyspieszone w tym kroku
+        const nt = simNow + (t - simNow) / k; state.timers[tk] = nt; QF[tk] = [simNow, nt];
+    }
+    const resCount = r => r === 'water' ? (state.water ? state.water.collected | 0 : 0) : r === 'plank' ? state.player.planks | 0 : r === 'herb' ? state.player.herbs | 0 : state.player[r] | 0;
+    { const _f = dropItemToSkup; dropItemToSkup = function (type) { const n = resCount(type); const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
+    { const _f = dropToFacilityInput; dropToFacilityInput = function (key) { const f = facilities[key], n = f ? resCount(f.inType) : 0; const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
+    { const _f = collectFromFacilityOutput; collectFromFacilityOutput = function (key) { const f = facilities[key], n0 = f ? f.output | 0 : 0; const r = _f.apply(this, arguments); qtyFast('nextCollectOut', Math.max(n0, f ? resCount(f.outType) : 0)); return r; }; }
+    { const _f = giveItemTo; giveItemTo = function (res) { const n = resCount(res); const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
+    { const _t = Items2.take; Items2.take = function (key) { const n = state.player[key] | 0; const r = _t.apply(Items2, arguments); qtyFast('nextDrop', n); return r; }; }
+    { const _g = Items2.give; Items2.give = function (key) { const r = _g.apply(Items2, arguments); const n = state.player[key] | 0; qtyFast('nextCollectOut', n); qtyFast('nextChop', n); return r; }; }
+
+    // ---------- v234: LICZBA SZTUK nad każdą ramką GOTOWE (od 1 sztuki, jak przy winie) ----------
+    w2mod({
+        key: 'readylab',
+        render() {
+            const icon = t => RES_ICON[t] || (t === 'roastedFish' ? 'rfish' : t === 'wheatBags' ? 'wbag' : t === 'snopki' ? 'snop' : t === 'planks' ? 'plank' : t);
+            const v = new THREE.Vector3(), cap = PileTrim.FAC_CAP || 24, zcap = PileTrim.ZONE_CAP || 36;
+            Object.keys(facilities).forEach(k => {
+                const f = facilities[k]; if (!f || !f.unlocked) return;
+                const n = f.output | 0, z = worldObjects[k + 'ZoneOut']; if (n <= 0 || n > cap || !z) return;
+                z.getWorldPosition(v); FloatLab.show('rdy' + k, v.x, 1.9, v.z, icon(f.outType), n, 0.85);
+            });
+            const pile = (id, zone, arr, ic) => { const n = arr ? arr.length : 0; if (!zone || n <= 0 || n > zcap) return; zone.getWorldPosition(v); FloatLab.show(id, v.x, 1.9, v.z, ic, n, 0.85); };
+            if (state.fishing && state.fishing.unlocked) pile('rdyFish', worldObjects.fishingZoneOut, worldObjects.visualFishStack, 'fish2d');
+            if (state.stoneHelper && state.stoneHelper.unlocked) pile('rdyStone', worldObjects.rockOutZone, worldObjects.visualStoneOutStack, 'stone');
+            if (worldObjects.wheatFieldGroup && worldObjects.wheatFieldGroup.visible) pile('rdyWheat', worldObjects.wheatOutZone, worldObjects.visualWheatStack, 'wheat');
+            if (worldObjects.threshingGroup && worldObjects.threshingGroup.visible) pile('rdySnop', worldObjects.snopekZone, worldObjects.visualSnopkiStack, 'snop');
+        }
+    });
+
+    // ---------- v234: bez „duchów” – przedmiot przejęty w locie nie wraca na stos; zgubione w locie (menu, synchronizacja) znikają ----------
+    { const _sj = spawnJumpAnimation; let seq = 0;
+      spawnJumpAnimation = function (mesh, sp, tg, dur, arc, done) {
+          if (!mesh || !mesh.userData) return _sj(mesh, sp, tg, dur, arc, done);
+          const id = ++seq; mesh.userData.flyId = id; mesh.userData.flyMiss = 0;
+          return _sj(mesh, sp, tg, dur, arc, () => { if (mesh.userData.flyId !== id) return; mesh.userData.flyId = 0; if (done) done(); });
+      }; }
+    w2mod({
+        key: 'ghosts', R: null, reset() { this.R = { t: 0 }; },
+        render() {
+            const R = this.R; if (!R) return; const tn = performance.now(); if (tn - R.t < 1000) return; R.t = tn;
+            const live = new Set(); for (let i = 0; i < animations.length; i++) if (animations[i].mesh) live.add(animations[i].mesh);
+            for (let i = scene.children.length - 1; i >= 0; i--) {
+                const c = scene.children[i], u = c.userData; if (!u || !u.flyId) continue;
+                if (live.has(c)) { u.flyMiss = 0; continue; }
+                u.flyMiss = (u.flyMiss | 0) + 1;
+                if (u.flyMiss >= 3) { scene.remove(c); u.flyId = 0; }
+            }
+        }
+    });
+
+    // ---------- v234: PÓŁKA Z WINEM przy ramce wina (butelki z zapasu karczmy) ----------
+    w2mod({
+        key: 'wineshelf', R: null,
+        reset() { if (this.R && this.R.g && this.R.g.parent) this.R.g.parent.remove(this.R.g); this.R = { g: null, b: [] }; },
+        render() {
+            const R = this.R, tv = W2.mods.find(m => m.key === 'tavstock'), T = Tavern.T; if (!R || !tv) return;
+            const vis = !!(T && tv.vis('wine')), p = vis ? tv.pos('wine') : null;
+            if (!vis || !p) { if (R.g) R.g.visible = false; return; }
+            if (!R.g) {
+                const g = new THREE.Group();
+                const rack = bakeItem('wineshelf', () => {
+                    const r = new THREE.Group(), wd = new THREE.MeshLambertMaterial({ color: 0x6D4C2F }), dk = new THREE.MeshLambertMaterial({ color: 0x4E342E });
+                    [[-1.3, 0], [1.3, 0]].forEach(([x]) => { const s = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.9, 0.6), dk); s.position.set(x, 0.95, 0); r.add(s); });
+                    [0.15, 0.75, 1.35, 1.9].forEach(y => { const b = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.08, 0.6), wd); b.position.y = y; r.add(b); });
+                    const back = new THREE.Mesh(new THREE.BoxGeometry(2.7, 1.9, 0.05), dk); back.position.set(0, 0.95, -0.28); r.add(back);
+                    return r;
+                });
+                g.add(rack); scene.add(g); R.g = g;
+            }
+            if (R.g.parent !== scene) scene.add(R.g);
+            R.g.visible = true; R.g.position.set(p.x, 0, p.z - 2.3);
+            const n = Math.min(12, (T.wine | 0));
+            while (R.b.length > n) { const m = R.b.pop(); if (m.parent) m.parent.remove(m); }
+            while (R.b.length < n) { const m = Items2.mesh('wine'); if (!m) break; m.scale.setScalar(0.8); R.g.add(m); R.b.push(m); }
+            R.b.forEach((m, i) => { const row = Math.floor(i / 4), col = i % 4; m.position.set(-0.95 + col * 0.63, 0.2 + row * 0.6, 0.05); });
+        }
+    });
+
+    // ---------- v234: SZYBSZY BARMAN (namiot) ----------
+    w2mod({ key: 'barx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(3, o.lvl | 0)); state.w2.barx = o; } });
+    (function barShop() {
+        const L = () => (state.w2 && state.w2.barx ? state.w2.barx.lvl | 0 : 0);
+        const at = Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage'));
+        SHOP_ITEMS.splice(at, 0, { k: 'x_barx', ext: true, icon: 'beer', name: 'Szybszy barman',
+            desc: () => 'Barman chodzi i nalewa szybciej: +30% za poziom (poziom ' + L() + '/3)',
+            price: () => 300 * (L() + 1), status: () => L() >= 3 ? 'max' : (Tavern.T && Tavern.T.barman) ? 'ok' : 'lock', lockText: 'najpierw barman w karczmie',
+            apply: () => { if (!state.w2.barx) state.w2.barx = { lvl: 0 }; state.w2.barx.lvl = Math.min(3, L() + 1); if (curCtx === localCtx()) showToast('🍺 Barman szybszy (' + state.w2.barx.lvl + '/3)'); } });
+    })();
+
+    // ---------- v234: WIĘCEJ WODY – piekarnia, huta, browar (+10 na poziom, do 3) ----------
+    Object.defineProperty(TAV, 'BREW_W_CAP', { get() { return wcap('brew', 12); }, configurable: true });
+    w2mod({ key: 'waterx', defaults() { return { bake: 0, huta: 0, brew: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); ['bake', 'huta', 'brew'].forEach(k => { o[k] = Math.max(0, Math.min(3, o[k] | 0)); }); state.w2.waterx = o; } });
+    (function waterShop() {
+        const L = k => (state.w2 && state.w2.waterx ? state.w2.waterx[k] | 0 : 0);
+        const at = Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage'));
+        [['brew', 'browarze', () => brewOK(), 'najpierw browar w karczmie', 12],
+         ['huta', 'hucie szkła', () => own2('ws2_huta'), 'najpierw huta szkła', WS2.huta.cap],
+         ['bake', 'piekarni', () => own2('bakery'), 'najpierw piekarnia', BAKERY.CAP]].forEach(([k, nm, ok, lock, base]) =>
+            SHOP_ITEMS.splice(at, 0, { k: 'x_wx_' + k, ext: true, icon: 'water', name: 'Więcej wody w ' + nm,
+                desc: () => 'Zbiornik mieści ' + wcap(k, base) + ' wody, +10 za poziom (poziom ' + L(k) + '/3)',
+                price: () => 200 * (L(k) + 1), status: () => L(k) >= 3 ? 'max' : ok() ? 'ok' : 'lock', lockText: lock,
+                apply: () => { if (!state.w2.waterx) state.w2.waterx = { bake: 0, huta: 0, brew: 0 }; state.w2.waterx[k] = Math.min(3, L(k) + 1); if (curCtx === localCtx()) showToast('💧 W ' + nm + ' mieści się teraz ' + wcap(k, base) + ' wody'); } }));
+    })();
+
+    // ---------- v234: KOPACZ PIASKU – pomocnik kopie piasek na kupkę GOTOWE (tragarz „piasek → huta” bierze z niej) ----------
+    const SANDD = { DX: 6.2, W: 3.6, COST: 400, REQ: { planks: 10 }, T: 1.6, CAP: 40 };
+    Req.def('sanddig', { lvl: () => state.w2.sanddig.own, need: () => SANDD.REQ });
+    w2mod({
+        key: 'sanddig',
+        defaults() { return { own: 0, paid: 0, out: 0, next: 0 }; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.out = Math.max(0, Math.min(SANDD.CAP, o.out | 0)); o.next = 0; state.w2.sanddig = o; },
+        R: null,
+        reset() { this.R = { f: null, man: null, piles: {} }; },
+        S() { return state.w2.sanddig; },
+        X() { return SANDPIT.X + SANDD.DX; }, Z() { return SANDPIT.Z; },
+        build() { this.R.f = mkFrame(this.X(), this.Z(), SANDD.W, SANDD.W, 0xFFD54F); },
+        playerStep(now, pos) {
+            if (!Areas.has('south')) return;
+            const S = this.S(), x = this.X(), z = this.Z();
+            if (!S.own) {
+                buyStep({ x, z, w: SANDD.W, h: SANDD.W }, now, pos, { rk: 'sanddig', paid: () => S.paid, cost: () => SANDD.COST, done: () => !!S.own, add: () => { S.paid++; },
+                    finish: () => { S.own = 1; S.paid = 0; S.next = simNow + SANDD.T; showToast('⛏️ Kopacz piasku zatrudniony – piasek kopie się sam!'); } });
+                return;
+            }
+            if (S.out > 0 && !PB('sand') && inRect(pos, x, z, SANDD.W, SANDD.W) && now > state.timers.nextCollectOut) {
+                state.timers.nextCollectOut = now + 0.12;
+                S.out--; Items2.give('sand', new THREE.Vector3(x, 0.4, z));
+            }
+        },
+        update(now) {
+            const S = this.S(); if (!S.own || !Areas.has('south')) return;
+            if (S.out >= SANDD.CAP || now >= S.next) { if (S.out < SANDD.CAP && S.next > 0) S.out++; S.next = now + SANDD.T / Wage.m(); }
+        },
+        render(now) {
+            const R = this.R; if (!R.f) return;
+            const S = this.S(), vis = Areas.has('south'); R.f.vis = vis;
+            Items2.pile(R.piles, 'sand', this.X(), this.Z(), vis && S.own ? S.out : 0, 12, 3);
+            if (!vis) { if (R.man) R.man.visible = false; return; }
+            if (!S.own) R.f.tp.update(buyLines('KOPACZ PIASKU', 'sanddig', SANDD.COST - S.paid), 'helper');
+            else R.f.tp.update(['GOTOWE', { i: 'sand', t: S.out + '/' + SANDD.CAP }], null);
+            if (S.own && !R.man) { const v = createVillagerMesh(0xE3C27A, 0x6D4C41); scene.add(v); R.man = v; }
+            if (R.man) { R.man.visible = !!S.own; const k = Math.sin(now * 6); R.man.position.set(SANDPIT.X + 1.0, 0.75 + Math.abs(k) * 0.07, SANDPIT.Z + 0.4); R.man.rotation.y = Math.PI / 2 + k * 0.3; }
+        }
+    });
+
+    // ---------- v234: bez złotych (rzadkich) ryb – łódka znika (zwrot do skarbca), port i karczma ich nie mają ----------
+    delete TAVSTOCK.rare;
+    { const i = BLOCKABLE.findIndex(b => b[0] === 'rareFish'); if (i >= 0) BLOCKABLE.splice(i, 1); }
+    PORT.BUY = PORT.BUY.filter(b => b[2] !== 'rareFish');
+    { const bm = W2.mods.find(m => m.key === 'boat'); if (bm) {
+        bm.build = function () {}; bm.playerStep = function () {}; bm.render = function () {};
+        bm.update = function () {
+            const S = state.w2.boat; if (!S || !(S.own || S.paid)) return;
+            const back = (S.own ? BOAT.COST : 0) + (S.paid | 0); state.bank = (state.bank || 0) + back; S.own = 0; S.paid = 0; S.out = 0;
+            showToast('🛶 Łódka ze złotymi rybami zlikwidowana – ' + back + ' monet wróciło do skarbca w namiocie');
+        };
+    } }
+
+    // ---------- v234: PRZESTAW WSZYSTKO – w opcjach przeciągnij ramkę: skóry, piekarnia, warsztaty, piasek, pola, polowanie, ramki w karczmie ----------
+    const MV = (() => {
+        const U = [];
+        const mod = k => W2.mods.find(m => m.key === k);
+        const unit = (id, name, objs, mods, extra) => U.push(Object.assign({ id, name, objs, mods }, extra || {}));
+        unit('skory', 'SKÓRY', [[SKORY, ['X'], ['Z']]], ['skory']);
+        unit('bakery', 'PIEKARNIA', [[BAKERY, ['X'], ['Z']]], ['bakery']);
+        unit('pal', 'PALENISKO', [[PAL, ['X'], ['Z']]], ['pal', 'mpor']);
+        Object.keys(WSHOPS).forEach(k => unit('ws_' + k, WSHOPS[k].title, [[WSHOPS[k], ['X'], ['Z']]], ['ws_' + k]));
+        Object.keys(WS2).forEach(k => unit('ws2_' + k, WS2[k].title, [[WS2[k], ['X'], ['Z']]], ['ws2_' + k]));
+        unit('sandpit', 'PIASEK', [[SANDPIT, ['X'], ['Z']]], ['sandpit', 'sanddig']);
+        unit('vine', 'WINNICA', [[VINE, ['X'], ['Z']]], ['vine']);
+        unit('carrot', 'MARCHEW', [[CARROT, ['X'], ['Z']]], ['carrot']);
+        unit('hunt', 'POLOWANIE', [[HUNT, ['X', 'OX', 'BX', 'FX', 'FPX'], ['Z', 'OZ', 'BZ']]], ['hunt', 'mpor']);
+        Object.keys(TAVSTOCK).forEach(k => { const d = TAVSTOCK[k]; if (d.lz === undefined) d.lz = TAV.FZ;
+            unit('ts_' + k, d.title, [[d, ['lx'], ['lz']]], ['tavstock', 'wineshelf'], { frames() { const m = mod('tavstock'); return m && m.R && m.R.f && m.R.f[k] ? [m.R.f[k]] : []; } }); });
+        // ramki w środku karczmy – współrzędne względem karczmy
+        const TZ = { brewIn: 'BREW_IN', brewWater: 'BREW_WIN', brewOut: 'BREW_OUT', spice: 'SPICE', kasa: 'KASA' };
+        Object.keys(TZ).forEach(k => { if (!TAV[TZ[k]]) return;
+            unit('tv_' + k, k === 'kasa' ? 'KASA' : k === 'spice' ? 'PRZYPRAWY' : 'BROWAR', [[TAV[TZ[k]], [0], [1]]], k === 'brewWater' ? ['brewwater'] : [], {
+                local: true, zone: k, post() { if (Tavern.applyLayout) Tavern.applyLayout(); },
+                frames() { return (Tavern.zoneRects ? Tavern.zoneRects() : []).filter(z => z.key === k).map(z => ({ x: z.x, z: z.z, w: z.w, h: z.h, vis: true })); } }); });
+        // wartości domyślne
+        U.forEach(u => { u.def = u.objs.map(([o, xs, zs]) => [xs.map(f => o[f]), zs.map(f => o[f])]); });
+        const cur = u => { const L = state.w2 && state.w2.layout; return (L && L[u.id]) || [0, 0]; };
+        function setOff(u, dx, dz) { u.objs.forEach(([o, xs, zs], i) => { xs.forEach((f, j) => { o[f] = u.def[i][0][j] + dx; }); zs.forEach((f, j) => { o[f] = u.def[i][1][j] + dz; }); }); }
+        // ramki jednostki (widoczne) – świat albo lokalnie w karczmie
+        function frames(u) {
+            if (u.frames) return u.frames();
+            const out = [], seen = new Set();
+            const walk = o => { if (!o || typeof o !== 'object' || seen.has(o) || o.isObject3D) return; seen.add(o);
+                if (o.zone && o.tp && typeof o.x === 'number' && typeof o.w === 'number') { out.push(o); return; }
+                if (Array.isArray(o)) { o.forEach(walk); return; }
+                const pr = Object.getPrototypeOf(o); if (pr !== Object.prototype && pr !== null) return;
+                for (const k in o) walk(o[k]); };
+            u.mods.forEach(k => { const m = mod(k); if (m) walk(m.R); });
+            return out;
+        }
+        const vframes = u => frames(u).filter(f => f.vis);
+        function tavBox() { const L = Tavern.level ? Tavern.level() : 0; return [-18, L >= 2 ? 30 : 18, TAV.Z0, L >= 3 ? TAV.DECK_Z3 : 6]; }
+        function ok(u, dx, dz) {
+            const fr = vframes(u); if (!fr.length) return false;
+            const A = u.local ? null : Areas.rects(), B = u.local ? tavBox() : null;
+            const others = u.local ? (Tavern.zoneRects ? Tavern.zoneRects().filter(z => z.key !== u.zone) : [])
+                : [].concat(...U.filter(o => o !== u && !o.local).map(vframes));
+            for (const f of fr) {
+                const x0 = f.x - f.w / 2 + dx, x1 = f.x + f.w / 2 + dx, z0 = f.z - f.h / 2 + dz, z1 = f.z + f.h / 2 + dz;
+                if (B) { if (x0 < B[0] || x1 > B[1] || z0 < B[2] || z1 > B[3]) return false; }
+                else if (![[x0, z0], [x1, z0], [x0, z1], [x1, z1]].every(([x, z]) => A.some(r => x >= r[0] && x <= r[1] && z >= r[2] && z <= r[3]))) return false;
+                for (const g of others) if (x0 < g.x + g.w / 2 - 0.05 && x1 > g.x - g.w / 2 + 0.05 && z0 < g.z + g.h / 2 - 0.05 && z1 > g.z - g.h / 2 + 0.05) return false;
+            }
+            return true;
+        }
+        function dispose(o, seen) {
+            if (!o || typeof o !== 'object' || seen.has(o)) return; seen.add(o);
+            if (o.isObject3D) { if (o.parent) o.parent.remove(o); return; }
+            if (Array.isArray(o)) { o.forEach(x => dispose(x, seen)); return; }
+            const pr = Object.getPrototypeOf(o); if (pr !== Object.prototype && pr !== null) return;
+            for (const k in o) dispose(o[k], seen);
+        }
+        function rebuild(keys) { keys.forEach(k => { const m = mod(k); if (!m) return; dispose(m.R, new Set()); if (m.reset) m.reset(); if (m.build) m.build(); }); }
+        // ----- przeciąganie (tylko widok; ruch idzie komendą do symulacji) -----
+        let D = null; const rc = new THREE.Raycaster(), ms = new THREE.Vector2(), pl = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        function ground(cx, cy) { if (typeof cx !== 'number' || typeof cy !== 'number') return null; ms.set(cx / window.innerWidth * 2 - 1, -(cy / window.innerHeight) * 2 + 1); rc.setFromCamera(ms, camera); const p = new THREE.Vector3(); return rc.ray.intersectPlane(pl, p) ? p : null; }
+        function toLocal(u, p) { if (!u.local) return p; const g = worldObjects.tavernGroup; return g ? new THREE.Vector3(p.x - g.position.x, 0, p.z - g.position.z) : null; }
+        function bbox(fr) { let a = Infinity, b = -Infinity, c = Infinity, d = -Infinity; fr.forEach(f => { a = Math.min(a, f.x - f.w / 2); b = Math.max(b, f.x + f.w / 2); c = Math.min(c, f.z - f.h / 2); d = Math.max(d, f.z + f.h / 2); }); return [a, b, c, d]; }
+        function down(cx, cy) {
+            const p = ground(cx, cy); if (!p) return false;
+            let best = null, ba = Infinity;
+            U.forEach(u => { const q = toLocal(u, p); if (!q) return; vframes(u).forEach(f => { if (Math.abs(q.x - f.x) <= f.w / 2 && Math.abs(q.z - f.z) <= f.h / 2 && f.w * f.h < ba) { ba = f.w * f.h; best = u; } }); });
+            if (!best) return false;
+            const bb = bbox(vframes(best)), g = new THREE.Mesh(new THREE.PlaneGeometry(bb[1] - bb[0], bb[3] - bb[2]), new THREE.MeshBasicMaterial({ color: 0x00E676, transparent: true, opacity: 0.4, depthTest: false }));
+            g.rotation.x = -Math.PI / 2; g.renderOrder = 999; scene.add(g);
+            D = { u: best, p0: toLocal(best, p), c: [(bb[0] + bb[1]) / 2, (bb[2] + bb[3]) / 2], g, dx: 0, dz: 0, ok: true };
+            place(); return true;
+        }
+        function place() {
+            const g = worldObjects.tavernGroup, ox = D.u.local && g ? g.position.x : 0, oz = D.u.local && g ? g.position.z : 0;
+            D.g.position.set(D.c[0] + D.dx + ox, 0.15, D.c[1] + D.dz + oz);
+            D.ok = ok(D.u, D.dx, D.dz); D.g.material.color.setHex(D.ok ? 0x00E676 : 0xFF5252);
+        }
+        function move(cx, cy) { if (!D) return; const p = ground(cx, cy); const q = p && toLocal(D.u, p); if (!q) return; D.dx = Math.round((q.x - D.p0.x) * 2) / 2; D.dz = Math.round((q.z - D.p0.z) * 2) / 2; place(); }
+        function up() {
+            if (!D) return; const d = D; D = null; scene.remove(d.g); d.g.geometry.dispose(); d.g.material.dispose();
+            if (!d.dx && !d.dz) return;
+            if (!d.ok) { showToast('✖ Tu nie można postawić: ' + d.u.name); return; }
+            const c = cur(d.u); Engine.queueCmd({ t: 'w2', k: 'layout', u: d.u.id, x: c[0] + d.dx, z: c[1] + d.dz });
+        }
+        // ----- symulacja -----
+        w2mod({
+            key: 'layout',
+            defaults() { return {}; },
+            reset() { U.forEach(u => setOff(u, 0, 0)); },
+            restore(v) {
+                const o = {}; if (v && typeof v === 'object') U.forEach(u => { const a = v[u.id]; if (Array.isArray(a) && isFinite(a[0]) && isFinite(a[1]) && Math.abs(a[0]) < 200 && Math.abs(a[1]) < 200) o[u.id] = [+a[0], +a[1]]; });
+                state.w2.layout = o; U.forEach(u => { const c = o[u.id] || [0, 0]; setOff(u, c[0], c[1]); });
+            },
+            afterDeco() { if (Tavern.applyLayout) Tavern.applyLayout(); },
+            cmd2(c) {
+                if (c.k !== 'layout' || typeof c.u !== 'string' || !isFinite(c.x) || !isFinite(c.z)) return;
+                const u = U.find(q => q.id === c.u); if (!u) return;
+                const L = state.w2.layout || (state.w2.layout = {}), c0 = cur(u), x = Math.round(c.x * 2) / 2, z = Math.round(c.z * 2) / 2;
+                if (Math.abs(x) > 200 || Math.abs(z) > 200 || !ok(u, x - c0[0], z - c0[1])) { if (curCtx === localCtx()) showToast('✖ Tu nie można postawić: ' + u.name); return; }
+                setOff(u, x, z); if (x || z) L[u.id] = [x, z]; else delete L[u.id];
+                rebuild(u.mods); if (u.post) u.post();
+                if (curCtx === localCtx()) showToast('✔ Przestawiono: ' + u.name);
+            }
+        });
+        return { down, move, up, drag: () => !!D, units: () => U.map(u => u.id), ok: (id, dx, dz) => { const u = U.find(q => q.id === id); return u ? ok(u, dx, dz) : null; }, frames: id => { const u = U.find(q => q.id === id); return u ? vframes(u).map(f => ({ x: f.x, z: f.z, w: f.w, h: f.h })) : []; } };
     })();
 
     init();
@@ -11265,6 +11636,7 @@ window.onerror = function(msg, src, line, col, err) {
         if ((state.dropZone.wheatBags||0) === 0) freeSkupSlot('wheatBags');
         if ((state.dropZone.water||0) === 0) freeSkupSlot('water');
         if ((state.dropZone.gems||0) === 0) freeSkupSlot('gems');
+        if ((state.dropZone.beer||0) === 0) freeSkupSlot('beer');
         IT2_KEYS().forEach(k => { if ((state.dropZone[k] | 0) === 0) freeSkupSlot(k); });
     }
     function freeSkupSlot(type) {
@@ -11398,7 +11770,7 @@ window.onerror = function(msg, src, line, col, err) {
                 }
             });
             if (closestTree && !PB('wood') && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
-                state.timers.nextChop = now + config.chopCooldown * Skills.k('topor'); chopTree(closestTree);
+                state.timers.nextChop = now + config.chopCooldown * Skills.k('topor') / qtyK(state.player.wood); chopTree(closestTree);
             }
             if(state.player.isScything) { state.player.isScything = false; sickleToolMesh.visible = false; sickleToolMesh.rotation.x = 0; }
         } else if (state.activeTool === 'sickle' && state.player.isScything === false) {
@@ -11408,7 +11780,7 @@ window.onerror = function(msg, src, line, col, err) {
             });
             
             if (closestPlant && !PB('plants') && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
-                state.timers.nextChop = now + (config.chopCooldown / 3) * Skills.k('topor');  
+                state.timers.nextChop = now + (config.chopCooldown / 3) * Skills.k('topor') / qtyK(state.player.plants);  
                 state.player.isScything = true; sickleToolMesh.visible = true;
                 chopPlant(closestPlant);
             } else if (!state.player.isScything || (now > state.timers.nextSaw && now > state.timers.nextChop)) {
@@ -11418,7 +11790,7 @@ window.onerror = function(msg, src, line, col, err) {
         
         if (state.activeTool === 'pickaxe' && state.pickaxe.unlocked) {
             if (worldObjects.rockZone && Mine.near(pos) && !PB('stone') && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
-                state.timers.nextChop = now + config.chopCooldown * Skills.k('kilof');
+                state.timers.nextChop = now + config.chopCooldown * Skills.k('kilof') / qtyK(state.player.stone);
                 state.player.isMining = true; pickaxeToolMesh.visible = true;
                 mineRock();
             }
@@ -11454,7 +11826,7 @@ window.onerror = function(msg, src, line, col, err) {
                 // Pierwszy towar (wg kolejności), dla którego jest miejsce na skupie
                 const sellOrder = [['gems', state.player.gems], ...IT2_KEYS().filter(k => IT2[k].price > 0).sort((a, b) => IT2[b].price - IT2[a].price).map(k => [k, state.player[k] | 0]), ['wheatBags', state.player.wheatBags], ['snopki', state.player.snopki], ['roastedFish', state.player.roastedFish],
                     ['herb', state.player.herbs], ['twine', state.player.twine], ['plank', state.player.planks], ['stone', state.player.stone],
-                    ['fish', state.player.fish], ['wood', state.player.wood], ['wheat', state.player.wheat], ['water', state.water ? state.water.collected : 0]];
+                    ['fish', state.player.fish], ['beer', state.player.beer | 0], ['wood', state.player.wood], ['wheat', state.player.wheat], ['water', state.water ? state.water.collected : 0]];
                 let dropType = null, hasGoods = false;
                 for (const [ty, cnt] of sellOrder) {
                     if ((cnt || 0) > 0) { hasGoods = true; if (getOrAllocateSkupSlot(ty) !== -1) { dropType = ty; break; } }
@@ -11473,7 +11845,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (worldObjects.waterZone && state.water) {
             const pW = new THREE.Vector3(); worldObjects.waterZone.getWorldPosition(pW);
             if (pos.distanceTo(pW) < 3 && !PB('water') && !state.dropLocked && now > (state.water.nextCollect||0)) {
-                state.water.nextCollect = now + 1.0; // 1s/szt
+                state.water.nextCollect = now + 1.0 / qtyK(state.water.collected); // 1s/szt, szybciej przy dużej ilości
                 state.water.collected++;
                 const dropMesh = waterDropMesh();
                 const sp2 = pW.clone(); sp2.y = 0.5; dropMesh.position.copy(sp2); scene.add(dropMesh);
@@ -11504,7 +11876,7 @@ window.onerror = function(msg, src, line, col, err) {
             }
         }
 
-        if (state.skup.expansions < 5) {
+        if (state.skup.expansions < 7) {
             let pExpand = new THREE.Vector3(); worldObjects.expandZone.getWorldPosition(pExpand);
             if (pos.distanceTo(pExpand) < 3.0 && Req.coinOk('expand', state.skup.expandPaid, state.skup.currentExpandCost) && state.player.coins > 0 && now > state.timers.nextDrop) {
                 state.timers.nextDrop = now + effectivePayCooldown; payForUpgrade('expand', pExpand);
@@ -11529,7 +11901,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (state.fishing.unlocked && !state.fishing.helperUnlocked && worldObjects.fishingGroup.visible) {
             let pFishIn = new THREE.Vector3(); worldObjects.fishingZoneIn.getWorldPosition(pFishIn);
             if (pos.distanceTo(pFishIn) < 3.0 && worldObjects.visualFishStack.length < state.fishing.maxOut && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
-                state.timers.nextChop = now + config.chopCooldown * 2 * Skills.k('ryby');
+                state.timers.nextChop = now + config.chopCooldown * 2 * Skills.k('ryby') / qtyK(state.player.fish);
                 catchFish();
             }
         }
@@ -11629,7 +12001,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (worldObjects.snopekZone && worldObjects.threshingGroup && worldObjects.threshingGroup.visible) {
             const pSnop = new THREE.Vector3(); worldObjects.snopekZone.getWorldPosition(pSnop);
             if (pos.distanceTo(pSnop) < 2.1 && !PB('snopki') && (worldObjects.visualSnopkiStack||[]).length > 0 && totalItems < config.maxPlayerItems && now > state.timers.nextCollectOut) {
-                state.timers.nextCollectOut = now + 0.2;
+                state.timers.nextCollectOut = now + 0.2 / qtyK(Math.max(worldObjects.visualSnopkiStack.length, state.player.snopki | 0));
                 const m = worldObjects.visualSnopkiStack.pop();
                 if (m) {
                     const sp = new THREE.Vector3(); m.getWorldPosition(sp);
@@ -11647,7 +12019,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (worldObjects.wheatOutZone && worldObjects.wheatFieldGroup && worldObjects.wheatFieldGroup.visible) {
             const pWOut = new THREE.Vector3(); worldObjects.wheatOutZone.getWorldPosition(pWOut);
             if (pos.distanceTo(pWOut) < 2.1 && !PB('wheat') && worldObjects.visualWheatStack.length > 0 && now > state.timers.nextCollectOut) {
-                state.timers.nextCollectOut = now + 0.15;
+                state.timers.nextCollectOut = now + 0.15 / qtyK(Math.max(worldObjects.visualWheatStack.length, state.player.wheat | 0));
                 const m = worldObjects.visualWheatStack.pop();
                 if (m) {
                     const sp = new THREE.Vector3(); m.getWorldPosition(sp);
@@ -11776,7 +12148,7 @@ window.onerror = function(msg, src, line, col, err) {
         const effectiveChopCooldown = config.chopCooldown / resourceMult;
         let rockOutPos = new THREE.Vector3(); worldObjects.rockOutZone.getWorldPosition(rockOutPos); rockOutPos.y = 0;
         if (pos.distanceTo(rockOutPos) < 3.5 && !PB('stone') && worldObjects.visualStoneOutStack.length > 0 && totalItems < config.maxPlayerItems && now > state.timers.nextCollectOut) {
-            state.timers.nextCollectOut = now + 0.15;
+            state.timers.nextCollectOut = now + 0.15 / qtyK(Math.max(worldObjects.visualStoneOutStack.length, state.player.stone | 0));
             state.player.stone++;
             let sMesh = worldObjects.visualStoneOutStack.pop();
             let startPos = new THREE.Vector3(); sMesh.getWorldPosition(startPos);
@@ -11792,7 +12164,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (state.fishing.unlocked) {
             let fishOutPos = new THREE.Vector3(); worldObjects.fishingZoneOut.getWorldPosition(fishOutPos);
             if (pos.distanceTo(fishOutPos) < 3.5 && !PB('fish') && worldObjects.visualFishStack.length > 0 && totalItems < config.maxPlayerItems && now > state.timers.nextCollectOut) {
-                state.timers.nextCollectOut = now + 0.15;
+                state.timers.nextCollectOut = now + 0.15 / qtyK(Math.max(worldObjects.visualFishStack.length, state.player.fish | 0));
                 state.player.fish++;
                 let fMesh = worldObjects.visualFishStack.pop();
                 let startPos = new THREE.Vector3(); fMesh.getWorldPosition(startPos);
@@ -11811,7 +12183,7 @@ window.onerror = function(msg, src, line, col, err) {
 
         // Auto-łowienie tylko gdy pomocnik wędkowania odblokowany
         if (state.fishing.helperUnlocked && now > state.fishing.nextCatch) {
-            state.fishing.nextCatch = now + 4.0 / Wage.m();
+            state.fishing.nextCatch = now + 4.0 / Wage.m() / (1 + 0.3 * ((state.w2 && state.w2.fishx && state.w2.fishx.lvl) | 0));   // v234: szybszy rybak (namiot)
             if (worldObjects.visualFishStack.length < state.fishing.maxOut) {
                 catchFish();
             }
@@ -12057,7 +12429,7 @@ window.onerror = function(msg, src, line, col, err) {
                     worldObjects.expandZone.position.x = expandX;
                     worldObjects.textPlanes.expand.mesh.position.x = expandX;
 
-                    if (state.skup.expansions >= 5) {
+                    if (state.skup.expansions >= 7) {
                         worldObjects.expandZone.visible = false; worldObjects.textPlanes.expand.mesh.visible = false;
                     }
                 }
@@ -12320,6 +12692,7 @@ window.onerror = function(msg, src, line, col, err) {
 
     function dropItemToSkup(type) {
         if (IT2[type]) { dropIt2ToSkup(type); return; }   // v229: bloki, chleb, dziczyzna… na wolne miejsce ramki
+        if (type === 'beer') { dropBeerToSkup(); return; }   // v234: piwo
         // Pszenica może być sprzedana ręcznie (gracz stoi na ramce sprzedaj)
         // ale NIE jest automatycznie wrzucana do sprzedaj przy przejściu
         let mesh, dropStack;
@@ -12492,7 +12865,7 @@ window.onerror = function(msg, src, line, col, err) {
     }
 
     function updateNPCs(delta, now) {
-        const hasAnythingToSell = state.dropZone.wood>0||state.dropZone.planks>0||state.dropZone.twine>0||state.dropZone.herbs>0||state.dropZone.stone>0||state.dropZone.fish>0||state.dropZone.roastedFish>0||state.dropZone.wheat>0||state.dropZone.wheatBags>0||(state.dropZone.snopki||0)>0||(state.dropZone.water||0)>0||(state.dropZone.gems||0)>0||IT2_KEYS().some(k => (state.dropZone[k] | 0) > 0);
+        const hasAnythingToSell = state.dropZone.wood>0||state.dropZone.planks>0||state.dropZone.twine>0||state.dropZone.herbs>0||state.dropZone.stone>0||state.dropZone.fish>0||state.dropZone.roastedFish>0||state.dropZone.wheat>0||state.dropZone.wheatBags>0||(state.dropZone.snopki||0)>0||(state.dropZone.water||0)>0||(state.dropZone.gems||0)>0||IT2_KEYS().some(k => (state.dropZone[k] | 0) > 0)||(state.dropZone.beer|0)>0;
         if (now > state.timers.nextNpc && hasAnythingToSell && npcs.length < 15) {
             state.timers.nextNpc = now + (1 + rand() * 3); 
             spawnNPC();
@@ -12531,6 +12904,7 @@ window.onerror = function(msg, src, line, col, err) {
                         if ((state.dropZone.water||0) > 0 && !boughtTypes.has('water')) available.push('water');
                         if ((state.dropZone.gems||0) > 0 && !boughtTypes.has('gems')) available.push('gems');
                         IT2_KEYS().forEach(k => { if ((state.dropZone[k] | 0) > 0 && !boughtTypes.has(k)) available.push(k); });
+                        if ((state.dropZone.beer|0) > 0 && !boughtTypes.has('beer')) available.push('beer');
                         
                         if (available.length === 0) break; 
                         
@@ -12551,6 +12925,7 @@ window.onerror = function(msg, src, line, col, err) {
                         else if (choice === 'water') { state.dropZone.water=(state.dropZone.water||0)-1; totalCoinsToGive += 1; itemMesh = (worldObjects.visualWaterStack||[]).pop(); }
                         else if (choice === 'gems') { state.dropZone.gems--; totalCoinsToGive += MINE.GEM_PRICE; itemMesh = (worldObjects.visualGemDropStack||[]).pop(); }
                         else if (IT2[choice]) { state.dropZone[choice]--; totalCoinsToGive += IT2[choice].price; itemMesh = skupStackIt2(choice).pop() || null; }
+                        else if (choice === 'beer') { state.dropZone.beer--; totalCoinsToGive += TAV.BEER_PRICE; itemMesh = skupStackIt2('beer').pop() || null; }
                         
                         if (itemMesh) {
                             const startPos = new THREE.Vector3(); itemMesh.getWorldPosition(startPos);
@@ -12618,6 +12993,7 @@ window.onerror = function(msg, src, line, col, err) {
                 ['beer', 'Piwo 🍺', state.player.beer||0],
                 ['gems', 'Klejnoty 💎', state.player.gems||0],
                 ['water', 'Woda 💧', state.water ? state.water.collected : 0],
+                ...IT2_KEYS().map(k => [k, IT2[k].name + ' <img src="' + Icons.url(IT2[k].icon, 24) + '" style="width:12px;height:12px;vertical-align:-2px">', state.player[k] | 0]),
             ];
             // Find which item changed since last frame
             if (!ind._prev) ind._prev = {};
@@ -12720,7 +13096,7 @@ window.onerror = function(msg, src, line, col, err) {
             worldObjects.textPlanes.wood.update(state.dropZone.planks > 0 || state.dropZone.wood > 0 || state.dropZone.twine > 0 || state.dropZone.herbs > 0 || state.dropZone.stone > 0 || state.dropZone.fish > 0 || state.dropZone.roastedFish > 0 || state.dropZone.wheat > 0 || state.dropZone.wheatBags > 0 ? [] : ["SPRZEDAJ"]);
         }
         if (worldObjects.textPlanes.coin) worldObjects.textPlanes.coin.update(state.dropZone.coins > 0 ? [] : [], state.dropZone.coins > 0 ? null : 'coin');
-        if (worldObjects.textPlanes.expand) worldObjects.textPlanes.expand.update(state.skup.expansions >= 5 ? [] : ['POSZERZ', ...Req.lines('expand'), { i: 'coin', t: state.skup.currentExpandCost - state.skup.expandPaid }]);
+        if (worldObjects.textPlanes.expand) worldObjects.textPlanes.expand.update(state.skup.expansions >= 7 ? [] : ['POSZERZ', ...Req.lines('expand'), { i: 'coin', t: state.skup.currentExpandCost - state.skup.expandPaid }]);
 
         // GOTOWE strefy – ikony
         const gotowe = {sawmill:'plank2d', sickle:'twine2d', herb:'herb', campfire:'campfire', threshing:'mill2d'};
@@ -12803,6 +13179,7 @@ window.onerror = function(msg, src, line, col, err) {
 
         const onPointerDown = (e) => {
             if (!state.isOptionsActive || e.target !== renderer.domElement) return;
+            { const cx = e.clientX || (e.touches && e.touches[0].clientX), cy = e.clientY || (e.touches && e.touches[0].clientY); if (MV.down(cx, cy)) { if (e.cancelable) e.preventDefault(); return; } }
             let clientX = e.clientX || (e.touches && e.touches[0].clientX); let clientY = e.clientY || (e.touches && e.touches[0].clientY);
             mouse.x = (clientX / window.innerWidth) * 2 - 1; mouse.y = -(clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
@@ -12852,6 +13229,7 @@ window.onerror = function(msg, src, line, col, err) {
         };
 
         const onPointerMove = (e) => {
+            if (MV.drag()) { const cx = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX), cy = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY); MV.move(cx, cy); if (e.cancelable) e.preventDefault(); return; }
             if (!isDraggingZone || !draggedGroup) return;
             let clientX = e.clientX || (e.touches && e.touches[0].clientX); let clientY = e.clientY || (e.touches && e.touches[0].clientY);
             mouse.x = (clientX / window.innerWidth) * 2 - 1; mouse.y = -(clientY / window.innerHeight) * 2 + 1;
@@ -12889,6 +13267,7 @@ window.onerror = function(msg, src, line, col, err) {
         };
 
         const onPointerUp = (e) => {
+            if (MV.drag()) { MV.up(); return; }
             if (isDraggingZone && draggedGroup) {
                 const target = draggedGroup.position.clone();
                 if (dragPreview && dragPreview.obj === draggedGroup) {
