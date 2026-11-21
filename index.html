@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gra Idle Drwal v220</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2E4A1E">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Drwal">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <script>
     // v219: komunikat startowy – zostaje widoczny, gdy plik otwarto w podglądzie (bez skryptów) albo gra nie ruszyła
     window.BootMsg = {
@@ -357,6 +363,9 @@
         .dv-need i { font-style: normal; display: inline-flex; align-items: center; gap: 2px; font-size: 12px; font-weight: 800; color: #B9F6CA; }
         .dv-need i.no { color: #FFAB91; }
         .dv-need img { width: 18px !important; height: 18px !important; flex: 0 0 18px !important; }
+        /* v220: ikony w namiocie i menu nie mogą się ściskać (reset stylów Tailwinda: img max-width 100%) */
+        body img { max-width: none; display: inline-block; vertical-align: middle; }
+        #tent-shop img, #ts-dev img, .dv-q img, #wl-menu img, .oc-row img { flex-shrink: 0; }
         </style>
 <style>/* Tailwind CSS 3.4 (MIT) */
 *,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}@media (min-width:1536px){.container{max-width:1536px}}.visible{visibility:visible}.collapse{visibility:collapse}.static{position:static}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.block{display:block}.flex{display:flex}.table{display:table}.grid{display:grid}.hidden{display:none}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.resize{resize:both}.flex-wrap{flex-wrap:wrap}.border{border-width:1px}.uppercase{text-transform:uppercase}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.outline{outline-style:solid}.ring{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow,0 0 #0000)}.filter{filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.ease-in-out{transition-timing-function:cubic-bezier(.4,0,.2,1)}
@@ -6798,6 +6807,7 @@ window.onerror = function(msg, src, line, col, err) {
                     `<label class="wc-lab">Grafika</label><div class="wc-seg">` +
                     [['auto', 'Auto'], ['2', 'Pełna'], ['1', 'Średnia'], ['0', 'Oszczędna'], ['-1', 'Bez cieni']].map(([v, t]) => `<button data-q="${v}">${t}</button>`).join('') + `</div>` +
                     `<label class="wc-lab">Zapis w pliku</label><div class="wc-seg two"><button data-f="exp">📤 Zapisz plik</button><button data-f="imp">📥 Wczytaj plik</button></div>` +
+                    `<label class="wc-lab">Pełny ekran (telefon)</label><div class="wc-seg two"><button data-fs="1">Włączony</button><button data-fs="0">Wyłączony</button></div>` +
                     `<label class="wc-lab">Komputer jako serwer (dla laptopa)</label><button class="wc-btn alt" data-f="srv">🖥️ Uruchom serwer na tym komputerze</button>` +
                     `<div class="wc-hint">Świat działa cały czas, a telefony tylko dołączają stałym kodem. Komputer musi być <b>włączony, nieuśpiony i z internetem</b>, a okno serwera otwarte – inaczej nikt nie zagra.</div>`;
             }
@@ -6808,6 +6818,9 @@ window.onerror = function(msg, src, line, col, err) {
             c.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); this.cardAction(b.dataset.w); }));
             c.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); Quality.setLevel(b.dataset.q === 'auto' ? null : +b.dataset.q); this.markQ(); }));
             c.querySelectorAll('[data-f]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); this.fileAction(b.dataset.f); }));
+            const fsMark = () => c.querySelectorAll('[data-fs]').forEach(b => b.classList.toggle('on', (b.dataset.fs === '1') === FullScr.want()));
+            c.querySelectorAll('[data-fs]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); FullScr.set(b.dataset.fs === '1'); fsMark(); }));
+            fsMark();
             const ci = this.el('wc-code');
             if (ci) ci.addEventListener('keydown', e => { if (e.key === 'Enter') this.cardAction('join'); });
             this.markQ();
@@ -6950,7 +6963,8 @@ window.onerror = function(msg, src, line, col, err) {
         const g = parent || scene;
         const zone = createZone(w, h, color, x, z, g);
         const tp = makeGroundText(w - 0.2, h - 0.2); tp.mesh.position.set(x, 0.06, z); g.add(tp.mesh);
-        return { zone, tp, x, z, w, h, set vis(v) { zone.visible = v; tp.mesh.visible = v; } };
+        // v220: odczyt „vis” też działa (wcześniej był tylko zapis → ramki zakupu bez napisów)
+        return { zone, tp, x, z, w, h, set vis(v) { zone.visible = v; tp.mesh.visible = v; }, get vis() { return zone.visible; } };
     }
     // zakup przez ramkę: najpierw towar (jeśli masz), monety od razu, ostatnia moneta po towarze
     function buyStep(f, now, pos, b) {
@@ -9273,6 +9287,45 @@ window.onerror = function(msg, src, line, col, err) {
             });
         }
     });
+
+    // =====================================================================
+    // v220: przycisk „Cofnij” w telefonie nie wyrzuca z gry. Najpierw zamyka okienka
+    // (namiot, opcje, online, menu), a gdy nic nie jest otwarte – nic nie robi
+    // (wyjście: 3× „Cofnij” w 2 sekundy albo przycisk ekranu głównego).
+    // Pełny ekran po pierwszym dotknięciu (telefon; można wyłączyć w Opcjach).
+    // =====================================================================
+    const BackGuard = {
+        armed: false, presses: [],
+        arm() { if (this.armed || Server.on) return; try { history.pushState({ drwal: 1 }, ''); this.armed = true; } catch (e) {} },
+        close() {
+            if (typeof Shop !== 'undefined' && Shop.open) { Shop.show(false); return true; }
+            const op = document.getElementById('online-panel'); if (op && op.style.display === 'block') { Online.closePanel(); return true; }
+            if (state.isOptionsActive) { toggleOptions(); return true; }
+            const wc = document.getElementById('wl-card'); if (Welcome.open && wc && wc.style.display === 'block') { Welcome.card(null); return true; }
+            return false;
+        },
+        onPop() {
+            this.armed = false;
+            if (Server.on) return;
+            if (this.close()) { this.arm(); return; }
+            const now = Date.now();
+            this.presses = this.presses.filter(t => now - t < 2000); this.presses.push(now);
+            if (this.presses.length >= 3) { this.presses = []; try { history.back(); } catch (e) {} return; }
+            showToast('🔒 „Cofnij” nie wychodzi z gry. Wyjście: 3× „Cofnij” szybko albo przycisk ekranu głównego.');
+            this.arm();
+        }
+    };
+    window.addEventListener('popstate', () => BackGuard.onPop());
+    const FullScr = {
+        want() { let v = null; try { v = localStorage.getItem('drwal_fs'); } catch (e) {} return v === null ? (('ontouchstart' in window) || navigator.maxTouchPoints > 0) : v === '1'; },
+        set(on) { try { localStorage.setItem('drwal_fs', on ? '1' : '0'); } catch (e) {} if (on) this.enter(); else this.exit(); },
+        enter() { const d = document.documentElement; if (document.fullscreenElement || !d.requestFullscreen) return; try { const p = d.requestFullscreen({ navigationUI: 'hide' }); if (p && p.catch) p.catch(() => {}); } catch (e) {} },
+        exit() { try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (e) {} }
+    };
+    ['pointerdown', 'touchend', 'keydown'].forEach(ev => window.addEventListener(ev, () => {
+        BackGuard.arm();
+        if (!Server.on && FullScr.want()) FullScr.enter();
+    }, { capture: true, passive: true }));
 
     init();
 
