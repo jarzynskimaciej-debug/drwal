@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v223</title>
+    <title>Gra Idle Drwal v224</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -761,7 +761,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v223';
+    const GAME_VERSION = 'v224';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -1863,10 +1863,10 @@ window.onerror = function(msg, src, line, col, err) {
     }
 
     function restoreBackpack() {
-        const LIM = 100;
+        const LIM = 30;   // v224: na plecach widać najwyżej 30 sztuk każdego towaru
         const add = (key, n, type, posFn, rotX) => {
             worldObjects[key] = worldObjects[key] || [];
-            for (let i = 0; i < Math.min(n | 0, LIM); i++) {
+            for (let i = 0, L = key === 'playerBackpackCoins' ? COIN_VIS : LIM; i < Math.min(n | 0, L); i++) {
                 const m = meshForItem(type); if (!m) return;
                 m.position.copy(posFn(worldObjects[key].length)); if (rotX) m.rotation.set(rotX, 0, 0);
                 playerGroup.add(m); worldObjects[key].push(m);
@@ -2155,11 +2155,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (best) {
                     withCtx(best, () => {
                         state.player.coins++;
-                        if (worldObjects.playerBackpackCoins.length >= COIN_VIS) {
-                            const tg = () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); playerGroup.localToWorld(v); return v; };
-                            spawnJumpAnimation(coinMesh, startCoinPos, tg, 0.4, 2, () => { scene.remove(coinMesh); });
-                            return;
-                        }
+                        if (worldObjects.playerBackpackCoins.length >= COIN_VIS) { scene.remove(coinMesh); return; }   // v224: ponad widoczne – bez lotu
                         const indexOnBack = worldObjects.playerBackpackCoins.length; worldObjects.playerBackpackCoins.push(coinMesh);
                         const getTargetPos = () => { const localPos = getPlayerCoinPos(indexOnBack); playerGroup.localToWorld(localPos.copy(localPos)); return localPos; };
                         spawnJumpAnimation(coinMesh, startCoinPos, getTargetPos, 0.4, 2, () => {
@@ -2168,10 +2164,7 @@ window.onerror = function(msg, src, line, col, err) {
                     });
                 } else {
                     state.dropZone.coins++;
-                    if (worldObjects.visualCoinStack.length >= COIN_VIS) {
-                        spawnJumpAnimation(coinMesh, startCoinPos, () => worldObjects.skupGroup.localToWorld(getCoinPileLocal(COIN_VIS - 1).clone()), 0.4, 2, () => { scene.remove(coinMesh); });
-                        return;
-                    }
+                    if (worldObjects.visualCoinStack.length >= COIN_VIS) { scene.remove(coinMesh); return; }   // v224: stos pełny – bez lotu
                     const pileIndex = worldObjects.visualCoinStack.length; worldObjects.visualCoinStack.push(coinMesh);
                     spawnJumpAnimation(coinMesh, startCoinPos, () => worldObjects.skupGroup.localToWorld(getCoinPileLocal(pileIndex).clone()), 0.4, 2, () => {
                         worldObjects.skupGroup.add(coinMesh); coinMesh.position.copy(getCoinPileLocal(pileIndex)); coinMesh.rotation.set(0, rand() * Math.PI, 0);
@@ -4176,6 +4169,7 @@ window.onerror = function(msg, src, line, col, err) {
             const start = new THREE.Vector3(R.grp.position.x + g.x, 1.6, R.grp.position.z + g.z);
             for (let k = 0; k < n; k++) {
                 scheduleSim(k * 0.12, () => {
+                    if (R.kasaStack.length >= TAV.KASA_VIS) return;   // v224: kasa pełna – bez lotu
                     const m = new THREE.Mesh(geoCoin, matCoin); m.position.copy(start); scene.add(m);
                     const tgt = () => kasaPos(Math.min(R.kasaStack.length, TAV.KASA_VIS - 1)).add(R.grp.position);
                     spawnJumpAnimation(m, start, tgt, 0.55, 2.2, () => {
@@ -4561,11 +4555,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (R.kasaStack.length > Math.min(T.cash, TAV.KASA_VIS)) m = R.kasaStack.pop();
             else { m = new THREE.Mesh(geoCoin, matCoin); m.position.copy(kasaPos(Math.max(0, R.kasaStack.length - 1))); R.grp.add(m); }
             const sp = new THREE.Vector3(); m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); scene.add(m); m.position.copy(sp);
-            if (worldObjects.playerBackpackCoins.length >= COIN_VIS) {
-                const tg = () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); playerGroup.localToWorld(v); return v; };
-                spawnJumpAnimation(m, sp, tg, 0.25, 1.5, () => { scene.remove(m); });
-                return;
-            }
+            if (worldObjects.playerBackpackCoins.length >= COIN_VIS) { scene.remove(m); return; }   // v224: ponad widoczne – bez lotu
             const idx = worldObjects.playerBackpackCoins.length; worldObjects.playerBackpackCoins.push(m);
             const tgt = () => { const v = getPlayerCoinPos(idx); playerGroup.localToWorld(v); return v; };
             spawnJumpAnimation(m, sp, tgt, 0.25, 1.5, () => { playerGroup.add(m); m.position.copy(getPlayerCoinPos(idx)); m.rotation.set(0, 0, 0); });
@@ -4995,10 +4985,7 @@ window.onerror = function(msg, src, line, col, err) {
                     const idx = bp.length; bp.push(m);
                     const tgt = () => { const v = getPlayerCoinPos(idx); playerGroup.localToWorld(v); return v; };
                     spawnJumpAnimation(m, sp, tgt, 0.25, 1.5, () => { playerGroup.add(m); m.position.copy(getPlayerCoinPos(idx)); m.rotation.set(0, 0, 0); });
-                } else {
-                    const tgt = () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); playerGroup.localToWorld(v); return v; };
-                    spawnJumpAnimation(m, sp, tgt, 0.25, 1.5, () => { scene.remove(m); });
-                }
+                } else scene.remove(m);   // v224: ponad widoczne – bez lotu
             }
         },
         texts() {
@@ -5217,11 +5204,11 @@ window.onerror = function(msg, src, line, col, err) {
     // Wysokość liczona tylko z pozycji (deterministycznie, obaj gracze tak samo).
     // =====================================================================
     const Wade = {
-        LX: -32, LZ: -32, R: 10, SINK: 0.42,
+        LX: -32, LZ: -32, R: 10, SINK: 0.85,   // v224: głębiej – przy brzegu po kostki, w środku po pas
         depth(x, z) {
             const dx = x - this.LX, dz = z - this.LZ, d = Math.sqrt(dx * dx + dz * dz);
             if (d >= this.R) return 0;
-            const k = (this.R - d) / 2.4;
+            const k = (this.R - d) / 4.5;
             return k >= 1 ? 1 : k;
         },
         step() {
@@ -7223,6 +7210,7 @@ window.onerror = function(msg, src, line, col, err) {
         // daj towar graczowi (lot z punktu sp do plecaka)
         give(key, sp, k) {
             state.player[key] = (state.player[key] | 0) + (k || 1);
+            if ((state.player[key] | 0) - (k || 1) >= 12) return;   // v224: ponad widoczne na plecach – bez lotu
             const m = this.mesh(key); if (!m) return;
             scene.add(m); m.position.copy(sp);
             const pg = playerGroup;
@@ -7285,12 +7273,9 @@ window.onerror = function(msg, src, line, col, err) {
             if (!ctx || players.indexOf(ctx) < 0) return;
             withCtx(ctx, () => {
                 state.player.coins++;
-                const m = new THREE.Mesh(geoCoin, matCoin), sp = from.clone(); sp.y = 1; scene.add(m); m.position.copy(sp);
                 const pg = playerGroup, arr = worldObjects.playerBackpackCoins;
-                if (arr.length >= COIN_VIS) {
-                    spawnJumpAnimation(m, sp, () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); pg.localToWorld(v); return v; }, 0.4, 2, () => { scene.remove(m); });
-                    return;
-                }
+                if (arr.length >= COIN_VIS) return;   // v224: ponad widoczne – bez lotu
+                const m = new THREE.Mesh(geoCoin, matCoin), sp = from.clone(); sp.y = 1; scene.add(m); m.position.copy(sp);
                 const idx = arr.length; arr.push(m);
                 spawnJumpAnimation(m, sp, () => { const v = getPlayerCoinPos(idx).clone(); pg.localToWorld(v); return v; }, 0.4, 2, () => {
                     if (arr.indexOf(m) !== -1) { pg.add(m); m.position.copy(getPlayerCoinPos(arr.indexOf(m))); m.rotation.set(0, 0, 0); } else scene.remove(m);
@@ -7624,7 +7609,7 @@ window.onerror = function(msg, src, line, col, err) {
             const S = state.w2.areas;
             for (const k in AREAS) {
                 const f = this.R.frames[k]; if (!f) continue;
-                f.vis = !S[k] && !!(state.tavern && state.tavern.built);
+                f.vis = !S[k];   // v224: widać od początku gry (wcześniej dopiero po karczmie, a i tak brało monety)
                 if (f.vis) f.tp.update(buyLines(AREAS[k].title, 'area_' + k, AREAS[k].cost - (S['p' + k[0]] | 0)), 'land');
             }
             this.visuals();
@@ -9632,7 +9617,15 @@ window.onerror = function(msg, src, line, col, err) {
         },
         // v223: jak dobre jest łącze (bezpośrednio / przez przekaźnik, ping, przycięcia)
         link() {
-            const O = Online; if (!O.active || O.role !== 'guest') return '';
+            const O = Online; if (!O.active) return '';
+            if (O.role === 'host' && !Server.on) {   // v224: gospodarz widzi łącze każdego gościa
+                const rows = O.peers.filter(r => r.state === 'live').map(r => {
+                    const v = r.conn && r.conn.via, nt = r.net && performance.now() - r.net.at < 10000 ? r.net : null;
+                    return `${cleanName(O.names[r.slot] || 'Gracz')}: ${v === 'relay' ? '📡 <b>przez przekaźnik</b>' : v === 'p2p' ? '📶 <b>bezpośrednio</b>' : '…'}${nt && nt.r ? ' · ping ' + nt.r + ' ms' : ''}${nt ? ' · przycięcia ' + nt.st + '/min' : ''}`;
+                });
+                return rows.length ? 'Łącze – ' + rows.join('; ') + ` · u Ciebie przycięcia: ${O.stallsMin()}/min` : '';
+            }
+            if (O.role !== 'guest') return '';
             const v = O.via(), st = O.stallsMin(), r = Math.round(O.rtt2 || 0), dl = Math.round(O.D * 1000 / 60);
             const path = v === 'relay' ? '📡 <b>przez przekaźnik</b> – wolniej: ta sieć (np. hotelowe Wi-Fi) nie pozwala na połączenie bezpośrednie' : v === 'p2p' ? '📶 <b>bezpośrednie</b>' : '…';
             return `Łącze: ${path}${r ? ' · ping ' + r + ' ms' : ''} · opóźnienie sterowania ${dl} ms · przycięcia w ostatniej minucie: ${st}`;
@@ -9650,6 +9643,64 @@ window.onerror = function(msg, src, line, col, err) {
         }
     };
     w2mod({ key: 'netinfo', render() { NetInfo.update(); } });
+
+    // ---------- v224: na plecach widać najwyżej 30 sztuk każdego towaru (monety 40, nowe towary 12) ----------
+    // Ponad to towar trafia do plecaka bez „rzucania” (drzewo dalej się trzęsie). Kolumna zawsze pokazuje
+    // tyle, ile masz (do 30) – także po oddaniu części. Liczone w kroku gry: u wszystkich graczy tak samo.
+    const BP_CAP = 30;
+    const BPV = [
+        ['playerBackpackWood', 'wood', i => getPlayerWoodPos(i)], ['playerBackpackPlanks', 'planks', i => getPlayerPlankPos(i)],
+        ['playerBackpackPlants', 'plants', i => getPlayerPlantPos(i)], ['playerBackpackTwine', 'twine', i => getPlayerTwinePos(i), Math.PI / 2],
+        ['playerBackpackHerbs', 'herbs', i => getPlayerHerbPos(i)], ['playerBackpackStone', 'stone', i => getPlayerStonePos(i)],
+        ['playerBackpackFish', 'fish', i => getPlayerFishPos(i)], ['playerBackpackRoastedFish', 'roastedFish', i => getPlayerRoastedFishPos(i)],
+        ['playerBackpackWheat', 'wheat', i => getPlayerWheatPos(i)], ['playerBackpackWheatBags', 'wheatBags', i => getPlayerWheatBagPos(i)],
+        ['playerBackpackSnopki', 'snopki', i => new THREE.Vector3(0.3, 0.3 + i * 0.35, -0.4)], ['playerBackpackBeer', 'beer', i => getPlayerBeerPos(i)],
+        ['playerBackpackGems', 'gems', i => getPlayerGemPos(i)], ['playerBackpackWater', 'water', i => new THREE.Vector3(-0.1, 0.5 + i * 0.3, 0.3)]
+    ];
+    function bpCount(type) { return type === 'water' ? (state.water ? state.water.collected | 0 : 0) : (state.player[type] | 0); }
+    // nowy towar dołożony ponad widoczne? – wyjmij go z kolumny (zostaje w liczniku plecaka)
+    function bpOver(mesh) {
+        for (let j = 0; j < BPV.length; j++) {
+            const arr = worldObjects[BPV[j][0]]; if (!arr || !arr.length) continue;
+            const i = arr.lastIndexOf(mesh);
+            if (i >= 0) { if (i >= BP_CAP) { arr.splice(i, 1); return true; } return false; }
+        }
+        return false;
+    }
+    const _sja = spawnJumpAnimation;
+    spawnJumpAnimation = function (mesh, sp, tg, dur, arc, done) {
+        if (mesh && mesh.isObject3D && bpOver(mesh)) { if (mesh.parent) mesh.parent.remove(mesh); return; }
+        return _sja(mesh, sp, tg, dur, arc, done ? () => { if (mesh && mesh.__bpGone) { if (mesh.parent) mesh.parent.remove(mesh); return; } done(); } : done);
+    };
+    function bpSync() {
+        players.forEach(c => withCtx(c, () => {
+            if (c.ghost) return;
+            for (let j = 0; j < BPV.length; j++) {
+                const [key, type, posFn, rotX] = BPV[j], arr = worldObjects[key]; if (!arr) continue;
+                const n = Math.min(bpCount(type), BP_CAP);
+                while (arr.length > n) { const m = arr.pop(); if (m) { m.__bpGone = true; if (m.parent) m.parent.remove(m); } }
+                while (arr.length < n) {
+                    const m = type === 'water' ? waterDropMesh() : meshForItem(type); if (!m) break;
+                    m.position.copy(posFn(arr.length)); if (rotX) m.rotation.set(rotX, 0, 0);
+                    playerGroup.add(m); arr.push(m);
+                }
+            }
+        }));
+    }
+    w2mod({ key: 'bpvis', update() { bpSync(); } });
+
+    // ---------- v224: ramka pomocnika pojawia się zawsze, gdy zakład działa i „Zatrudnię” jest kupione ----------
+    // (wcześniej np. przy suszeniu ziół kupionym PO „Zatrudnię” ramka pomocnika nie wychodziła – tak samo jak przy wczytaniu gry)
+    w2mod({
+        key: 'helperfix',
+        update() {
+            if (!state.hireGate || !state.hireGate.unlocked) return;
+            const show = (z, tp) => { if (z && !z.visible) { z.visible = true; if (tp) tp.mesh.visible = true; } };
+            ['sawmill', 'sickle', 'herb', 'threshing'].forEach(k => { if (facilities[k] && facilities[k].unlocked) show(worldObjects[k + 'HelperZone'], worldObjects.textPlanes[k + 'Helper']); });
+            if (state.fishing && state.fishing.unlocked) show(worldObjects.fishingHelperZone, worldObjects.textPlanes.fishingHelper);
+            if (state.wheatField && (state.wheatField.seeded || state.wheatField.hasBeenSeeded)) show(worldObjects.wheatHelperZone, worldObjects.textPlanes.wheatHelper);
+        }
+    });
 
     init();
 
@@ -11479,11 +11530,7 @@ window.onerror = function(msg, src, line, col, err) {
         const startPos = new THREE.Vector3(); coinMesh.getWorldPosition(startPos);
         worldObjects.skupGroup.remove(coinMesh); scene.add(coinMesh); coinMesh.position.copy(startPos);
 
-        if (worldObjects.playerBackpackCoins.length >= COIN_VIS) {
-            const tg = () => { const v = new THREE.Vector3(0.5, 1.2, -0.5); playerGroup.localToWorld(v); return v; };
-            spawnJumpAnimation(coinMesh, startPos, tg, 0.25, 1.5, () => { scene.remove(coinMesh); });
-            return;
-        }
+        if (worldObjects.playerBackpackCoins.length >= COIN_VIS) { scene.remove(coinMesh); return; }   // v224: ponad widoczne – bez lotu
         const indexOnBack = worldObjects.playerBackpackCoins.length; worldObjects.playerBackpackCoins.push(coinMesh);
         const getTargetPos = () => { const localPos = getPlayerCoinPos(indexOnBack); playerGroup.localToWorld(localPos.copy(localPos)); return localPos; };
         spawnJumpAnimation(coinMesh, startPos, getTargetPos, 0.25, 1.5, () => {
