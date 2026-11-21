@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v230</title>
+    <title>Gra Idle Drwal v231</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -775,7 +775,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v230';
+    const GAME_VERSION = 'v231';
     const DT = 1 / 60;
     let simTick = 0, simNow = 0;
     let STATE0 = null, FAC0 = null;
@@ -10277,6 +10277,143 @@ window.onerror = function(msg, src, line, col, err) {
             R.fx.vis = !!(R.fin && R.fin.vis) && !!S.own && S.cap < d.capMax;
             if (R.fx.vis) R.fx.tp.update(['MAKS', ...Req.lines('masonx'), { i: 'coin', t: S.xcost - S.xpaid }], null);
         };
+    })();
+
+    // ---------- v231: TRAGARZE-TRASY – łączą źródła surowców z warsztatami i karczmą (gospodarka sama się kręci) ----------
+    // każdy tragarz obsługuje swój zakład: wybiera surowiec, którego najbardziej brakuje, idzie do źródła, ładuje, zanosi
+    const RP_PT = (x, z) => ({ x, z });
+    const wpos = o => { if (!o) return null; const v = new THREE.Vector3(); o.getWorldPosition(v); return { x: v.x, z: v.z }; };
+    const RP_SRC = {
+        mine: { t: 0.22, pos() { const g = worldObjects.stoneOutGroup; return g ? RP_PT(g.position.x - 1.9, g.position.z + 1.6) : null; },
+                avail() { return (state.stoneHelper && state.stoneHelper.unlocked && worldObjects.visualStoneOutStack) ? worldObjects.visualStoneOutStack.length : 0; },
+                take() { const m = worldObjects.visualStoneOutStack.pop(); if (m && m.parent) m.parent.remove(m); } },
+        mill: { t: 0.22, pos() { const p = wpos(worldObjects.threshingZoneOut) || wpos(worldObjects.threshingGroup); return p ? RP_PT(p.x, p.z + 2.2) : null; },
+                avail() { const f = facilities.threshing; return f && f.unlocked ? f.output | 0 : 0; },
+                take() { const f = facilities.threshing; f.output--; const m = f.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } },
+        water: { t: 0.45, pos() { const p = wpos(worldObjects.waterZone); return p ? RP_PT(p.x + 1.2, p.z + 1.2) : null; }, avail() { return worldObjects.waterZone ? 99 : 0; }, take() {} },
+        sand: { t: 0.45, pos() { return RP_PT(SANDPIT.X + 1.5, SANDPIT.Z + 1.5); }, avail() { return Areas.has('south') ? 99 : 0; }, take() {} },
+        vine: { t: 0.3, pos() { return RP_PT(VINE.X, VINE.Z + VINE.H / 2 - 0.8); }, avail() { const S = state.w2.vine; return S && S.own ? S.ripe | 0 : 0; }, take() { state.w2.vine.ripe--; } },
+        carrot: { t: 0.25, pos() { return RP_PT(CARROT.X, CARROT.Z + 1.5); }, avail() { const S = state.w2.carrot; return S && S.own && Areas.has('east') ? S.ripe | 0 : 0; }, take() { state.w2.carrot.ripe--; } },
+        hunt: { t: 0.3, pos() { return RP_PT(HUNT.OX + 1.2, HUNT.OZ + 1.6); }, avail() { const S = state.w2.hunt; return S && Areas.has('east') ? S.out | 0 : 0; }, take() { state.w2.hunt.out--; } },
+        huta: { t: 0.2, pos() { return RP_PT(WS2.huta.X + 4.4, WS2.huta.Z + 2.2); }, avail() { const S = state.w2.ws2_huta; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.ws2_huta.out--; } },
+        winery: { t: 0.2, pos() { return RP_PT(WS2.winery.X + 4.4, WS2.winery.Z + 2.2); }, avail() { const S = state.w2.ws2_winery; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.ws2_winery.out--; } },
+        kuchnia: { t: 0.2, pos() { return RP_PT(WS2.kuchnia.X + 4.4, WS2.kuchnia.Z + 2.2); }, avail() { const S = state.w2.ws2_kuchnia; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.ws2_kuchnia.out--; } },
+        pal: { t: 0.2, pos() { return RP_PT(PAL.X + 4.2, PAL.Z + 2.2); }, avail() { const S = state.w2.pal; return S && S.own ? S.out | 0 : 0; }, take() { state.w2.pal.out--; } }
+    };
+    const rpWs2 = (w, k) => ({ pos() { return RP_PT(WS2[w].X - 4.4, WS2[w].Z + 2.4); }, room() { const S = state.w2['ws2_' + w]; return S && S.own ? Math.max(0, WS2[w].cap - (S.inv[k] | 0)) : 0; }, put() { state.w2['ws2_' + w].inv[k]++; } });
+    const rpTav = k => ({
+        pos() { const tv = W2.mods.find(m => m.key === 'tavstock'), p = tv && tv.pos(k); return p ? RP_PT(p.x, p.z + 2.4) : null; },
+        room() { const T = Tavern.T, tv = W2.mods.find(m => m.key === 'tavstock'), d = TAVSTOCK[k]; if (!T || !tv || !d || !tv.vis(k)) return 0; return Math.max(0, d.cap() - (T[d.field || k] | 0)); },
+        put() { const T = Tavern.T, d = TAVSTOCK[k]; T[d.field || k] = (T[d.field || k] | 0) + 1; }
+    });
+    const RP_DST = {
+        mason: { pos() { return RP_PT(WSHOPS.mason.X - 4.2, WSHOPS.mason.Z + 2.4); }, room() { const S = state.w2.ws_mason; return S && S.own ? Math.max(0, S.cap - (S.in | 0)) : 0; }, put() { state.w2.ws_mason.in++; } },
+        bakeFl: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, BAKERY.CAP - (S.fl | 0)) : 0; }, put() { state.w2.bakery.fl++; } },
+        bakeWa: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, BAKERY.CAP - (S.wa | 0)) : 0; }, put() { state.w2.bakery.wa++; } },
+        hutaSand: rpWs2('huta', 'sand'), hutaWater: rpWs2('huta', 'water'),
+        winGrapes: rpWs2('winery', 'grapes'), winGlass: rpWs2('winery', 'glass'),
+        kuchCarrot: rpWs2('kuchnia', 'carrot'), kuchMeat: rpWs2('kuchnia', 'meat'),
+        tavWine: rpTav('wine'), tavStew: rpTav('stew'), tavRoast: rpTav('meat')
+    };
+    const own2 = k => !!(state.w2[k] && state.w2[k].own);
+    const RP = [
+        { key: 'kam', name: 'Tragarz: kopalnia → kamieniarz', desc: 'Nosi kamień z kopalni do KAMIENIARZA', price: 400, shirt: 0x78909C, hat: 0x37474F,
+          ok: () => own2('ws_mason') && !!(state.stoneHelper && state.stoneHelper.unlocked), lock: 'najpierw kamieniarz i górnicy w kopalni',
+          legs: [{ it: 'stone', src: 'mine', dst: 'mason' }] },
+        { key: 'pie', name: 'Tragarz: młyn → piekarnia', desc: 'Nosi mąkę z MŁYNA i wodę ze źródła do PIEKARNI', price: 500, shirt: 0xFFF8E1, hat: 0x8D6E63,
+          ok: () => own2('bakery') && !!(facilities.threshing && facilities.threshing.unlocked), lock: 'najpierw piekarnia',
+          legs: [{ it: 'wheatBags', src: 'mill', dst: 'bakeFl' }, { it: 'water', src: 'water', dst: 'bakeWa' }] },
+        { key: 'hut', name: 'Tragarz: piasek i woda → huta', desc: 'Kopie piasek w piaskowni i nosi wodę do HUTY', price: 500, shirt: 0xE3C27A, hat: 0x6D4C41,
+          ok: () => own2('ws2_huta'), lock: 'najpierw huta szkła', legs: [{ it: 'sand', src: 'sand', dst: 'hutaSand' }, { it: 'water', src: 'water', dst: 'hutaWater' }] },
+        { key: 'tlo', name: 'Tragarz: winnica i huta → tłocznia', desc: 'Zrywa winogrona i nosi szkło z huty do TŁOCZNI', price: 600, shirt: 0x8E24AA, hat: 0x4A148C,
+          ok: () => own2('ws2_winery'), lock: 'najpierw tłocznia wina', legs: [{ it: 'grapes', src: 'vine', dst: 'winGrapes' }, { it: 'glass', src: 'huta', dst: 'winGlass' }] },
+        { key: 'kuc', name: 'Tragarz: marchew i dziczyzna → kuchnia', desc: 'Zbiera marchew z pola i nosi dziczyznę od myśliwego do KUCHNI POLOWEJ', price: 600, shirt: 0xFB8C00, hat: 0x5D4037,
+          ok: () => own2('ws2_kuchnia'), lock: 'najpierw kuchnia polowa', legs: [{ it: 'carrot', src: 'carrot', dst: 'kuchCarrot' }, { it: 'meat', src: 'hunt', dst: 'kuchMeat' }] },
+        { key: 'kar', name: 'Tragarz: wino, gulasz, pieczeń → karczma', desc: 'Nosi wino z tłoczni, gulasz z kuchni i pieczeń z paleniska do KARCZMY', price: 700, shirt: 0xC62828, hat: 0x212121,
+          ok: () => !!(state.tavern && state.tavern.kominekBuilt) && (own2('ws2_winery') || own2('ws2_kuchnia') || own2('pal')), lock: 'najpierw karczma z grillem i tłocznia, kuchnia albo palenisko',
+          legs: [{ it: 'wine', src: 'winery', dst: 'tavWine' }, { it: 'stew', src: 'kuchnia', dst: 'tavStew' }, { it: 'pieczen', src: 'pal', dst: 'tavRoast' }] }
+    ];
+    const rpOwned = r => !!(state.porters && state.porters['rp_' + r.key]);
+    function rpMesh(it) {
+        if (IT2[it]) return Items2.mesh(it);
+        if (it === 'stone') return new THREE.Mesh(geoStone, matStone);
+        if (it === 'water') { const m = waterDropMesh(); m.scale.setScalar(0.62); return m; }
+        if (it === 'wheatBags') return createWheatBagMesh();
+        return null;
+    }
+    w2mod({
+        key: 'rp',
+        defaults() { const o = {}; RP.forEach(r => { o[r.key] = { x: 0, z: 0, st: 0, n: 0, t: 0, leg: 0, face: 0 }; }); return o; },
+        restore(v) {
+            const o = this.defaults();
+            RP.forEach(r => { const s = mergeNum(o[r.key], v && v[r.key]); s.st = 0; s.t = 0; s.n = Math.max(0, Math.min(15, s.n | 0)); s.leg = Math.max(0, Math.min(r.legs.length - 1, s.leg | 0)); o[r.key] = s; });
+            state.w2.rp = o;
+        },
+        R: null,
+        reset() { if (this.R) Object.values(this.R.p).forEach(q => { if (q.mesh && q.mesh.parent) q.mesh.parent.remove(q.mesh); }); this.R = { p: {} }; },
+        home(r) { const d = RP_DST[r.legs[0].dst].pos(); return d ? RP_PT(d.x + 1.6, d.z + 0.6) : null; },
+        cap() { const X = state.w2 && state.w2.shopx; return 6 + 3 * (X ? X.pcap | 0 : 0); },
+        update(now) {
+            const sp = 4.2 * (0.8 + 0.2 * Wage.m()) * (1 + 0.2 * ((state.w2.shopx && state.w2.shopx.pspd) | 0));
+            RP.forEach(r => {
+                if (!rpOwned(r)) return;
+                const S = state.w2.rp[r.key], hm = this.home(r); if (!hm) return;
+                if (S.x === 0 && S.z === 0) { S.x = hm.x; S.z = hm.z; }
+                const L = r.legs[S.leg], src = RP_SRC[L.src], dst = RP_DST[L.dst];
+                switch (S.st) {
+                    case 0: {   // w domu: najpierw dostarcza, co niesie; potem wybiera najbardziej potrzebny surowiec
+                        if (!wpWalk(S, hm.x, hm.z, sp) || now < S.t) break;
+                        S.t = now + 1;
+                        if (S.n > 0) { if (dst.room() > 0 && dst.pos()) S.st = 3; break; }
+                        let best = -1, br = 0;
+                        r.legs.forEach((l, i) => { const so = RP_SRC[l.src], de = RP_DST[l.dst], rm = de.room(); if (rm > br && so.avail() > 0 && so.pos() && de.pos()) { br = rm; best = i; } });
+                        if (best >= 0) { S.leg = best; S.st = 1; }
+                        break;
+                    }
+                    case 1: { const q = src.pos(); if (!q) { S.st = 0; break; } if (wpWalk(S, q.x, q.z, sp)) { S.st = 2; S.t = now + src.t; } break; }
+                    case 2:   // ładuje
+                        if (now < S.t) break;
+                        if (S.n < Math.min(this.cap(), dst.room()) && src.avail() > 0) { src.take(); S.n++; S.t = now + src.t / Wage.m(); }
+                        else S.st = S.n > 0 ? 3 : 0;
+                        break;
+                    case 3: { const q = dst.pos(); if (!q) { S.st = 0; break; } if (wpWalk(S, q.x, q.z, sp)) { S.st = 4; S.t = now + 0.25; } break; }
+                    case 4:   // oddaje po sztuce
+                        if (now < S.t) break;
+                        if (S.n > 0 && dst.room() > 0) { dst.put(); S.n--; S.t = now + 0.25; }
+                        else S.st = 0;
+                        break;
+                }
+            });
+        },
+        render() {
+            RP.forEach(r => {
+                const S = state.w2.rp && state.w2.rp[r.key]; if (!S) return;
+                let q = this.R.p[r.key];
+                if (!rpOwned(r)) { if (q && q.mesh) q.mesh.visible = false; return; }
+                if (!q) q = this.R.p[r.key] = { mesh: createVillagerMesh(r.shirt, r.hat), carry: [], it: '' };
+                if (q.mesh.parent !== scene) scene.add(q.mesh);
+                q.mesh.visible = true;
+                const moving = S.st === 1 || S.st === 3 || (S.st === 0 && (Math.abs(q.mesh.position.x - S.x) > 0.001 || Math.abs(q.mesh.position.z - S.z) > 0.001));
+                q.mesh.position.set(S.x, 0.75 + (moving ? Math.abs(Math.sin(simNow * 10 + r.key.length)) * 0.1 : 0), S.z);
+                q.mesh.rotation.y = S.face || 0;
+                q.mesh.rotation.z = (S.st === 2 || S.st === 4) ? Math.sin(simNow * 14) * 0.05 : 0;
+                const it = r.legs[S.leg] ? r.legs[S.leg].it : '';
+                if (q.it !== it) { q.carry.forEach(m => m.parent && m.parent.remove(m)); q.carry = []; q.it = it; }
+                const n = Math.min(S.n, 12);
+                while (q.carry.length > n) { const m = q.carry.pop(); if (m.parent) m.parent.remove(m); }
+                while (q.carry.length < n) { const m = rpMesh(it); if (!m) break; m.scale.multiplyScalar(0.85); q.mesh.add(m); q.carry.push(m); }
+                q.carry.forEach((m, i) => m.position.set(0, -0.1 + i * 0.22, -0.5));
+            });
+        }
+    });
+    // w namiocie, za tragarzem wody
+    (function rpShop() {
+        let at = SHOP_ITEMS.findIndex(i => i.k === 'por_water'); at = at < 0 ? Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage')) : at + 1;
+        RP.slice().reverse().forEach(r => SHOP_ITEMS.splice(at, 0, {
+            k: 'rp_' + r.key, ext: true, icon: 'porter', name: r.name, desc: () => r.desc + ' – sam wybiera, czego najbardziej brakuje',
+            price: () => r.price, status: () => rpOwned(r) ? 'own' : r.ok() ? 'ok' : 'lock', lockText: r.lock, ownText: '✔ nosi',
+            apply: () => { if (!state.porters) state.porters = {}; state.porters['rp_' + r.key] = 1; if (curCtx === localCtx()) showToast('🧺 ' + r.name + ' – zatrudniony!'); }
+        }));
     })();
 
     init();
