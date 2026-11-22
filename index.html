@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v234</title>
+    <title>Gra Idle Drwal v235</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v234';
+    const GAME_VERSION = 'v235';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -1690,7 +1690,7 @@ window.onerror = function(msg, src, line, col, err) {
         Tavern.restore(obj(s.tavern2));
         World2.restore(obj(s.w2));
         state.bank = Math.max(0, Math.floor(numOr(s.bank, 0)));
-        state.wage = Math.max(0, Math.min(5, Math.floor(numOr(s.wage, 0))));
+        state.wage = Math.max(0, Math.min(10, Math.floor(numOr(s.wage, 0))));
         state.porters = {}; if (obj(s.porters)) Object.keys(s.porters).forEach(k => { if (s.porters[k]) state.porters[k] = 1; });
         state.req = {};
         if (obj(s.req)) Object.keys(s.req).forEach(k => { const v = s.req[k]; if (!obj(v)) return; const o = {}; Object.keys(v).forEach(r => { if (typeof v[r] === 'number' && isFinite(v[r])) o[r] = Math.max(0, Math.floor(v[r])); }); state.req[k] = o; });
@@ -4294,7 +4294,7 @@ window.onerror = function(msg, src, line, col, err) {
         // v234: wino kelnerzy biorą z półki przy ramce wina, piwo – od nalewaka
         function winePick() { const d = (typeof TAVSTOCK !== 'undefined') && TAVSTOCK.wine; return d ? [d.lx, (d.lz !== undefined ? d.lz : TAV.FZ) + 2.3] : TAV.BAR_PICK; }
         // v234: barman z namiotu: szybszy (+30% na poziom)
-        function barK(w) { return w && w.bar ? 1 + 0.3 * ((state.w2 && state.w2.barx && state.w2.barx.lvl) | 0) : 1; }
+        function barK(w) { return w && w.bar ? 1 + 0.2 * ((state.w2 && state.w2.barx && state.w2.barx.lvl) | 0) : 1; }
         function wspd(w) { return TAV.WSPEED * (1 + 0.1 * (state.wage | 0)) * barK(w); }
         function pickPoint(item, g) { return item === 'b' ? ((g && g.wine) ? winePick() : TAV.BAR_PICK) : TAV.PICKUP; }
         function stock(item) { return item === 'b' ? T.brew.out : (facilities.kominek ? facilities.kominek.output : 0); }
@@ -6013,7 +6013,7 @@ window.onerror = function(msg, src, line, col, err) {
     function takeRes(res) { if (res === 'water') { if (state.water) state.water.collected--; } else state.player[res]--; }
     // gracz blokuje zbieranie danego towaru (klik w wierszu plecaka)
     function PB(type) { return !!(curCtx && curCtx.block && curCtx.block[type]); }
-    const Wage = { m() { return 1 + 0.25 * Math.max(0, Math.min(5, state.wage | 0)); } };
+    const Wage = { m() { return 1 + 0.25 * Math.max(0, Math.min(10, state.wage | 0)); } };
 
     // przedmiot z plecaka leci na ramkę i znika
     function giveItemTo(res, target) {
@@ -6193,13 +6193,13 @@ window.onerror = function(msg, src, line, col, err) {
         item(k) { return SHOP_ITEMS.find(i => i.k === k) || ShopX.items().find(i => i.k === k); },
         status(it) {
             if (it.ext) return it.status ? it.status() : 'ok';
-            if (it.k === 'wage') return (state.wage | 0) >= 5 ? 'max' : 'ok';
+            if (it.k === 'wage') return (state.wage | 0) >= 10 ? 'max' : 'ok';
             if (Porters.owned(it.fac)) return 'own';
             if (it.fac === 'stone') return state.stoneHelper.unlocked ? 'ok' : 'lock';
             if (!facilities[it.fac] || !facilities[it.fac].unlocked) return 'lock';
             return 'ok';
         },
-        price(it) { return it.ext ? (it.price ? it.price() : 0) : it.price; },
+        price(it) { return it.ext ? (it.price ? it.price() : 0) : it.k === 'wage' ? 200 * Math.max(1, (state.wage | 0) - 3) : it.price; },
         // płaci skarbiec namiotu, a brakującą resztę – kupujący
         buy(k) {
             const it = this.item(k); if (!it) return;
@@ -6241,7 +6241,7 @@ window.onerror = function(msg, src, line, col, err) {
             tab.innerHTML = SHOP_ITEMS.concat(ShopX.items()).filter(i => !i.hidden).map(it => {
                 const s = this.status(it), pr = this.price(it);
                 let desc = it.ext ? it.desc() : it.desc;
-                if (it.k === 'wage') desc += ` (poziom ${state.wage | 0}/5, teraz +${Math.round((Wage.m() - 1) * 100)}%)`;
+                if (it.k === 'wage') desc += ` (poziom ${state.wage | 0}/10, teraz +${Math.round((Wage.m() - 1) * 100)}%)`;
                 let btn;
                 if (s === 'own') btn = '<span class="ts-own">' + (it.ownText || '✔ pracuje') + '</span>' + (it.toggle ? `<button class="ts-tog" data-k="${it.toggle.k}">${it.toggle.label()}</button>` : '') + (it.toggle2 ? `<button class="ts-tog" data-k="${it.toggle2.k}">${it.toggle2.label()}</button>` : '');
                 else if (s === 'max') btn = '<span class="ts-own">✔ maks.</span>';
@@ -7678,7 +7678,7 @@ window.onerror = function(msg, src, line, col, err) {
         rects() {
             const r = [[-48, 48, -48, 48]];
             for (const k in AREAS) if (this.has(k)) r.push(AREAS[k].rect);
-            if (this.has('south') && state.w2.port && state.w2.port.own) r.push([-1.6, 1.6, 78, 96]);   // pomost portu
+            if (this.has('south') && state.w2.port && state.w2.port.own) r.push([-2.45, 2.45, 78, 96]);   // pomost portu (v235: szerszy o 50%)
             { const g = worldObjects.tavernGroup; if (g && Tavern.level && Tavern.level() >= 3) r.push([g.position.x - 18, g.position.x + 30, g.position.z, g.position.z + TAV.DECK_Z3]); }   // v234: sala karczmy w dół
             return r;
         },
@@ -8046,25 +8046,30 @@ window.onerror = function(msg, src, line, col, err) {
     });
 
     // ---------- PORT: statki kupców (zamówienia za 3x, kryształy i rzadkie ryby na sprzedaż) i statki ze szlachtą ----------
-    const PORT = { X: 8, Z: 73.5, COST: 1500, REQ: { planks: 40, blocks: 20 }, DOCK_Z: 99, ORDER_X: 0, ORDER_Z: 92.5, BUY: [[0, 82.2, 'crystal', 40], [0, 86.4, 'rareFish', 25]],
+    const PORT = { X: 8, Z: 73.5, COST: 1500, REQ: { planks: 40, blocks: 20 }, DOCK_Z: 99, ORDER_X: 0, ORDER_Z: 92.5, OFF: [[-1.2, 88.6], [1.2, 88.6], [-1.2, 91.9], [1.2, 91.9]], PAY: [0, 85.0], BUY: [[0, 82.2, 'crystal', 40], [0, 86.4, 'rareFish', 25]],
         PRICE: { planks: 2, twine: 2, herbs: 2, fish: 3, roastedFish: 6, beer: 4, wheatBags: 5, blocks: 6, glass: 10, wine: 30, gems: 15, stone: 1, wood: 1 } };
     Req.def('port', { lvl: () => state.w2.port.own, need: () => PORT.REQ });
     const Port = w2mod({
         key: 'port',
-        defaults() { return { own: 0, paid: 0, next: 0, kind: '', t0: 0, stay: 0, order: {}, got: {}, reward: 0, done: 0, stock: { crystal: 0, rareFish: 0 }, bp: { crystal: 0, rareFish: 0 }, nob: 0, nobT: 0, ships: 0 }; },
+        defaults() { return { own: 0, paid: 0, next: 0, kind: '', t0: 0, stay: 0, order: {}, got: {}, price: {}, pay: 0, gone: 0, reward: 0, done: 0, stock: { crystal: 0, rareFish: 0 }, bp: { crystal: 0, rareFish: 0 }, nob: 0, nobT: 0, ships: 0 }; },
         restore(v) {
             const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0;
             const clean = (src, max) => { const r = {}; if (src && typeof src === 'object') Object.keys(src).forEach(k => { if ((PORT.PRICE[k] || IT2[k]) && typeof src[k] === 'number') r[k] = Math.max(0, Math.min(max, src[k] | 0)); }); return r; };
-            o.order = clean(v && v.order, 40); o.got = clean(v && v.got, 40);
+            o.order = clean(v && v.order, 200); o.got = clean(v && v.got, 200); o.price = clean(v && v.price, 99999);
+            Object.keys(o.order).forEach(k => { if (!o.price[k]) o.price[k] = o.order[k] * (PORT.PRICE[k] || (IT2[k] && IT2[k].price) || 2) * 3; });
             o.kind = (o.kind === 'm' || o.kind === 'n') ? o.kind : '';
             state.w2.port = o;
         },
         R: null,
-        reset() { this.R = { f: null, ord: null, buy: [], pier: null, ship: null, shipKind: '' }; },
+        reset() { this.R = { f: null, offs: [], pay: null, buy: [], pier: null, ship: null, shipKind: '' }; },
         S() { return state.w2.port; },
         build() {
             this.R.f = mkFrame(PORT.X, PORT.Z, 5, 4, 0x81D4FA);
-            this.R.ord = mkFrame(PORT.ORDER_X, PORT.ORDER_Z, 3.0, 3.6, 0xFFD54F);
+            this.R.offs = PORT.OFF.map(([x, z]) => mkFrame(x, z, 2.3, 3.0, 0xFFD54F));   // v235: oferty kupców na pomoście
+            this.R.pay = mkFrame(PORT.PAY[0], PORT.PAY[1], 3.0, 2.6, 0xFFC107);   // wypłata zostaje po odpłynięciu
+            // ramki na pomoście leżą na deskach (wcześniej chowały się pod nimi)
+            const lift = f => { f.zone.position.y += 0.36; f.tp.mesh.position.y += 0.36; };
+            this.R.offs.forEach(lift); lift(this.R.pay); this.R.buy.forEach(lift);
             this.R.buy = PORT.BUY.map(([x, z]) => mkFrame(x, z, 2.8, 2.8, 0x80DEEA));
         },
         // faza statku: 0 brak, 1 przypływa, 2 w porcie, 3 odpływa
@@ -8073,9 +8078,9 @@ window.onerror = function(msg, src, line, col, err) {
             const S = this.S();
             const tav = !!(state.tavern && state.tavern.kominekBuilt && Tavern.T && Tavern.T.tables.some(Boolean));
             S.kind = (tav && rand() < 0.42) ? 'n' : 'm'; S.t0 = now; S.done = 0; S.ships++;
-            S.order = {}; S.got = {}; S.reward = 0; S.stock = { crystal: 0, rareFish: 0 }; S.bp = { crystal: 0, rareFish: 0 };
+            S.order = {}; S.got = {}; S.price = {}; S.gone = 0; S.reward = 0; S.stock = { crystal: 0, rareFish: 0 }; S.bp = { crystal: 0, rareFish: 0 };
             if (S.kind === 'm') {
-                S.stay = 150;
+                S.stay = 240;
                 // zamówienie: 3 rodzaje towarów, które da się zrobić w tym świecie
                 const pool = ['planks', 'twine', 'herbs', 'fish'];
                 if (state.pickaxe.unlocked) pool.push('stone');
@@ -8086,10 +8091,14 @@ window.onerror = function(msg, src, line, col, err) {
                 if (state.w2.ws2_huta && state.w2.ws2_huta.own) pool.push('glass');
                 if (state.w2.ws2_winery && state.w2.ws2_winery.own) pool.push('wine');
                 if (Areas.has('east')) pool.push(rand() < 0.6 ? 'skoraJ' : 'skoraD');   // v220: skóry z lasu łowieckiego
-                for (let i = 0; i < 3 && pool.length; i++) {
+                // v235: 2–4 oferty (różne zestawy), duże ilości po świetnej cenie; płacą dopiero za 100% wszystkich
+                const nOff = 2 + Math.floor(rand() * 3);
+                for (let i = 0; i < nOff && pool.length; i++) {
                     const k = pool.splice(Math.floor(rand() * pool.length), 1)[0];
-                    const base = PORT.PRICE[k] || 2, n = base >= 10 ? 2 + Math.floor(rand() * 3) : 5 + Math.floor(rand() * 8);
-                    S.order[k] = n; S.got[k] = 0; S.reward += n * base * 3;
+                    const base = PORT.PRICE[k] || (IT2[k] && IT2[k].price) || 2;
+                    const n = base >= 10 ? 3 + Math.floor(rand() * 6) : base >= 4 ? 10 + 5 * Math.floor(rand() * 5) : 20 + 10 * Math.floor(rand() * 6);
+                    const pr = Math.max(50, Math.round(n * base * (2.5 + rand()) / 10) * 10);
+                    S.order[k] = n; S.got[k] = 0; S.price[k] = pr; S.reward += pr;
                 }
                 S.stock.crystal = 2 + Math.floor(rand() * 3); S.stock.rareFish = 3 + Math.floor(rand() * 4);
             } else {
@@ -8098,12 +8107,13 @@ window.onerror = function(msg, src, line, col, err) {
                 S.nob = Math.min(6, 1 + (T ? T.level : 0) + (TavUp.has('zyrandol') ? 1 : 0)); S.nobT = now + 9;
             }
             S.next = now + S.stay + 16 + 90 + Math.floor(rand() * 90);
-            showToast(S.kind === 'm' ? '⛵ Statek kupców w porcie! Zamówienie za 3x cenę, mają też kryształy' : '⛵ Statek ze szlachtą! Idą zjeść w karczmie (płacą 3x)');
+            showToast(S.kind === 'm' ? '⛵ Statek kupców! Oferty na pomoście – zapłacą, gdy spełnisz wszystkie w 100%' : '⛵ Statek ze szlachtą! Idą zjeść w karczmie (płacą 3x)');
         },
         update(now) {
             const S = this.S(); if (!S.own) return;
             if (!S.kind) { if (now >= S.next) this.newShip(now); return; }
             const ph = this.phase(now);
+            if (S.kind === 'm' && ph === 3 && !S.done && !S.gone) { S.gone = 1; showToast('⛵ Statek odpłynął – oferty nie były spełnione w 100%, bez zapłaty'); }
             if (ph === 0) { S.kind = ''; return; }
             // szlachta schodzi na ląd i idzie do karczmy
             if (S.kind === 'n' && ph === 2 && S.nob > 0 && now >= S.nobT) { S.nobT = now + 1.6; if (Tavern.spawnNoble()) S.nob--; }
@@ -8115,21 +8125,27 @@ window.onerror = function(msg, src, line, col, err) {
                     finish: () => { S.own = 1; S.paid = 0; S.next = simNow + 30; Tavern.refreshFence(); showToast('⚓ Port zbudowany! Za chwilę pierwszy statek.'); } });
                 return;
             }
+            // v235: wypłata na pomoście (zostaje po odpłynięciu statku)
+            if ((S.pay | 0) > 0 && inRect(pos, PORT.PAY[0], PORT.PAY[1], 3.0, 2.6)) {
+                const n = S.pay | 0; S.pay = 0; state.player.coins += n;
+                const sp = new THREE.Vector3(PORT.PAY[0], 1.2, PORT.PAY[1]), pg = playerGroup;
+                for (let i = 0; i < Math.min(14, n); i++) scheduleSim(i * 0.06, () => { const m = new THREE.Mesh(geoCoin, matCoin); scene.add(m); m.position.copy(sp); spawnJumpAnimation(m, sp, () => { const v = pg.position.clone(); v.y = 1.5; return v; }, 0.45, 2.2, () => scene.remove(m)); });
+                showToast('💰 Wypłata z portu: +' + n + ' monet');
+            }
             if (S.kind !== 'm' || this.phase(now) !== 2) return;
-            // zamówienie: zrzucaj towar na ramkę przy statku
-            if (!S.done && !state.dropLocked && now > state.timers.nextDrop && inRect(pos, PORT.ORDER_X, PORT.ORDER_Z, 3.0, 3.6)) {
-                for (const k in S.order) {
-                    if ((S.got[k] | 0) >= S.order[k]) continue;
-                    const have = k === 'water' ? 0 : (state.player[k] | 0);
-                    if (have <= 0) continue;
+            // oferty: stań na ramce i zrzucaj towar; zapłata dopiero, gdy wszystkie są w 100%
+            if (!S.done && !state.dropLocked && now > state.timers.nextDrop) {
+                const ks = Object.keys(S.order);
+                for (let i = 0; i < ks.length && i < PORT.OFF.length; i++) {
+                    const k = ks[i], x = PORT.OFF[i][0], z = PORT.OFF[i][1];
+                    if (!inRect(pos, x, z, 2.3, 3.0)) continue;
+                    if ((S.got[k] | 0) >= S.order[k] || (state.player[k] | 0) <= 0) break;
                     state.timers.nextDrop = now + config.dropCooldown * 0.7;
-                    dropItem(k, new THREE.Vector3(PORT.ORDER_X, 0.5, PORT.ORDER_Z + 3));
+                    dropItem(k, new THREE.Vector3(x, 0.6, z));
                     S.got[k] = (S.got[k] | 0) + 1;
-                    if (Object.keys(S.order).every(q => (S.got[q] | 0) >= S.order[q])) {
-                        S.done = 1; state.player.coins += S.reward;
-                        const n = Math.min(12, S.reward), sp = new THREE.Vector3(PORT.ORDER_X, 2, PORT.ORDER_Z + 4), pg = playerGroup;
-                        for (let i = 0; i < n; i++) scheduleSim(i * 0.08, () => { const m = new THREE.Mesh(geoCoin, matCoin); scene.add(m); m.position.copy(sp); spawnJumpAnimation(m, sp, () => { const v = pg.position.clone(); v.y = 1.5; return v; }, 0.45, 2.2, () => scene.remove(m)); });
-                        showToast('💰 Zamówienie kupców wykonane! +' + S.reward + ' monet');
+                    if (ks.every(q => (S.got[q] | 0) >= S.order[q])) {
+                        S.done = 1; S.pay = (S.pay | 0) + S.reward; S.stay = Math.max(0, now - S.t0 - 8);   // statek odpływa od razu
+                        showToast('⛵ Wszystkie oferty spełnione! Wypłata ' + S.reward + ' monet czeka na pomoście');
                     }
                     break;
                 }
@@ -8145,9 +8161,9 @@ window.onerror = function(msg, src, line, col, err) {
             if (this.R.pier) return;
             const g = bakeItem('pier', () => {
                 const r = new THREE.Group(), wd = new THREE.MeshLambertMaterial({ color: 0x8B5A2B }), wd2 = new THREE.MeshLambertMaterial({ color: 0x6D4224 }), rope = new THREE.MeshLambertMaterial({ color: 0xD8C08A });
-                for (let z = 78; z < 96.5; z += 0.9) { const b = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.14, 0.82), (Math.round(z * 10) % 2) ? wd : wd2); b.position.set(0, 0.32, z); r.add(b); }
-                for (let z = 80; z <= 96; z += 4) [-1.6, 1.6].forEach(x => { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 1.6, 7), wd2); p.position.set(x, 0.2, z); r.add(p); });
-                [-1.6, 1.6].forEach(x => { const rp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 16), rope); rp.position.set(x, 0.95, 88); r.add(rp); });
+                for (let z = 78; z < 96.5; z += 0.9) { const b = new THREE.Mesh(new THREE.BoxGeometry(5.1, 0.14, 0.82), (Math.round(z * 10) % 2) ? wd : wd2); b.position.set(0, 0.32, z); r.add(b); }
+                for (let z = 80; z <= 96; z += 4) [-2.45, 2.45].forEach(x => { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.18, 1.6, 7), wd2); p.position.set(x, 0.2, z); r.add(p); });
+                [-2.45, 2.45].forEach(x => { const rp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 16), rope); rp.position.set(x, 0.95, 88); r.add(rp); });
                 // domek portowy
                 const h = new THREE.Mesh(new THREE.BoxGeometry(3.2, 2.2, 2.6), new THREE.MeshLambertMaterial({ color: 0xE0D2B4 })); h.position.set(-6.5, 1.1, 74.5); r.add(h);
                 const rf = new THREE.Mesh(new THREE.ConeGeometry(2.6, 1.3, 4), new THREE.MeshLambertMaterial({ color: 0x1565C0 })); rf.rotation.y = Math.PI / 4; rf.position.set(-6.5, 2.85, 74.5); r.add(rf);
@@ -8180,13 +8196,16 @@ window.onerror = function(msg, src, line, col, err) {
             R.f.vis = south && !S.own;
             if (R.f.vis) R.f.tp.update(buyLines('PORT', 'port', PORT.COST - S.paid), 'ship');
             const ph = S.own ? this.phase(now) : 0, merchant = S.kind === 'm' && ph === 2;
-            R.ord.vis = merchant;
+            const iconOf = k => IT2[k] ? IT2[k].icon : (RES_ICON[k] || (k === 'roastedFish' ? 'rfish' : k === 'wheatBags' ? 'wbag' : k));
+            const ks = Object.keys(S.order || {});
             R.buy.forEach((f, i) => { const k = PORT.BUY[i][2]; f.vis = merchant && (S.stock[k] | 0) > 0; if (f.vis) f.tp.update([{ i: IT2[k].icon, t: (PORT.BUY[i][3] - (S.bp[k] | 0)) }, 'zostało ' + S.stock[k]], null); });
-            if (merchant) {
-                if (S.done) R.ord.tp.update(['ZAPŁACONE', '+' + S.reward], 'coin');
-                else R.ord.tp.update(['ZAMÓWIENIE', ...Object.keys(S.order).map(k => ({ i: IT2[k] ? IT2[k].icon : (RES_ICON[k] || (k === 'roastedFish' ? 'rfish' : k === 'wheatBags' ? 'wbag' : k)), t: (S.got[k] | 0) + '/' + S.order[k] })), { i: 'coin', t: S.reward }], null);
+            R.offs.forEach((f, i) => { const k = ks[i]; f.vis = merchant && !S.done && !!k; if (f.vis) f.tp.update(['OFERTA', { i: iconOf(k), t: (S.got[k] | 0) + '/' + S.order[k] }, { i: 'coin', t: S.price[k] | 0 }], null); });
+            R.pay.vis = !!S.own && south && (S.pay | 0) > 0;
+            if (R.pay.vis) R.pay.tp.update(['WYPŁATA', { i: 'coin', t: '+' + S.pay }], 'coin');
+            if (merchant && !S.done) {
                 const left = Math.max(0, Math.ceil(S.t0 + 8 + S.stay - now));
-                FloatLab.show('portT', PORT.ORDER_X, 3.2, PORT.ORDER_Z, 'ship', Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'), 0.9);
+                let tot = 0, got = 0; ks.forEach(k => { tot += S.order[k]; got += Math.min(S.order[k], S.got[k] | 0); });
+                FloatLab.show('portT', 0, 3.4, 90.25, 'ship', Math.floor(100 * got / Math.max(1, tot)) + '% · ' + Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'), 0.9);
             }
             if (!S.own || !south) return;
             this.ensurePier();
@@ -8304,17 +8323,17 @@ window.onerror = function(msg, src, line, col, err) {
     Items2.mesh = function (key) { if (key && key.indexOf('coin') === 0 && key.length > 4) return new THREE.Mesh(geoCoin, matCoin); return _itemMesh(key); };
 
     // ---------- dodatkowe zakupy w namiocie ----------
-    w2mod({ key: 'shopx', defaults() { return { pcap: 0, pspd: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.pcap = Math.max(0, Math.min(3, o.pcap | 0)); o.pspd = Math.max(0, Math.min(3, o.pspd | 0)); state.w2.shopx = o; } });
+    w2mod({ key: 'shopx', defaults() { return { pcap: 0, pspd: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.pcap = Math.max(0, Math.min(10, o.pcap | 0)); o.pspd = Math.max(0, Math.min(10, o.pspd | 0)); state.w2.shopx = o; } });
     const ShopX = {
         items() {
             const X = state.w2 && state.w2.shopx ? state.w2.shopx : { pcap: 0, pspd: 0 };
             const anyPorter = () => Object.keys(state.porters || {}).length > 0;
             const out = [
-                { k: 'x_pcap', ext: true, icon: 'porter', name: 'Udźwig tragarzy', desc: () => `Każdy tragarz nosi więcej naraz (teraz ${6 + 3 * X.pcap}, poziom ${X.pcap}/3)`,
-                  price: () => 400 * (X.pcap + 1), status: () => X.pcap >= 3 ? 'max' : anyPorter() ? 'ok' : 'lock', lockText: 'najpierw zatrudnij tragarza',
+                { k: 'x_pcap', ext: true, icon: 'porter', name: 'Udźwig tragarzy', desc: () => `Każdy tragarz nosi więcej naraz (teraz ${6 + 3 * X.pcap}, poziom ${X.pcap}/10)`,
+                  price: () => 400 * (X.pcap + 1), status: () => X.pcap >= 10 ? 'max' : anyPorter() ? 'ok' : 'lock', lockText: 'najpierw zatrudnij tragarza',
                   apply: () => { X.pcap++; if (curCtx === localCtx()) showToast('🧺 Tragarze noszą teraz po ' + (6 + 3 * X.pcap)); } },
-                { k: 'x_pspd', ext: true, icon: 'porter', name: 'Nowe buty dla tragarzy', desc: () => `Tragarze chodzą szybciej (+${20 * X.pspd}%, poziom ${X.pspd}/3)`,
-                  price: () => 350 * (X.pspd + 1), status: () => X.pspd >= 3 ? 'max' : anyPorter() ? 'ok' : 'lock', lockText: 'najpierw zatrudnij tragarza',
+                { k: 'x_pspd', ext: true, icon: 'porter', name: 'Nowe buty dla tragarzy', desc: () => `Tragarze chodzą szybciej (+${20 * X.pspd}%, poziom ${X.pspd}/10)`,
+                  price: () => 350 * (X.pspd + 1), status: () => X.pspd >= 10 ? 'max' : anyPorter() ? 'ok' : 'lock', lockText: 'najpierw zatrudnij tragarza',
                   apply: () => { X.pspd++; if (curCtx === localCtx()) showToast('👢 Nowe buty! Tragarze szybsi o ' + (20 * X.pspd) + '%'); } }
             ];
             Object.keys(STALL_FAC).forEach(k => {
@@ -10451,7 +10470,7 @@ window.onerror = function(msg, src, line, col, err) {
         { key: 'sprK', it: 'blocks', src: 'masonOut', dst: 'skupBlocks', name: 'bloki: kamieniarz → SPRZEDAJ', price: 400, shirt: 0x9E9E9E, hat: 0x5D4037, ok: () => own2('ws_mason'), lock: 'najpierw kamieniarz' },
         { key: 'karO', it: 'roastedFish', src: 'camp', dst: 'grillOut', name: 'pieczone ryby: ognisko → karczma', price: 400, shirt: 0xFF7043, hat: 0x212121, ok: () => tavOK() && !!(facilities.campfire && facilities.campfire.unlocked), lock: 'najpierw karczma z grillem i ognisko' },
     ];
-    const RP_MAX = 3, RP_LV = 3;
+    const RP_MAX = 3, RP_LV = 10;   // v235: szybkość i udźwig tragarzy do 10
     const rpX = k => { const A = state.w2 && state.w2.rpx; return (A && A[k]) || { c: 0, s: 0, k: 0 }; };
     const rpCap = r => 6 + 3 * rpX(r.key).k;
     const rpSpd = r => 4.2 * (0.8 + 0.2 * Wage.m()) * (1 + 0.25 * rpX(r.key).s);
@@ -10610,14 +10629,14 @@ window.onerror = function(msg, src, line, col, err) {
     })();
 
     // ---------- v234: SZYBSZY RYBAK (namiot) ----------
-    w2mod({ key: 'fishx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(3, o.lvl | 0)); state.w2.fishx = o; } });
+    w2mod({ key: 'fishx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(10, o.lvl | 0)); state.w2.fishx = o; } });
     (function fishShop() {
         const L = () => (state.w2 && state.w2.fishx ? state.w2.fishx.lvl | 0 : 0);
         const at = Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage'));
         SHOP_ITEMS.splice(at, 0, { k: 'x_fishx', ext: true, icon: 'fish2d', name: 'Szybszy rybak',
-            desc: () => 'Pomocnik rybaka łowi szybciej: +30% za poziom (poziom ' + L() + '/3)',
-            price: () => 300 * (L() + 1), status: () => L() >= 3 ? 'max' : (state.fishing && state.fishing.helperUnlocked) ? 'ok' : 'lock', lockText: 'najpierw pomocnik rybaka',
-            apply: () => { if (!state.w2.fishx) state.w2.fishx = { lvl: 0 }; state.w2.fishx.lvl = Math.min(3, L() + 1); if (curCtx === localCtx()) showToast('🎣 Rybak łowi szybciej (' + state.w2.fishx.lvl + '/3)'); } });
+            desc: () => 'Pomocnik rybaka łowi szybciej: +30% za poziom (poziom ' + L() + '/10)',
+            price: () => 300 * (L() + 1), status: () => L() >= 10 ? 'max' : (state.fishing && state.fishing.helperUnlocked) ? 'ok' : 'lock', lockText: 'najpierw pomocnik rybaka',
+            apply: () => { if (!state.w2.fishx) state.w2.fishx = { lvl: 0 }; state.w2.fishx.lvl = Math.min(10, L() + 1); if (curCtx === localCtx()) showToast('🎣 Rybak łowi szybciej (' + state.w2.fishx.lvl + '/10)'); } });
     })();
 
     // ---------- v234: PRZYSPIESZENIE OD ILOŚCI – zrzucanie i podnoszenie każdego surowca (>50: 2×, >100: 3×, >150: 5×, >200: 8×) ----------
@@ -10705,14 +10724,14 @@ window.onerror = function(msg, src, line, col, err) {
     });
 
     // ---------- v234: SZYBSZY BARMAN (namiot) ----------
-    w2mod({ key: 'barx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(3, o.lvl | 0)); state.w2.barx = o; } });
+    w2mod({ key: 'barx', defaults() { return { lvl: 0 }; }, restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(10, o.lvl | 0)); state.w2.barx = o; } });
     (function barShop() {
         const L = () => (state.w2 && state.w2.barx ? state.w2.barx.lvl | 0 : 0);
         const at = Math.max(0, SHOP_ITEMS.findIndex(i => i.k === 'wage'));
         SHOP_ITEMS.splice(at, 0, { k: 'x_barx', ext: true, icon: 'beer', name: 'Szybszy barman',
-            desc: () => 'Barman chodzi i nalewa szybciej: +30% za poziom (poziom ' + L() + '/3)',
-            price: () => 300 * (L() + 1), status: () => L() >= 3 ? 'max' : (Tavern.T && Tavern.T.barman) ? 'ok' : 'lock', lockText: 'najpierw barman w karczmie',
-            apply: () => { if (!state.w2.barx) state.w2.barx = { lvl: 0 }; state.w2.barx.lvl = Math.min(3, L() + 1); if (curCtx === localCtx()) showToast('🍺 Barman szybszy (' + state.w2.barx.lvl + '/3)'); } });
+            desc: () => 'Barman chodzi i nalewa szybciej: +20% za poziom (poziom ' + L() + '/10)',
+            price: () => 300 * (L() + 1), status: () => L() >= 10 ? 'max' : (Tavern.T && Tavern.T.barman) ? 'ok' : 'lock', lockText: 'najpierw barman w karczmie',
+            apply: () => { if (!state.w2.barx) state.w2.barx = { lvl: 0 }; state.w2.barx.lvl = Math.min(10, L() + 1); if (curCtx === localCtx()) showToast('🍺 Barman szybszy (' + state.w2.barx.lvl + '/10)'); } });
     })();
 
     // ---------- v234: WIĘCEJ WODY – piekarnia, huta, browar (+10 na poziom, do 3) ----------
