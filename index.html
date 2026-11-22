@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v237</title>
+    <title>Gra Idle Drwal v238</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v237';
+    const GAME_VERSION = 'v238';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -4273,8 +4273,10 @@ window.onerror = function(msg, src, line, col, err) {
         }
         function guestPrice(g) { return (g.roast ? TAV.ROAST_PRICE : g.stew ? TAV.STEW_PRICE : g.rare ? TAV.RARE_PRICE : g.vip ? TAV.VIP_PRICE : TAV.PRICE) * (g.noble ? TAV.NOBLE_MULT : 1) + (TavUp.has('dekor') ? 3 : 0); }
         function beerPrice(g) { return (g.wine ? TAV.WINE_PRICE + (TavUp.has('kielichy') ? 6 : 0) : g.vip ? TAV.VIP_BEER : TAV.BEER_PRICE) * (g.noble ? TAV.NOBLE_MULT : 1); }
-        function billFull(g) { return g.nf * guestPrice(g) + g.nb * beerPrice(g) + (g.quick ? (g.vip ? 6 : 2) : 0) + (T.music ? g.nf + g.nb : 0) + (TavUp.has('krzesla') ? 2 : 0); }
-        function billPart(g) { return g.gf * guestPrice(g) + g.gb * beerPrice(g); }
+        // v238: przychód karczmy −25% (szło za łatwo)
+        function incCut(x) { return x > 0 ? Math.max(1, Math.round(x * 0.75)) : 0; }
+        function billFull(g) { return incCut(g.nf * guestPrice(g) + g.nb * beerPrice(g) + (g.quick ? (g.vip ? 6 : 2) : 0) + (T.music ? g.nf + g.nb : 0) + (TavUp.has('krzesla') ? 2 : 0)); }
+        function billPart(g) { return incCut(g.gf * guestPrice(g) + g.gb * beerPrice(g)); }
         function pay(g) {
             const coins = billFull(g);
             T.cash += coins; T.served++; T.fame += (g.noble ? TAV.NOBLE_FAME : g.vip ? 3 : 1) * (TavUp.has('zyrandol') ? 2 : 1);
