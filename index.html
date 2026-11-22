@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v242</title>
+    <title>Gra Idle Drwal v243</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -809,13 +809,15 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v242';
+    const GAME_VERSION = 'v243';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
     // v236: monety – po dłuższym zbieraniu kilka na raz (5× szybciej od progu)
     function coinBulk(cs, thr) { return cs >= thr ? 5 : cs >= thr * 0.6 ? 3 : cs >= thr * 0.3 ? 2 : 1; }
     // v236: tempo ogniwa (namiot „Tempo: …”, do 10 poziomów, +25% za poziom) razem z płacą pomocników
+    // v243: większy magazyn wejścia zakładu – +10 za poziom (do 10)
+    function inCap(k, base) { const C = (state && state.w2) ? state.w2.capx : null; return base + 10 * (C ? Math.max(0, Math.min(10, C[k] | 0)) : 0); }
     function spdLv(k) { const S = (state && state.w2) ? state.w2.spd : null; return S ? Math.max(0, Math.min(10, S[k] | 0)) : 0; }
     function WK(k) { return Wage.m() * (1 + 0.25 * spdLv(k)); }
     function zzzOn(id) { const Z = (state && state.w2) ? state.w2.zzz : null; return !!(Z && Z[id]); }
@@ -6093,7 +6095,7 @@ window.onerror = function(msg, src, line, col, err) {
         fish: 'playerBackpackFish', roastedFish: 'playerBackpackRoastedFish', wheatBags: 'playerBackpackWheatBags', beer: 'playerBackpackBeer',
         snopki: 'playerBackpackSnopki', gems: 'playerBackpackGems' };
     const RES_ICON = { wood: 'wood', planks: 'plank', stone: 'stone', twine: 'twine', herbs: 'herb', water: 'water', plants: 'plant', wheat: 'wheat', coins: 'coin', fish: 'fish' };
-    function haveRes(res) { return res === 'water' ? (state.water ? state.water.collected : 0) : (state.player[res] || 0); }
+    function haveRes(res) { return res === 'water' ? (state.water ? state.water.collected : 0) : res === 'crystal' ? (state.player.crystal || 0) + (state.player.gems || 0) : (state.player[res] || 0); }   // v243: kryształy z kopalni też
     function takeRes(res) { if (res === 'water') { if (state.water) state.water.collected--; } else state.player[res]--; }
     // gracz blokuje zbieranie danego towaru (klik w wierszu plecaka)
     function PB(type) { return !!(curCtx && curCtx.block && curCtx.block[type]); }
@@ -6149,7 +6151,7 @@ window.onerror = function(msg, src, line, col, err) {
             for (const r in l) {
                 if (haveRes(r) > 0) {
                     state.timers.nextDrop = now + config.dropCooldown;
-                    giveItemTo(r, target);
+                    giveItemTo(r === 'crystal' && !((state.player.crystal | 0) > 0) ? 'gems' : r, target);
                     const s = this.st(key); s[r] = (s[r] || 0) + 1;
                     return true;
                 }
@@ -6459,7 +6461,7 @@ window.onerror = function(msg, src, line, col, err) {
                     if (now < p.t || zzzOn('cp:' + p.k)) break;   // v236: śpi
                     p.t = now + 1.0;
                     if (isStone) { if (state.skup.expansions >= 1 && worldObjects.visualStoneOutStack.length > STONE_KEEP && getOrAllocateSkupSlot('stone') !== -1) { p.tgt = 'stones'; p.st = 'GO'; } break; }
-                    if (fac.input >= MAX_IN) break;
+                    if (fac.input >= inCap(p.k, MAX_IN)) break;   // v243: większy magazyn
                     if (p.d.src === 'tree') { const t = pickTree(p); if (t) { p.tgt = t; p.st = 'GO'; } }
                     else if (p.d.src === 'grass') { const q = pickPlant(p); if (q) { p.tgt = q; p.st = 'GO'; } }
                     else if (worldObjects.visualWheatStack && worldObjects.visualWheatStack.length > 0 && worldObjects.wheatOutZone) { p.tgt = 'pile'; p.st = 'GO'; }
@@ -6724,7 +6726,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (lv < 2) this.R.upLab.update(['KOPALNIA II', ...Req.lines('mine2'), { i: 'coin', t: MINE.UP_COST - (sh.upPaid | 0) }], 'gems');
             const n = (worldObjects.visualGemStack || []).length;
             this.R.gemZone.visible = this.R.gemLab.mesh.visible = lv >= 2;
-            if (lv >= 2) this.R.gemLab.update(n ? [] : ['KLEJNOTY', '15 za sztukę'], n ? null : 'gems');
+            if (lv >= 2) this.R.gemLab.update(n ? [] : ['KRYSZTAŁY', MINE.GEM_PRICE + ' za sztukę'], n ? null : 'gems');
         }
     };
     Mine.reset();
@@ -6733,11 +6735,12 @@ window.onerror = function(msg, src, line, col, err) {
     // =====================================================================
     // v209 – STRAGAN na skupie (jak kozioł przy pile)
     // =====================================================================
+    // v243: poszerzony skup – stragan rośnie razem z ramką: kilka straganów obok siebie, każdy z dachem w innym kolorze
     const Stall = {
-        g: null,
-        ensure() {
-            const sg = worldObjects.skupGroup; if (!sg) return;
-            if (this.g && this.g.parent === sg) return;
+        g: null, n: -1, geo: {}, sign: null,
+        ROOFS: [0xC62828, 0x1565C0, 0x2E7D32, 0xF9A825, 0x6A1B9A, 0xEF6C00],
+        model(col) {
+            if (this.geo[col]) return this.geo[col];
             const tmp = new THREE.Group();
             const add = (geo, col, x, y, z, rx, ry, rz) => { const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ color: col })); m.position.set(x, y, z); m.rotation.set(rx || 0, ry || 0, rz || 0); tmp.add(m); return m; };
             const WD = 0x8B5A2B, DK = 0x5D3A1A;
@@ -6746,23 +6749,37 @@ window.onerror = function(msg, src, line, col, err) {
             for (let i = -2; i <= 2; i++) add(new THREE.BoxGeometry(0.06, 0.9, 0.04), DK, i * 1.0, 0.5, 0.67);
             // słupki i daszek w paski
             [[-2.6, -0.7], [2.6, -0.7], [-2.6, 0.75], [2.6, 0.75]].forEach(([x, z]) => add(new THREE.BoxGeometry(0.2, z < 0 ? 3.0 : 2.5, 0.2), DK, x, z < 0 ? 1.5 : 1.25, z));
-            for (let i = 0; i < 8; i++) add(new THREE.BoxGeometry(0.72, 0.08, 1.95), i % 2 ? 0xFAFAFA : 0xC62828, -2.52 + i * 0.72, 2.78, 0.05, 0.27, 0, 0);
-            for (let i = 0; i < 8; i++) { const m = add(new THREE.ConeGeometry(0.36, 0.34, 3), i % 2 ? 0xFAFAFA : 0xC62828, -2.52 + i * 0.72, 2.36, 1.08, Math.PI, 0, 0); m.scale.set(1, 1, 0.3); }
+            for (let i = 0; i < 8; i++) add(new THREE.BoxGeometry(0.72, 0.08, 1.95), i % 2 ? 0xFAFAFA : col, -2.52 + i * 0.72, 2.78, 0.05, 0.27, 0, 0);
+            for (let i = 0; i < 8; i++) { const m = add(new THREE.ConeGeometry(0.36, 0.34, 3), i % 2 ? 0xFAFAFA : col, -2.52 + i * 0.72, 2.36, 1.08, Math.PI, 0, 0); m.scale.set(1, 1, 0.3); }
             // towar na ladzie: skrzynki, waga, worek, ryba
             add(new THREE.BoxGeometry(0.8, 0.45, 0.6), 0xA1887F, -1.8, 1.35, 0); add(new THREE.CylinderGeometry(0.16, 0.16, 0.6, 8), 0x8A5530, -1.8, 1.72, 0, 0, 0, Math.PI / 2);
             add(new THREE.CylinderGeometry(0.06, 0.08, 0.5, 8), 0x9E9E9E, 0.2, 1.37, 0); add(new THREE.BoxGeometry(0.9, 0.05, 0.12), 0x9E9E9E, 0.2, 1.63, 0);
             add(new THREE.CylinderGeometry(0.18, 0.2, 0.05, 12), 0xD4AF37, -0.22, 1.5, 0); add(new THREE.CylinderGeometry(0.18, 0.2, 0.05, 12), 0xD4AF37, 0.62, 1.5, 0);
             add(new THREE.SphereGeometry(0.34, 10, 8), 0xE8C46A, 1.6, 1.4, 0); add(new THREE.BoxGeometry(0.16, 0.24, 0.5), 0x42A5F5, 2.3, 1.3, 0.1);
-            const baked = bakeTemplate(tmp);
-            const m = new THREE.Mesh(baked.geo, bakeItem.mat); m.castShadow = true; m.receiveShadow = true;
-            const g = new THREE.Group(); g.add(m);
-            // szyld SKUP
-            const cv = document.createElement('canvas'); cv.width = 512; cv.height = 160;
-            const c = cv.getContext('2d'); c.fillStyle = '#6D4C2F'; c.fillRect(0, 0, 512, 160); c.strokeStyle = '#3E2A17'; c.lineWidth = 14; c.strokeRect(7, 7, 498, 146);
-            c.textAlign = 'center'; c.textBaseline = 'middle'; drawOutlined(c, 'SKUP', 256, 84, 100, '#FFE082');
-            const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.75), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) }));
-            sign.position.set(0, 3.45, -0.62); g.add(sign);
-            g.position.set(2.0, 0, -2.4); sg.add(g); this.g = g;   // v239: nad ramką, na którą trafia towar
+            return (this.geo[col] = bakeTemplate(tmp));
+        },
+        ensure() {
+            const sg = worldObjects.skupGroup; if (!sg) return;
+            const e = Math.max(0, (state.skup && state.skup.expansions) | 0), W = 4 + e * 4, n = e ? Math.max(1, Math.round(W / 5)) : 1;
+            if (this.g && this.g.parent === sg && this.n === n) return;
+            if (this.g && this.g.parent) this.g.parent.remove(this.g);
+            const g = new THREE.Group(), w = W / n;
+            for (let i = 0; i < n; i++) {
+                const b = this.model(this.ROOFS[i % this.ROOFS.length]), m = new THREE.Mesh(b.geo, bakeItem.mat); m.castShadow = true; m.receiveShadow = true;
+                if (n > 1) { m.position.x = -4 + (i + 0.5) * w; m.scale.x = Math.min(1.1, w / 5.6); }
+                g.add(m);
+            }
+            if (!this.sign) {
+                // szyld SKUP
+                const cv = document.createElement('canvas'); cv.width = 512; cv.height = 160;
+                const c = cv.getContext('2d'); c.fillStyle = '#6D4C2F'; c.fillRect(0, 0, 512, 160); c.strokeStyle = '#3E2A17'; c.lineWidth = 14; c.strokeRect(7, 7, 498, 146);
+                c.textAlign = 'center'; c.textBaseline = 'middle'; drawOutlined(c, 'SKUP', 256, 84, 100, '#FFE082');
+                const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.75), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) }));
+                sign.position.set(0, 3.45, -0.62); g.add(sign);
+                this.sign = sign;
+            }
+            this.sign.position.set(n > 1 ? -4 + w / 2 : 0, 3.45, -0.62); g.add(this.sign);
+            g.position.set(2.0, 0, -2.4); sg.add(g); this.g = g; this.n = n;   // v239: nad ramką, na którą trafia towar
         }
     };
 
@@ -7785,7 +7802,7 @@ window.onerror = function(msg, src, line, col, err) {
         playerStep(now, pos) {
             const S = state.w2.areas;
             for (const k in AREAS) {
-                if (S[k]) continue;
+                if (S[k] || (AREAS[k].pre && !S[AREAS[k].pre])) continue;
                 const a = AREAS[k], pk = 'p' + k[0];
                 buyStep({ x: a.fx, z: a.fz, w: 6, h: 5 }, now, pos, { rk: 'area_' + k, paid: () => S[pk] | 0, cost: () => a.cost, done: () => !!S[k], add: () => { S[pk] = (S[pk] | 0) + 1; },
                     finish: () => { S[k] = 1; S[pk] = 0; showToast(a.toast); } });
@@ -7841,7 +7858,7 @@ window.onerror = function(msg, src, line, col, err) {
             const S = state.w2.areas;
             for (const k in AREAS) {
                 const f = this.R.frames[k]; if (!f) continue;
-                f.vis = !S[k];   // v224: widać od początku gry (wcześniej dopiero po karczmie, a i tak brało monety)
+                f.vis = !S[k] && !(AREAS[k].pre && !S[AREAS[k].pre]);   // v224: widać od początku gry (wcześniej dopiero po karczmie, a i tak brało monety)
                 if (f.vis) f.tp.update(buyLines(AREAS[k].title, 'area_' + k, AREAS[k].cost - (S['p' + k[0]] | 0)), 'land');
             }
             this.visuals();
@@ -7927,7 +7944,7 @@ window.onerror = function(msg, src, line, col, err) {
         return w2mod({
             key: sk,
             defaults() { const o = { own: 0, paid: 0, out: 0, busy: 0, next: 0, inv: {} }; IN.forEach(k => o.inv[k] = 0); return o; },
-            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(k === 'water' ? d.cap + 30 : d.cap, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(k === 'water' ? d.cap + 30 : d.cap + 100, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
             R: null,
             reset() { this.R = { buy: null, fin: null, fout: null, model: null, piles: {} }; },
             S() { return state.w2[sk]; },
@@ -7946,7 +7963,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!state.dropLocked && now > state.timers.nextDrop && inRect(pos, d.X - 4.4, d.Z, 4, 4)) {
                     // najpierw ten surowiec, którego brakuje najbardziej
                     let best = null, bv = Infinity;
-                    IN.forEach(k => { const v = S.inv[k] / d.ins[k]; if (S.inv[k] < (k === 'water' ? wcap(key, d.cap) : d.cap) && haveItem(k) > 0 && v < bv) { bv = v; best = k; } });
+                    IN.forEach(k => { const v = S.inv[k] / d.ins[k]; if (S.inv[k] < (k === 'water' ? wcap(key, d.cap) : inCap('ws2_' + key, d.cap)) && haveItem(k) > 0 && v < bv) { bv = v; best = k; } });
                     if (best) { state.timers.nextDrop = now + config.dropCooldown; dropItem(best, new THREE.Vector3(d.X - 4.4, 0, d.Z)); S.inv[best]++; return; }
                 }
                 if (S.out > 0 && !PB(d.out) && inRect(pos, d.X + 4.4, d.Z, 3.6, 3.6) && now > state.timers.nextCollectOut) {
@@ -7989,7 +8006,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!vis) return;
                 if (!S.own) { R.buy.tp.update(buyLines(d.title, sk, d.cost - S.paid), d.icon); return; }
                 this.ensureModel();
-                R.fin.tp.update([d.title.split(' ')[0], ...IN.map(k => ({ i: k === 'water' ? 'water' : IT2[k].icon, t: S.inv[k] + '/' + (k === 'water' ? wcap(key, d.cap) : d.cap) }))], null);
+                R.fin.tp.update([d.title.split(' ')[0], ...IN.map(k => ({ i: k === 'water' ? 'water' : IT2[k].icon, t: S.inv[k] + '/' + (k === 'water' ? wcap(key, d.cap) : inCap('ws2_' + key, d.cap)) }))], null);
                 R.fout.tp.update(S.out ? [] : ['ODBIÓR'], S.out ? null : IT2[d.out].icon);
                 Items2.pile(R.piles, d.out, d.X + 4.4, d.Z, S.out, 24);
                 if (S.out > 0) FloatLab.show(sk + 'o', d.X + 4.4, 1.9, d.Z, IT2[d.out].icon, S.out, 0.85);
@@ -8472,6 +8489,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (x > r[0] - 3 && x < r[1] + 3 && z > r[2] - 3 && z < r[3] + 3) {
                 const near = (cx, cz, rr) => (x - cx) * (x - cx) + (z - cz) * (z - cz) < rr * rr;
                 if (near(HUNT.X + 2, HUNT.Z + 1, 9) || near(CARROT.X, CARROT.Z, 9) || near(WILDHERB.X, WILDHERB.Z, 6) || near(HUNT.CX, HUNT.CZ, 6) || z > 12) return true;
+                if (typeof TOWERS !== 'undefined' && TOWERS.some(t => near(t.x - 3.2, t.z - 2.6, 3.6))) return true;   // v243: ambony nie stoją pod drzewami
                 return (Math.round(x * 7 + z * 13) % 4) !== 0;
             }
         }
@@ -10045,7 +10063,7 @@ window.onerror = function(msg, src, line, col, err) {
     const Bakery = w2mod({
         key: 'bakery',
         defaults() { return { own: 0, paid: 0, fl: 0, wa: 0, out: 0, busy: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP, o.fl | 0); o.wa = Math.min(BAKERY.CAP + 30, o.wa | 0); state.w2.bakery = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP + 100, o.fl | 0); o.wa = Math.min(BAKERY.CAP + 30, o.wa | 0); state.w2.bakery = o; },
         R: null,
         reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
         S() { return state.w2.bakery; },
@@ -10065,7 +10083,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!state.dropLocked && now > state.timers.nextDrop && inRect(pos, B.X - 4.2, B.Z, 3.6, 3.6)) {
                 const hf = state.player.wheatBags | 0, hw = state.water ? state.water.collected | 0 : 0;
                 // najpierw to, czego w piecu mniej
-                const k = (hf > 0 && S.fl < B.CAP && (S.fl <= S.wa || hw <= 0 || S.wa >= wcap('bake', B.CAP))) ? 'wheatBags' : (hw > 0 && S.wa < wcap('bake', B.CAP)) ? 'water' : null;
+                const k = (hf > 0 && S.fl < inCap('bakery', B.CAP) && (S.fl <= S.wa || hw <= 0 || S.wa >= wcap('bake', B.CAP))) ? 'wheatBags' : (hw > 0 && S.wa < wcap('bake', B.CAP)) ? 'water' : null;
                 if (k) {
                     state.timers.nextDrop = now + config.dropCooldown;
                     giveItemTo(k, new THREE.Vector3(B.X - 4.2, 0, B.Z));
@@ -10108,7 +10126,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!vis) return;
             if (!S.own) { R.buy.tp.update(buyLines('PIEKARNIA', 'ws_bakery', B.COST - S.paid), 'bakery'); return; }
             this.ensureModel();
-            R.fin.tp.update(['PIEKARNIA', { i: 'wbag', t: S.fl + '/' + B.CAP }, { i: 'water', t: S.wa + '/' + wcap('bake', B.CAP) }], null);
+            R.fin.tp.update(['PIEKARNIA', { i: 'wbag', t: S.fl + '/' + inCap('bakery', B.CAP) }, { i: 'water', t: S.wa + '/' + wcap('bake', B.CAP) }], null);
             R.fout.tp.update(S.out ? [] : ['CHLEB'], S.out ? null : 'bread');
             Items2.pile(R.piles, 'bread', B.X + 4.2, B.Z, S.out, 30);
             if (S.out > 0) FloatLab.show('bakeryo', B.X + 4.2, 1.9, B.Z, 'bread', S.out, 0.85);
@@ -10218,7 +10236,7 @@ window.onerror = function(msg, src, line, col, err) {
         owned() { const H = state.w2.hunt; return !!(H && H.por) && Areas.has('east'); },
         home() { return { x: HUNT.FPX, z: HUNT.OZ + 3.0 }; },
         tav() { return W2.mods.find(m => m.key === 'tavstock'); },
-        palRoom() { const P = state.w2.pal; return (P && P.own) ? Math.max(0, PAL.CAP - (P.in | 0)) : 0; },
+        palRoom() { const P = state.w2.pal; return (P && P.own) ? Math.max(0, inCap('pal', PAL.CAP) - (P.in | 0)) : 0; },
         dest() { return this.palRoom() > 0 ? 1 : skupHasRoom('meat') ? 2 : 0; },
         dpos(d) {
             if (d === 1) return { x: PAL.X - 4.2, z: PAL.Z + 2.6 };
@@ -10303,7 +10321,7 @@ window.onerror = function(msg, src, line, col, err) {
     w2mod({
         key: 'pal',
         defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.in = Math.max(0, Math.min(PAL.CAP, o.in | 0)); o.out = Math.max(0, Math.min(PAL.CAPOUT, o.out | 0)); state.w2.pal = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.in = Math.max(0, Math.min(PAL.CAP + 100, o.in | 0)); o.out = Math.max(0, Math.min(PAL.CAPOUT, o.out | 0)); state.w2.pal = o; },
         R: null,
         reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, fire: null, spit: null, piles: {} }; },
         S() { return state.w2.pal; },
@@ -10320,7 +10338,7 @@ window.onerror = function(msg, src, line, col, err) {
                     finish: () => { S.own = 1; S.paid = 0; showToast('🔥 Palenisko gotowe! Wrzucaj dziczyznę – upieczesz pieczeń (karczma i SPRZEDAJ).'); } });
                 return;
             }
-            if (!state.dropLocked && now > state.timers.nextDrop && S.in < P.CAP && (state.player.meat | 0) > 0 && inRect(pos, P.X - 4.2, P.Z, 3.6, 3.6)) {
+            if (!state.dropLocked && now > state.timers.nextDrop && S.in < inCap('pal', P.CAP) && (state.player.meat | 0) > 0 && inRect(pos, P.X - 4.2, P.Z, 3.6, 3.6)) {
                 state.timers.nextDrop = now + config.dropCooldown;
                 Items2.take('meat', new THREE.Vector3(P.X - 4.2, 0, P.Z)); S.in++;
                 return;
@@ -10369,7 +10387,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (!vis) return;
             if (!S.own) { R.buy.tp.update(buyLines('PALENISKO', 'ws_pal', P.COST - S.paid), 'palenisko'); return; }
             this.ensureModel();
-            R.fin.tp.update(['PALENISKO', { i: 'meat', t: S.in + '/' + P.CAP }], null);
+            R.fin.tp.update(['PALENISKO', { i: 'meat', t: S.in + '/' + inCap('pal', P.CAP) }], null);
             R.fout.tp.update(S.out ? [] : ['PIECZEŃ'], S.out ? null : 'pieczen');
             Items2.pile(R.piles, 'meat', P.X - 4.2, P.Z, S.in, 16);
             Items2.pile(R.piles, 'pieczen', P.X + 4.2, P.Z, S.out, 24);
@@ -10512,7 +10530,7 @@ window.onerror = function(msg, src, line, col, err) {
                 avail() { const f = facilities.campfire; return f && f.unlocked ? f.output | 0 : 0; },
                 take() { const f = facilities.campfire; f.output--; const m = f.visualsOut.pop(); if (m) { m.userData = m.userData || {}; m.userData.isDead = true; if (m.parent) m.parent.remove(m); } } }
     };
-    const rpWs2 = (w, k) => ({ pos() { return RP_PT(WS2[w].X - 4.4, WS2[w].Z + 2.4); }, room() { const S = state.w2['ws2_' + w]; return S && S.own ? Math.max(0, (k === 'water' ? wcap(w, WS2[w].cap) : WS2[w].cap) - (S.inv[k] | 0)) : 0; }, put() { state.w2['ws2_' + w].inv[k]++; } });
+    const rpWs2 = (w, k) => ({ pos() { return RP_PT(WS2[w].X - 4.4, WS2[w].Z + 2.4); }, room() { const S = state.w2['ws2_' + w]; return S && S.own ? Math.max(0, (k === 'water' ? wcap(w, WS2[w].cap) : inCap('ws2_' + w, WS2[w].cap)) - (S.inv[k] | 0)) : 0; }, put() { state.w2['ws2_' + w].inv[k]++; } });
     const rpTav = k => ({
         pos() { const tv = W2.mods.find(m => m.key === 'tavstock'), p = tv && tv.pos(k); return p ? RP_PT(p.x, p.z + 2.4) : null; },
         room() { const T = Tavern.T, tv = W2.mods.find(m => m.key === 'tavstock'), d = TAVSTOCK[k]; if (!T || !tv || !d || !tv.vis(k)) return 0; return Math.max(0, d.cap() - (T[d.field || k] | 0)); },
@@ -10520,7 +10538,7 @@ window.onerror = function(msg, src, line, col, err) {
     });
     const RP_DST = {
         mason: { pos() { return RP_PT(WSHOPS.mason.X - 4.2, WSHOPS.mason.Z + 2.4); }, room() { const S = state.w2.ws_mason; return S && S.own ? Math.max(0, S.cap - (S.in | 0)) : 0; }, put() { state.w2.ws_mason.in++; } },
-        bakeFl: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, BAKERY.CAP - (S.fl | 0)) : 0; }, put() { state.w2.bakery.fl++; } },
+        bakeFl: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, inCap('bakery', BAKERY.CAP) - (S.fl | 0)) : 0; }, put() { state.w2.bakery.fl++; } },
         bakeWa: { pos() { return RP_PT(BAKERY.X - 4.2, BAKERY.Z + 2.4); }, room() { const S = state.w2.bakery; return S && S.own ? Math.max(0, wcap('bake', BAKERY.CAP) - (S.wa | 0)) : 0; }, put() { state.w2.bakery.wa++; } },
         hutaSand: rpWs2('huta', 'sand'), hutaWater: rpWs2('huta', 'water'),
         winGrapes: rpWs2('winery', 'grapes'), winGlass: rpWs2('winery', 'glass'),
@@ -10539,11 +10557,11 @@ window.onerror = function(msg, src, line, col, err) {
                      room() { const T = Tavern.T; return T && T.brew && T.brew.own ? Math.max(0, TAV.BREW_CAP_IN - (T.brew.in | 0)) : 0; }, put() { Tavern.brewPut('wheat'); } },
         tavSpice: { pos() { const g = worldObjects.tavernGroup; return g ? RP_PT(g.position.x + TAV.SPICE[0], g.position.z + TAV.SPICE[1] + 2.4) : null; },
                     room() { const T = Tavern.T; return T && state.tavern && state.tavern.kominekBuilt ? Math.max(0, Tavern.spiceCap() - (T.spice | 0)) : 0; }, put() { Tavern.T.spice = (Tavern.T.spice | 0) + 1; } },
-        palIn: { pos() { return RP_PT(PAL.X - 4.2, PAL.Z + 2.4); }, room() { const S = state.w2.pal; return S && S.own ? Math.max(0, PAL.CAP - (S.in | 0)) : 0; }, put() { state.w2.pal.in++; } },
+        palIn: { pos() { return RP_PT(PAL.X - 4.2, PAL.Z + 2.4); }, room() { const S = state.w2.pal; return S && S.own ? Math.max(0, inCap('pal', PAL.CAP) - (S.in | 0)) : 0; }, put() { state.w2.pal.in++; } },
         skupBread: { pos() { const p = wpos(worldObjects.woodZone); return p ? RP_PT(p.x - 2.5, p.z + 2.2) : null; }, room() { return skupHasRoom('bread') ? 99 : 0; },
                      put() { const q = this.pos(); if (q) skupPutIt2('bread', new THREE.Vector3(q.x, 1.3, q.z)); } },
         campfire: { pos() { const p = wpos(worldObjects.campfireZoneIn); return p ? RP_PT(p.x, p.z + 2.2) : null; },
-                    room() { const f = facilities.campfire; return f && f.unlocked ? Math.max(0, 30 - (f.input | 0)) : 0; },
+                    room() { const f = facilities.campfire; return f && f.unlocked ? Math.max(0, inCap('campfire', 30) - (f.input | 0)) : 0; },
                     put() { const f = facilities.campfire, g = worldObjects.campfireGroup, m = meshForItem(f.inType); f.input++; if (m && g) { m.position.copy(getFacilityPileLocal(f.visualsIn.length, false, 'campfire')); g.add(m); f.visualsIn.push(m); } } },
         brewWater: { pos() { const g = worldObjects.tavernGroup; return g ? RP_PT(g.position.x + TAV.BREW_WIN[0], g.position.z + TAV.BREW_WIN[1] - 1.6) : null; },
                      room() { const T = Tavern.T; return T && T.brew && T.brew.own ? Math.max(0, TAV.BREW_W_CAP - (T.brew.water | 0)) : 0; }, put() { Tavern.brewPut('water'); } },
@@ -10964,6 +10982,7 @@ window.onerror = function(msg, src, line, col, err) {
         function tavRects() { const L = Tavern.level ? Tavern.level() : 0, r = [[-18, L >= 2 ? 30 : 18, TAV.Z0, 6]]; if (L >= 3) r.push([-18, 30, 5.9, TAV.DECK_Z3]); if (L >= 4) r.push([TAV.TERR_X[0], TAV.TERR_X[1], TAV.DECK_Z3 - 0.1, TAV.DECK_Z4]); return r; }
         function ok(u, dx, dz) {
             const fr = vframes(u); if (!fr.length) return false;
+            if (u.lim && !u.lim(dx, dz)) return false;   // v243: np. ambona blisko zwierzyny
             const A = u.local ? tavRects() : Areas.rects();
             const others = u.local ? (Tavern.zoneRects ? Tavern.zoneRects().filter(z => z.key !== u.zone) : [])
                 : [].concat(...U.filter(o => o !== u && !o.local).map(vframes));
@@ -11377,7 +11396,7 @@ window.onerror = function(msg, src, line, col, err) {
                     bow.position.set(0.12, 0.25, 0.42); bow.rotation.set(0, -Math.PI / 2, -Math.PI / 2); m.add(bow); m.userData.bow = bow; m.scale.setScalar(0.9); scene.add(m); q.man = m; m.userData.sh = -1; m.userData.t0 = -9;
                     const a = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.9, 5), new THREE.MeshLambertMaterial({ color: 0x3E2723 })); a.visible = false; scene.add(a); q.arrow = a;
                 }
-                q.g.visible = true; q.man.visible = true;
+                q.g.visible = true; q.man.visible = true; q.g.position.set(tx, 0, tz);   // v243: ambonę można przesunąć
                 const m = q.man, fy = Math.atan2(HUNT.CX - tx, HUNT.CZ - tz), sh = S.sh | 0;
                 if (sh !== m.userData.sh) { if (m.userData.sh >= 0 && sh % (n + 1) === i + 1) m.userData.t0 = now; m.userData.sh = sh; }
                 const u = now - m.userData.t0, pull = u < 0.35 ? Math.sin(u / 0.35 * Math.PI) : 0;
@@ -11651,7 +11670,7 @@ window.onerror = function(msg, src, line, col, err) {
             apply: () => {
                 const E = UPG[rk]; if (!E || E.b.done() || !upHave(rk)) return;
                 const l = upLeft(rk), tp = playerGroup.position.clone(); tp.y = 0.2; tp.z += 1.4;
-                for (const r in l) for (let i = 0; i < l[r] && haveRes(r) > 0; i++) { if (IT2[r]) Items2.take(r, tp); else giveItemTo(r, tp); const s = Req.st(rk); s[r] = (s[r] || 0) + 1; }
+                for (const r in l) for (let i = 0; i < l[r] && haveRes(r) > 0; i++) { const rr = r === 'crystal' && !((state.player.crystal | 0) > 0) ? 'gems' : r; if (IT2[rr]) Items2.take(rr, tp); else giveItemTo(rr, tp); const s = Req.st(rk); s[r] = (s[r] || 0) + 1; }
                 let g = 200000; while (!E.b.done() && E.b.paid() < E.b.cost() && g-- > 0) E.b.add();
                 if (!E.b.done() && E.b.paid() >= E.b.cost()) E.b.finish();
             } }); });
@@ -11779,6 +11798,367 @@ window.onerror = function(msg, src, line, col, err) {
             if (s && pi) { const l = (s.offsetLeft + s.offsetWidth + 10) + 'px'; if (pi.style.left !== l) pi.style.left = l; }
         }
     });
+
+    // =====================================================================
+    // v243: MORZE z falami (wysokość, odbicia nieba, piana na grzbietach i przy brzegu, mokry piasek)
+    //       i nowy STATEK (kadłub z wręg, żagle wybrzuszone wiatrem, olinowanie, flagi), który kołysze się na tych samych falach
+    // =====================================================================
+    const SEA = { SHORE: 80, Z: 115, W: 260, H: 70, Y0: 0.05, P: 400,
+        // kierunek x, z, liczba falowa, prędkość (pełne obroty w okresie P – czas zawija się bez skoku), wysokość
+        WAVES: [[0.24, -0.97, 0.30, 2 * Math.PI * 67 / 400, 0.14], [-0.51, -0.86, 0.52, 2 * Math.PI * 92 / 400, 0.07], [0.94, -0.33, 0.85, 2 * Math.PI * 127 / 400, 0.035]] };
+    const sstep = (a, b, v) => { const u = Math.max(0, Math.min(1, (v - a) / (b - a))); return u * u * (3 - 2 * u); };
+    function seaEnv(z) { return sstep(0, 10, z - SEA.SHORE); }
+    // poziom wody: przy piasku nisko, dalej nad trawą pod spodem (doliny fal jej nie odsłaniają); przy pomoście fale mniejsze
+    function seaY0(z) { return 0.03 + 0.21 * sstep(0, 4, z - SEA.SHORE); }
+    function seaK(x, z) { return 1 - 0.55 * (1 - sstep(3.5, 8, Math.abs(x))) * (1 - sstep(96, 100, z)); }
+    function seaH(x, z, t) {
+        let h = 0;
+        for (const [dx, dz, k, s, a] of SEA.WAVES) { const ph = (dx * x + dz * z) * k + t * s; h += a * (2 * Math.exp(Math.sin(ph) - 1) - 1); }
+        return seaY0(z) + seaEnv(z) * seaK(x, z) * h;
+    }
+    const SEA_GLSL = (() => {
+        const f = v => v.toFixed(5);
+        const wv = SEA.WAVES.map(([dx, dz, k, s, a]) => `ph = dot(vec2(${f(dx)}, ${f(dz)}), p) * ${f(k)} + t * ${f(s)}; h += ${f(a)} * (2.0 * exp(sin(ph) - 1.0) - 1.0);`).join('\n');
+        return `
+uniform float uTime;
+varying vec3 vSeaW;
+varying float vSeaH;
+float seaEnv(float z) { return smoothstep(0.0, 10.0, z - ${f(SEA.SHORE)}); }
+float seaWaves(vec2 p, float t) { float h = 0.0, ph;
+${wv}
+return h; }
+float seaY0(float z) { return 0.03 + 0.21 * smoothstep(0.0, 4.0, z - ${f(SEA.SHORE)}); }
+float seaK(vec2 p) { return 1.0 - 0.55 * (1.0 - smoothstep(3.5, 8.0, abs(p.x))) * (1.0 - smoothstep(96.0, 100.0, p.y)); }
+float seaH(vec2 p, float t) { return seaY0(p.y) + seaEnv(p.y) * seaK(p) * seaWaves(p, t); }
+float seaHash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 - 2.0 * q);
+  return mix(mix(seaHash(i), seaHash(i + vec2(1.0, 0.0)), u.x), mix(seaHash(i + vec2(0.0, 1.0)), seaHash(i + vec2(1.0, 1.0)), u.x), u.y); }
+`;
+    })();
+    function seaMaterial(U) {
+        const m = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x8a9aa8, shininess: 110 });
+        m.onBeforeCompile = sh => {
+            sh.uniforms.uTime = U.uTime;
+            sh.vertexShader = SEA_GLSL + sh.vertexShader
+                .replace('#include <beginnormal_vertex>', `
+    vec3 sW0 = (modelMatrix * vec4(position, 1.0)).xyz;
+    float sE = 0.25;
+    float sH0 = seaH(sW0.xz, uTime);
+    float sHx = seaH(sW0.xz + vec2(sE, 0.0), uTime), sHz = seaH(sW0.xz + vec2(0.0, sE), uTime);
+    vec3 objectNormal = normalize(vec3(-(sHx - sH0) / sE * 1.7, (sHz - sH0) / sE * 1.7, 1.0));   // fale wyraźniej w świetle
+    #ifdef USE_TANGENT
+    vec3 objectTangent = vec3(tangent.xyz);
+    #endif`)
+                .replace('#include <begin_vertex>', `
+    vec3 transformed = vec3(position.x, position.y, position.z + sH0);
+    vSeaW = vec3(sW0.x, sH0, sW0.z);
+    vSeaH = seaWaves(sW0.xz, uTime) * seaEnv(sW0.z) * seaK(sW0.xz);`);
+            sh.fragmentShader = SEA_GLSL + sh.fragmentShader.replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
+    {
+      float t = uTime, tw = t * 6.2831853 / ${f2(SEA.P)};
+      vec2 rp = vSeaW.xz;
+      float sd = vSeaW.z - ${f2(SEA.SHORE)};
+      // drobne zmarszczki (tylko światło) – błyski słońca
+      vec2 rg = vec2(0.0); float r;
+      r = dot(rp, vec2(0.8, 0.6)) * 2.3 + t * ${f2(2 * Math.PI * 197 / SEA.P)}; rg += vec2(0.8, 0.6) * cos(r) * 0.07;
+      r = dot(rp, vec2(-0.6, 0.8)) * 3.1 + t * ${f2(2 * Math.PI * 153 / SEA.P)}; rg += vec2(-0.6, 0.8) * cos(r) * 0.055;
+      r = dot(rp, vec2(0.95, -0.31)) * 4.7 - t * ${f2(2 * Math.PI * 236 / SEA.P)}; rg += vec2(0.95, -0.31) * cos(r) * 0.04;
+      r = dot(rp, vec2(-0.2, -0.98)) * 6.3 + t * ${f2(2 * Math.PI * 274 / SEA.P)}; rg += vec2(-0.2, -0.98) * cos(r) * 0.03;
+      float rEnv = 0.35 + 0.65 * smoothstep(0.0, 6.0, sd);
+      vec3 upV = (viewMatrix * vec4(0.0, 1.0, 0.0, 0.0)).xyz;
+      vec3 rN = normalize((viewMatrix * vec4(-rg.x * rEnv, 1.0, -rg.y * rEnv, 0.0)).xyz);
+      normal = normalize(normal + (rN - upV));
+      // kolor: płycizna turkusowa → głębia granatowa, jaśniejsze grzbiety, odbicie nieba pod kątem
+      vec3 wc = mix(vec3(0.26, 0.76, 0.78), vec3(0.08, 0.49, 0.74), smoothstep(0.0, 9.0, sd));
+      wc = mix(wc, vec3(0.03, 0.28, 0.54), smoothstep(12.0, 45.0, sd));
+      float crest = clamp(vSeaH / 0.17, 0.0, 1.0);
+      wc += vec3(0.05, 0.12, 0.09) * crest;
+      float fres = pow(1.0 - clamp(dot(normalize(vViewPosition), normal), 0.0, 1.0), 4.0);
+      wc = mix(wc, vec3(0.72, 0.87, 0.98), fres * 0.6);
+      // piana: na grzbietach fal (z dala od brzegu), pasy fal przybojowych i biała krawędź przy piasku
+      vec2 dr = vec2(sin(tw), cos(tw)) * 9.0;
+      float n = seaNoise(rp * 0.9 + dr) * 0.6 + seaNoise(rp * 2.6 - dr * 1.3) * 0.4;
+      float n2 = seaNoise(rp * 4.2 + dr * 2.1) * 0.65 + seaNoise(rp * 9.0 - dr * 3.0) * 0.35;
+      float foamCrest = smoothstep(0.8, 1.0, crest) * smoothstep(0.5, 0.78, n2) * smoothstep(3.0, 12.0, sd) * 0.85;
+      float band = sin(sd * 1.9 + t * ${f2(2 * Math.PI * 166 / SEA.P)} + n * 3.0);
+      float foamShore = smoothstep(0.55, 0.97, band) * smoothstep(7.5, 1.2, sd) * (0.5 + 0.5 * n);
+      float edge = smoothstep(1.5, 0.15, sd) * (0.6 + 0.4 * sin(rp.x * 0.7 + t * ${f2(2 * Math.PI * 83 / SEA.P)} + n * 4.0));
+      float foam = clamp(max(max(foamCrest, foamShore), edge), 0.0, 1.0);
+      wc = mix(wc, vec3(0.96, 0.98, 1.0), foam * 0.92);
+      diffuseColor.rgb = wc;
+    }`);
+        };
+        return m;
+    }
+    function f2(v) { return v.toFixed(5); }
+
+    // ---------- morze: podmiana modułu (stary płaski plan z kafelkami znika) ----------
+    { const sm = W2.mods.find(m => m.key === 'sea'); if (sm) {
+        const U = { uTime: { value: 0 } };
+        sm.reset = function () { if (this.R && this.R.objs) this.R.objs.forEach(o => { if (o.parent) o.parent.remove(o); }); this.R = { built: false, objs: [] }; };
+        sm.render = function (now) {
+            if (!Areas.has('south')) return;
+            const R = this.R;
+            if (!R.built) {
+                R.built = true;
+                const beach = new THREE.Mesh(new THREE.PlaneGeometry(SEA.W, 9), new THREE.MeshLambertMaterial({ color: 0xE9D29A }));
+                beach.rotation.x = -Math.PI / 2; beach.position.set(0, 0.015, 76.5); beach.receiveShadow = true;
+                const wet = new THREE.Mesh(new THREE.PlaneGeometry(SEA.W, 2.2), new THREE.MeshLambertMaterial({ color: 0xCBB07A }));
+                wet.rotation.x = -Math.PI / 2; wet.position.set(0, 0.018, 79.4); wet.receiveShadow = true;
+                const sea = new THREE.Mesh(new THREE.PlaneGeometry(SEA.W, SEA.H, 176, 48), seaMaterial(U));
+                sea.rotation.x = -Math.PI / 2; sea.position.set(0, 0, SEA.Z); sea.receiveShadow = true;
+                [beach, wet, sea].forEach(o => { scene.add(o); R.objs.push(o); });
+            }
+            U.uTime.value = now % SEA.P;
+        };
+    } }
+
+    // ---------- STATEK ----------
+    const SHIP_TPL = {};
+    function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 2; return t; }
+    function buildShip(kind) {
+        const noble = kind === 'n';
+        const holder = new THREE.Group(), body = new THREE.Group(); body.name = 'body'; holder.add(body);
+        const L = 12.5, B = 3.9, N = 28, M = 9;
+        const hb = u => B / 2 * (u < 0.45 ? 0.8 + 0.2 * Math.sin(u / 0.45 * Math.PI / 2) : Math.pow(Math.max(0, Math.cos((u - 0.45) / 0.55 * Math.PI / 2)), 0.7));
+        const top = u => 1.25 + 0.5 * Math.pow(Math.abs(u - 0.48) / 0.52, 2) + (u > 0.85 ? (u - 0.85) / 0.15 * 0.3 : 0);
+        const bot = u => -0.85 * (u > 0.8 ? 1 - Math.pow((u - 0.8) / 0.2, 1.4) * 0.85 : u < 0.06 ? 0.8 + u / 0.06 * 0.2 : 1);
+        const deckY = u => top(u) - 0.34;
+        const ux = x => (x + L / 2) / L;
+        const C = h => new THREE.Color(h);
+        const cl = noble ? { bottom: C(0x3B1F2B), hull: C(0x4A2C6B), stripe: C(0xD4AF37), rail: C(0x2A1840), transom: C(0x3E2459) }
+                         : { bottom: C(0x6B2A1F), hull: C(0x7A4A23), stripe: C(0xD7A23B), rail: C(0x4E2D14), transom: C(0x6A3F1E) };
+        const wood = new THREE.MeshLambertMaterial({ color: 0x5D3A1A }), dark = new THREE.MeshLambertMaterial({ color: 0x3B2A1E });
+        const gold = new THREE.MeshLambertMaterial({ color: 0xD4AF37 }), glow = new THREE.MeshBasicMaterial({ color: 0xFFD966 });
+        const vc = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+        // --- kadłub z wręg: przekroje w kształcie U, rufa szeroka, dziób ostry, burty podniesione na dziobie i rufie ---
+        const P = [];
+        for (let i = 0; i <= N; i++) {
+            const u = i / N, x = -L / 2 + u * L, w = hb(u), t = top(u), b = bot(u), row = [];
+            for (let j = 0; j <= 2 * M; j++) { const th = (j / (2 * M) - 0.5) * Math.PI, c = Math.cos(th), s = Math.sin(th);
+                row.push([x, b + (t - b) * (1 - Math.pow(Math.max(0, c), 0.55)), w * Math.sign(s) * Math.pow(Math.abs(s), 0.8)]); }
+            P.push(row);
+        }
+        const pos = [], col = [];
+        const tri = (a, b, c, k) => { pos.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]); for (let q = 0; q < 3; q++) col.push(k.r, k.g, k.b); };
+        const band = (y, u) => { const t = top(u); return y < 0.08 ? cl.bottom : y > t - 0.16 ? cl.rail : y > t - 0.44 ? cl.stripe : cl.hull; };
+        for (let i = 0; i < N; i++) for (let j = 0; j < 2 * M; j++) {
+            const a = P[i][j], b = P[i + 1][j], c = P[i + 1][j + 1], d = P[i][j + 1], k = band((a[1] + b[1] + c[1] + d[1]) / 4, (i + 0.5) / N);
+            tri(a, b, c, k); tri(a, c, d, k);
+        }
+        const r0 = P[0], cym = (top(0) + bot(0)) / 2;
+        for (let j = 0; j < 2 * M; j++) tri([r0[0][0], cym, 0], r0[j + 1], r0[j], r0[j][1] > top(0) - 0.16 ? cl.rail : cl.transom);
+        // pokład z desek
+        const dA = C(noble ? 0xC09A6B : 0xB98A5C), dB = C(noble ? 0xAD875A : 0xA67A4E), S = 6;
+        for (let i = 0; i < N; i++) for (let k = 0; k < S; k++) {
+            const u0 = i / N, u1 = (i + 1) / N, x0 = -L / 2 + u0 * L, x1 = -L / 2 + u1 * L, w0 = hb(u0) * 0.97, w1 = hb(u1) * 0.97, y0 = deckY(u0), y1 = deckY(u1);
+            const z0a = -w0 + 2 * w0 * k / S, z0b = -w0 + 2 * w0 * (k + 1) / S, z1a = -w1 + 2 * w1 * k / S, z1b = -w1 + 2 * w1 * (k + 1) / S, cc = (k + Math.floor(i / 3)) % 2 ? dA : dB;
+            tri([x0, y0, z0a], [x0, y0, z0b], [x1, y1, z1b], cc); tri([x0, y0, z0a], [x1, y1, z1b], [x1, y1, z1a], cc);
+        }
+        const hg = new THREE.BufferGeometry(); hg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); hg.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); hg.computeVertexNormals();
+        const hull = new THREE.Mesh(hg, vc); hull.castShadow = true; body.add(hull);
+        const add = (geo, mat, x, y, z, sh) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); if (sh) m.castShadow = true; body.add(m); return m; };
+        // nadbudówka rufowa z oknami i latarnią, pokład dziobowy
+        const qx0 = -L / 2 + 0.2, qx1 = -L / 2 + 2.5, qw = hb(0.1) * 1.9, qy = deckY(0.1);
+        add(new THREE.BoxGeometry(qx1 - qx0, 0.95, qw), new THREE.MeshLambertMaterial({ color: noble ? 0x4A2C6B : 0x7A4A23 }), (qx0 + qx1) / 2, qy + 0.47, 0, true);
+        add(new THREE.BoxGeometry(qx1 - qx0 + 0.1, 0.08, qw + 0.1), new THREE.MeshLambertMaterial({ color: noble ? 0xC09A6B : 0xB98A5C }), (qx0 + qx1) / 2, qy + 0.98, 0);
+        [-1, 1].forEach(s => add(new THREE.BoxGeometry(qx1 - qx0, 0.06, 0.06), noble ? gold : dark, (qx0 + qx1) / 2, qy + 1.38, s * qw / 2));
+        for (let x = qx0 + 0.05; x <= qx1; x += 0.45) [-1, 1].forEach(s => add(new THREE.BoxGeometry(0.05, 0.4, 0.05), noble ? gold : dark, x, qy + 1.18, s * qw / 2));
+        [-0.75, 0, 0.75].forEach(z => add(new THREE.BoxGeometry(0.06, 0.34, 0.42), glow, -L / 2 - 0.02, top(0) - 0.55, z));
+        [-0.55, 0.55].forEach(z => add(new THREE.BoxGeometry(0.06, 0.3, 0.36), glow, qx0 - 0.03, qy + 0.5, z));
+        add(new THREE.BoxGeometry(0.22, 0.32, 0.22), glow, qx0 + 0.15, qy + 1.65, 0); add(new THREE.BoxGeometry(0.3, 0.06, 0.3), dark, qx0 + 0.15, qy + 1.84, 0);
+        add(new THREE.BoxGeometry(0.25, 1.1, 0.12), dark, -L / 2 - 0.08, 0.05, 0);   // ster
+        const fx0 = L / 2 - 2.9, fx1 = L / 2 - 1.1, fw = hb(0.86) * 1.85, fy = deckY(0.84);
+        add(new THREE.BoxGeometry(fx1 - fx0, 0.5, fw), new THREE.MeshLambertMaterial({ color: noble ? 0x4A2C6B : 0x7A4A23 }), (fx0 + fx1) / 2, fy + 0.25, 0, true);
+        add(new THREE.BoxGeometry(fx1 - fx0 + 0.05, 0.07, fw + 0.05), new THREE.MeshLambertMaterial({ color: noble ? 0xC09A6B : 0xB98A5C }), (fx0 + fx1) / 2, fy + 0.52, 0);
+        // bukszpryt i galion
+        const bsx = L / 2 - 0.45, bsy = top(1) - 0.2, bsa = 0.36, bsl = 3.1;
+        const bsp = add(new THREE.CylinderGeometry(0.07, 0.11, bsl, 7), wood, bsx + Math.cos(bsa) * bsl / 2, bsy + Math.sin(bsa) * bsl / 2, 0); bsp.rotation.z = -(Math.PI / 2 - bsa);
+        const tipX = bsx + Math.cos(bsa) * bsl, tipY = bsy + Math.sin(bsa) * bsl;
+        if (noble) { const fh = add(new THREE.ConeGeometry(0.22, 0.7, 8), gold, L / 2 + 0.05, top(1) - 0.45, 0); fh.rotation.z = -Math.PI / 2 - 0.4; add(new THREE.SphereGeometry(0.16, 8, 6), gold, L / 2 + 0.25, top(1) - 0.25, 0); }
+        // kotwica
+        [-1, 1].forEach(s => { const a = add(new THREE.TorusGeometry(0.22, 0.045, 5, 10, Math.PI), dark, L / 2 - 1.7, 0.75, s * (hb(0.86) + 0.06)); a.rotation.z = Math.PI; add(new THREE.BoxGeometry(0.06, 0.6, 0.06), dark, L / 2 - 1.7, 1.0, s * (hb(0.86) + 0.06)); });
+        // maszty, reje, żagle
+        const sailMat = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: canvasTex(64, 64, (g, w, h) => {
+            g.fillStyle = noble ? '#FBF8F2' : '#F2E6CC'; g.fillRect(0, 0, w, h);
+            g.fillStyle = 'rgba(110,85,50,0.14)'; for (let x = 4; x < w; x += 8) g.fillRect(x, 0, 1, h);
+            g.fillStyle = 'rgba(110,85,50,0.16)'; g.fillRect(0, h - 3, w, 3); g.fillRect(0, 0, w, 2);
+            if (noble) { g.fillStyle = '#6A1B9A'; g.fillRect(w * 0.43, 0, w * 0.14, h); g.fillRect(0, h * 0.43, w, h * 0.14); g.fillStyle = '#D4AF37'; g.beginPath(); g.arc(w / 2, h / 2, 7, 0, Math.PI * 2); g.fill(); }
+            else { g.fillStyle = '#B23A2A'; g.fillRect(0, h * 0.38, w, h * 0.2); }
+        }) });
+        function squareSail(w, h, bulge) {
+            const g = new THREE.PlaneGeometry(w, h, 8, 6), p = g.attributes.position;
+            for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), xn = x / (w / 2), yn = y / (h / 2);
+                p.setX(i, x * (1 + 0.08 * -yn)); p.setZ(i, bulge * (1 - xn * xn) * (1 - 0.5 * yn * yn)); }
+            g.computeVertexNormals();
+            const m = new THREE.Mesh(g, sailMat); m.rotation.y = Math.PI / 2; m.castShadow = true; return m;
+        }
+        const lines = [], LN = (a, b) => lines.push(a[0], a[1], a[2], b[0], b[1], b[2]);
+        const masts = [{ x: 2.9, H: 7.6, s: [[1.55, 2.5, 3.5], [4.35, 2.0, 2.7]] }, { x: 0.1, H: 9.0, s: [[1.6, 2.9, 4.0], [4.85, 2.4, 3.1], [7.55, 1.4, 2.0]] }, { x: -3.4, H: 6.4, s: [] }];
+        masts.forEach((ms, mi) => {
+            const u = ux(ms.x), dy = deckY(u);
+            add(new THREE.CylinderGeometry(0.09, 0.16, ms.H, 8), wood, ms.x, dy + ms.H / 2, 0, true);
+            add(new THREE.CylinderGeometry(0.2, 0.2, 0.12, 8), dark, ms.x, dy + ms.H * 0.62, 0);   // bocianie gniazdo
+            ms.s.forEach(([y0, h, w]) => {
+                const sail = squareSail(w, h, 0.42); sail.position.set(ms.x + 0.18, dy + y0 + h / 2, 0); body.add(sail);
+                const yd = add(new THREE.CylinderGeometry(0.05, 0.05, w + 0.5, 6), wood, ms.x + 0.12, dy + y0 + h + 0.02, 0); yd.rotation.x = Math.PI / 2;
+                LN([ms.x + 0.12, dy + y0 + h + 0.02, -(w / 2 + 0.25)], [ms.x - 0.4, dy + y0 + h - 0.8, -(hb(u) - 0.05)]);
+                LN([ms.x + 0.12, dy + y0 + h + 0.02, w / 2 + 0.25], [ms.x - 0.4, dy + y0 + h - 0.8, hb(u) - 0.05]);
+            });
+            const mt = dy + ms.H * 0.93;
+            [-0.9, -0.35, 0.2].forEach(dx => [-1, 1].forEach(s => LN([ms.x, mt - 0.4, 0], [ms.x + dx, top(ux(ms.x + dx)) + 0.02, s * (hb(ux(ms.x + dx)) - 0.02)])));
+            ms.top = [ms.x, mt, 0]; ms.dy = dy;
+        });
+        // bezan: żagiel skośny (gafel) za tylnym masztem
+        { const ms = masts[2], dy = ms.dy, g = new THREE.BufferGeometry();
+          const A = [ms.x - 0.15, dy + 0.9, 0], Bp = [ms.x - 2.5, dy + 0.95, 0], Cp = [ms.x - 2.1, dy + 4.2, 0], D = [ms.x - 0.15, dy + 4.8, 0];
+          g.setAttribute('position', new THREE.Float32BufferAttribute([...A, ...Bp, ...Cp, ...A, ...Cp, ...D], 3));
+          g.setAttribute('uv', new THREE.Float32BufferAttribute([1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1], 2)); g.computeVertexNormals();
+          const gs = new THREE.Mesh(g, sailMat); gs.castShadow = true; body.add(gs);
+          const bm = add(new THREE.CylinderGeometry(0.05, 0.05, 2.5, 6), wood, ms.x - 1.3, dy + 0.9, 0); bm.rotation.z = Math.PI / 2;
+          const gf = add(new THREE.CylinderGeometry(0.045, 0.045, 2.1, 6), wood, ms.x - 1.1, dy + 4.5, 0); gf.rotation.z = Math.PI / 2 + 0.27; }
+        // fok: trójkąt od przedniego masztu do bukszprytu
+        { const ms = masts[0], g = new THREE.BufferGeometry();
+          const A = [ms.x + 0.12, ms.dy + 6.3, 0], Bp = [tipX - 0.15, tipY - 0.05, 0], Cp = [L / 2 - 0.9, deckY(0.93) + 0.55, 0];
+          g.setAttribute('position', new THREE.Float32BufferAttribute([...A, ...Bp, ...Cp], 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute([0.5, 1, 1, 0, 0, 0], 2)); g.computeVertexNormals();
+          const js = new THREE.Mesh(g, sailMat); js.castShadow = true; body.add(js); }
+        // sztagi między masztami i do bukszprytu
+        LN(masts[0].top, [tipX, tipY, 0]); LN(masts[1].top, [masts[0].x, masts[0].dy + 1.3, 0]); LN(masts[2].top, [masts[1].x, masts[1].dy + 4.2, 0]);
+        const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.Float32BufferAttribute(lines, 3));
+        body.add(new THREE.LineSegments(lg, new THREE.LineBasicMaterial({ color: 0x3B2A1E })));
+        // flagi (falują): proporczyk na grotmaszcie i bandera na rufie
+        const flags = [];
+        { const g = new THREE.BufferGeometry(), seg = 8, v = [], ix = [];
+          for (let i = 0; i <= seg; i++) { const x = i / seg * 2.4, h2 = 0.2 * (1 - i / seg); v.push(x, h2, 0, x, -h2, 0); if (i < seg) { const a = i * 2; ix.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+          g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.setIndex(ix);
+          const pn = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: noble ? 0xD4AF37 : 0xC62828, side: THREE.DoubleSide }));
+          pn.position.set(masts[1].x, masts[1].dy + masts[1].H + 0.05, 0); pn.name = 'flag'; body.add(pn); flags.push(pn); }
+        { const fp = add(new THREE.CylinderGeometry(0.035, 0.035, 1.6, 5), wood, -L / 2 - 0.15, qy + 1.7, 0); fp.rotation.z = 0.5;
+          const g = new THREE.PlaneGeometry(1.3, 0.8, 8, 2); g.translate(0.65, 0, 0);
+          const fl = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: canvasTex(32, 20, (c, w, h) => {
+              if (noble) { c.fillStyle = '#5E1E8C'; c.fillRect(0, 0, w, h); c.fillStyle = '#D4AF37'; c.fillRect(w * 0.42, h * 0.25, w * 0.16, h * 0.5); c.fillRect(w * 0.3, h * 0.42, w * 0.4, h * 0.16); }
+              else { c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, w, h / 2); c.fillStyle = '#D32F2F'; c.fillRect(0, h / 2, w, h / 2); } }) }));
+          fl.position.set(-L / 2 - 0.55, qy + 2.35, 0); fl.rotation.y = Math.PI; fl.name = 'flag'; body.add(fl); flags.push(fl); }
+        // ładunek kupców / baldachim szlachty
+        if (!noble) {
+            const crate = new THREE.MeshLambertMaterial({ color: 0x9C6B3C }), barrel = new THREE.MeshLambertMaterial({ color: 0x8D5A2B }), hoop = new THREE.MeshLambertMaterial({ color: 0x3E3E3E });
+            [[1.4, -0.8], [1.45, 0.05], [-1.2, 0.85]].forEach(([x, z]) => add(new THREE.BoxGeometry(0.7, 0.6, 0.7), crate, x, deckY(ux(x)) + 0.3, z, true));
+            add(new THREE.BoxGeometry(0.55, 0.45, 0.55), crate, 1.42, deckY(ux(1.4)) + 0.82, -0.5);
+            [[-1.5, -0.7], [-1.0, -0.95], [-1.9, 0.1], [4.4, 0.6]].forEach(([x, z]) => { const y = deckY(ux(x)); add(new THREE.CylinderGeometry(0.28, 0.28, 0.72, 10), barrel, x, y + 0.36, z, true); add(new THREE.CylinderGeometry(0.29, 0.29, 0.06, 10), hoop, x, y + 0.6, z); add(new THREE.CylinderGeometry(0.29, 0.29, 0.06, 10), hoop, x, y + 0.12, z); });
+        } else {
+            const cx = -1.4, cy = deckY(ux(cx));
+            [[-0.9, -0.85], [-0.9, 0.85], [0.9, -0.85], [0.9, 0.85]].forEach(([dx, dz]) => add(new THREE.CylinderGeometry(0.05, 0.05, 1.7, 6), gold, cx + dx, cy + 0.85, dz));
+            add(new THREE.BoxGeometry(2.0, 0.12, 1.9), new THREE.MeshLambertMaterial({ color: 0x6A1B9A }), cx, cy + 1.72, 0, true);
+            add(new THREE.BoxGeometry(2.05, 0.22, 0.04), gold, cx, cy + 1.6, 0.96); add(new THREE.BoxGeometry(2.05, 0.22, 0.04), gold, cx, cy + 1.6, -0.96);
+            add(new THREE.BoxGeometry(1.2, 0.5, 0.6), new THREE.MeshLambertMaterial({ color: 0x8E24AA }), cx, cy + 0.25, 0);
+        }
+        // piana przy burtach i kilwater (płasko na wodzie, nie przechyla się ze statkiem)
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.86, 1.08, 48), new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.4, depthWrite: false }));
+        ring.rotation.x = -Math.PI / 2; ring.scale.set(L / 2 + 0.6, B / 2 + 0.35, 1); ring.position.x = 0.4; ring.name = 'ring'; holder.add(ring);
+        const wake = new THREE.Mesh(new THREE.PlaneGeometry(18, 6), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, map: canvasTex(256, 64, (g, w, h) => {
+            g.clearRect(0, 0, w, h);
+            for (let i = 0; i < 2; i++) { const gr = g.createLinearGradient(w, 0, 0, 0); gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.strokeStyle = gr; g.lineWidth = 5;
+                g.beginPath(); g.moveTo(w, h / 2); g.quadraticCurveTo(w * 0.5, h / 2 + (i ? 1 : -1) * h * 0.2, 0, i ? h - 3 : 3); g.stroke(); }
+            const gc = g.createLinearGradient(w, 0, 0, 0); gc.addColorStop(0, 'rgba(255,255,255,0.7)'); gc.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gc; g.fillRect(0, h / 2 - 4, w, 8);
+        }) }));
+        wake.rotation.x = -Math.PI / 2; wake.position.x = -L / 2 - 8.6; wake.name = 'wake'; holder.add(wake);
+        holder.userData.flagBase = flags.map(f => Float32Array.from(f.geometry.attributes.position.array));
+        return holder;
+    }
+    function shipFor(kind) {
+        const tpl = SHIP_TPL[kind] || (SHIP_TPL[kind] = buildShip(kind));
+        const h = tpl.clone(true);
+        h.userData = { body: h.getObjectByName('body'), ring: h.getObjectByName('ring'), wake: h.getObjectByName('wake'), flags: [], base: tpl.userData.flagBase };
+        h.traverse(o => { if (o.name === 'flag') h.userData.flags.push(o); });
+        return h;
+    }
+    function shipRide(h, now) {
+        const ud = h.userData, body = ud.body; if (!body) return;
+        const x = h.position.x, z = h.position.z, t = now % SEA.P;
+        const tn = performance.now(), dt = ud.tp ? Math.max(1, tn - ud.tp) / 1000 : 0.016, v = ud.px !== undefined ? Math.min(60, Math.abs(x - ud.px) / dt) : 0;
+        ud.px = x; ud.tp = tn; ud.v = (ud.v || 0) * 0.92 + v * 0.08;
+        const w = seaH(x, z, t), hB = seaH(x + 5, z, t), hS = seaH(x - 5, z, t), hP = seaH(x, z - 1.9, t), hT = seaH(x, z + 1.9, t);
+        h.position.y = 0; h.rotation.set(0, 0, 0);
+        body.position.y = w - 0.08;
+        body.rotation.z = Math.atan2(hB - hS, 10) + Math.sin(now * 0.55) * 0.008;
+        body.rotation.x = -Math.atan2(hT - hP, 3.8) + Math.sin(now * 0.8) * 0.014;
+        ud.ring.position.y = w + 0.03; ud.ring.material.opacity = 0.32 + Math.min(0.45, ud.v / 18);
+        ud.wake.position.y = w + 0.04; ud.wake.material.opacity = Math.min(0.8, ud.v / 10);
+        // flagi na wietrze
+        ud.flags.forEach((f, i) => {
+            const p = f.geometry.attributes.position, b = ud.base[i]; if (!b) return;
+            for (let k = 0; k < p.count; k++) { const bx = b[k * 3]; p.setZ(k, Math.sin(bx * 3.2 - now * 7.5 + i) * 0.14 * Math.min(1, bx)); }
+            p.needsUpdate = true;
+        });
+    }
+    { const pm = W2.mods.find(m => m.key === 'port'); if (pm) {
+        pm.shipMesh = kind => shipFor(kind);
+        const r0 = pm.render;
+        pm.render = function (now) { r0.call(this, now); const R = this.R; if (R && R.ship && R.ship.userData && R.ship.userData.body) shipRide(R.ship, now); };
+    } }
+
+    // ---------- KRYSZTAŁY z kopalni: po 25 na SPRZEDAJ; liczą się na kielichy i żyrandol (jak kryształy z portu) ----------
+    MINE.GEM_PRICE = 25;
+
+    // ---------- AMBONY: można je przestawiać (opcje → przeciągnij), ale tylko blisko zwierzyny; drzewa wokół ambon znikają ----------
+    TOWERS[1].x = 57; TOWERS[1].z = -31;   // trzecia ambona – na polanie, nie pod drzewem
+    TOWERS.forEach((T, i) => MV.add('tw_' + i, 'AMBONA ' + (i + 2), [[T, ['x'], ['z']]], ['hunttw'], {
+        frames() { const S = state.w2.hunt; return S && (S.tw | 0) > i ? [{ x: T.x - 3.2, z: T.z - 2.6, w: 2.6, h: 2.6, vis: true }] : []; },
+        lim(dx, dz) { const x = T.x - 3.2 + dx, z = T.z - 2.6 + dz, r = AREAS.east.rect; return x > r[0] + 2 && x < r[1] - 2 && z > r[2] + 2 && z < r[3] - 2 && Math.hypot(x - HUNT.CX, z - HUNT.CZ) < HUNT.R + 10; }
+    }));
+    // drzewa liczone od nowa, gdy ambona stanie gdzie indziej
+    { const _vis = Areas.visuals.bind(Areas); let tk = '';
+      Areas.visuals = function () { const k = TOWERS.map(t => t.x + ',' + t.z).join(';') + '|' + (Areas.has('meadow') ? 1 : 0); if (k !== tk) { tk = k; this.R.vkey = ''; } return _vis(); }; }
+
+    // ---------- ŁĄKA: nowy teren pod lasem łowieckim – głównie trawa i kwiaty, mało drzew ----------
+    AREAS.meadow = { cost: 3000, req: { planks: 60, blocks: 20 }, rect: [48, 88, 21.5, 72], fx: 72, fz: 18.4, pre: 'east', title: 'ŁĄKA', sub: 'nowy teren',
+        toast: '🌼 Łąka kupiona! Pod lasem łowieckim jest dużo miejsca na nowe rzeczy.' };
+    Req.def('area_meadow', { lvl: () => state.w2.areas.meadow | 0, need: () => AREAS.meadow.req });
+    { const _def = Areas.defaults, _res = Areas.restore;
+      Areas.defaults = function () { return Object.assign(_def.call(this), { meadow: 0, pm: 0 }); };
+      Areas.restore = function (v) { _res.call(this, v); const o = state.w2.areas; o.meadow = v && v.meadow ? 1 : 0; o.pm = Math.max(0, (v && v.pm) | 0); }; }
+    { const _cl = Areas.cleared.bind(Areas);
+      Areas.cleared = function (x, z) {
+          if (this.has('meadow')) { const r = AREAS.meadow.rect; if (x > r[0] - 3 && x < r[1] + 3 && z > r[2] - 3 && z < r[3] + 3) return (Math.round(x * 7 + z * 13) % 10) !== 0; }   // co dziesiąte drzewo zostaje
+          return _cl(x, z);
+      }; }
+    // trawa i kwiaty na łące (dokładane do ozdób terenów)
+    { const _vis = Areas.visuals; 
+      Areas.visuals = function () {
+          const ex0 = this.R.extra; _vis.call(this);
+          if (this.R.extra === ex0 || !this.has('meadow')) return;   // ozdoby terenów zbudowane od nowa – dokładam łąkę
+          const r = AREAS.meadow.rect, RR = makePRNG((worldSeed ^ 0x3C1EAD) | 0), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), s = new THREE.Vector3(), p = new THREE.Vector3(), c = new THREE.Color();
+          const N = 900, tufts = new THREE.InstancedMesh(tuftGeometry(), new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }), N);
+          tufts.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(N * 3), 3); tufts.frustumCulled = false;
+          for (let i = 0; i < N; i++) { e.set(0, RR() * 6.28, 0); q.setFromEuler(e); const sc = 0.5 + RR() * 0.6; s.set(sc, sc * (0.8 + RR() * 0.6), sc); p.set(r[0] + RR() * (r[1] - r[0]), 0, r[2] + RR() * (r[3] - r[2]));
+              m4.compose(p, q, s); tufts.setMatrixAt(i, m4); c.setHSL(0.2 + RR() * 0.07, 0.42 + RR() * 0.15, 0.4 + RR() * 0.12); tufts.setColorAt(i, c); }
+          tufts.instanceMatrix.needsUpdate = true; tufts.instanceColor.needsUpdate = true;
+          const F = 420, fg = new THREE.SphereGeometry(0.13, 6, 4), flowers = new THREE.InstancedMesh(fg, new THREE.MeshLambertMaterial({ vertexColors: false }), F);
+          flowers.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(F * 3), 3); flowers.frustumCulled = false;
+          const FC = [0xFFFFFF, 0xFFEB3B, 0xF06292, 0xBA68C8, 0x64B5F6, 0xFF8A65];
+          for (let i = 0; i < F; i++) { const k = 0.8 + RR() * 0.6; p.set(r[0] + RR() * (r[1] - r[0]), 0.32 * k, r[2] + RR() * (r[3] - r[2])); s.set(k, k * 0.7, k); q.identity();
+              m4.compose(p, q, s); flowers.setMatrixAt(i, m4); c.setHex(FC[Math.floor(RR() * FC.length)]); flowers.setColorAt(i, c); }
+          flowers.instanceMatrix.needsUpdate = true; flowers.instanceColor.needsUpdate = true;
+          [tufts, flowers].forEach(o => { scene.add(o); this.R.extra.push(o); });
+          if (typeof deco !== 'undefined' && deco) { deco.inst = (deco.inst || []).filter(d => d.mesh.parent); deco.inst.push({ mesh: tufts, base: tufts.instanceMatrix.array.slice() }); }
+      }; }
+
+    // ---------- WIĘKSZY MAGAZYN: każde wejście zakładu da się rozbudować (+10 za poziom, do 10) – piasek w hucie, winogrona, marchew, mąka, mięso, drewno… ----------
+    w2mod({ key: 'capx', defaults() { return {}; }, restore(v) { const o = {}; if (v && typeof v === 'object') Object.keys(v).forEach(k => { if (/^[a-z0-9_]+$/.test(k)) o[k] = Math.max(0, Math.min(10, v[k] | 0)); }); state.w2.capx = o; } });
+    const CAPX = {
+        ws2_huta: ['piasek w hucie', 'sand', () => own2('ws2_huta'), () => WS2.huta.cap], ws2_winery: ['winogrona i szkło w tłoczni', 'grapes', () => own2('ws2_winery'), () => WS2.winery.cap],
+        ws2_kuchnia: ['marchew i dziczyzna w kuchni', 'carrot', () => own2('ws2_kuchnia'), () => WS2.kuchnia.cap], bakery: ['mąka w piekarni', 'wbag', () => own2('bakery'), () => BAKERY.CAP],
+        pal: ['dziczyzna w palenisku', 'meat', () => own2('pal'), () => PAL.CAP], campfire: ['ryby przy ognisku (tragarze)', 'fish', () => !!(facilities.campfire && facilities.campfire.unlocked), () => 30],
+        sawmill: ['drewno przy pile (tragarz)', 'wood', () => !!(facilities.sawmill && facilities.sawmill.unlocked), () => 30], sickle: ['trawa przy sierpie (tragarz)', 'plant', () => !!(facilities.sickle && facilities.sickle.unlocked), () => 30],
+        herb: ['trawa przy ziołach (tragarz)', 'herb', () => !!(facilities.herb && facilities.herb.unlocked), () => 30], threshing: ['zboże przy młynie (tragarz)', 'wheat', () => !!(facilities.threshing && facilities.threshing.unlocked), () => 30]
+    };
+    Object.keys(CAPX).forEach(k => { const [nm, icon, ok, base] = CAPX[k], L = () => { const C = state.w2 && state.w2.capx; return C ? Math.max(0, Math.min(10, C[k] | 0)) : 0; };
+        SHOP_ITEMS.push({ k: 'x_cap_' + k, ext: true, icon, name: 'Większy magazyn',
+            desc: () => 'Mieści się więcej: ' + nm + ' – ' + inCap(k, base()) + ', +10 za poziom (poziom ' + L() + '/10)',
+            price: () => 250 * (L() + 1), status: () => L() >= 10 ? 'max' : ok() ? 'ok' : 'lock', lockText: 'najpierw kup zakład',
+            apply: () => { if (!state.w2.capx) state.w2.capx = {}; state.w2.capx[k] = Math.min(10, L() + 1); if (curCtx === localCtx()) showToast('📦 Większy magazyn: ' + nm + ' – ' + inCap(k, base())); } }); });
+    // do paneli ROZBUDOWA tych zakładów (zaraz po tempie)
+    Object.keys(CAPX).forEach(k => { const D = FAC_UI[k]; if (!D) return; const i = D.it.findIndex(x => x.indexOf('x_spd_') === 0); D.it.splice(i >= 0 ? i + 1 : D.it.length, 0, 'x_cap_' + k); PANEL_ONLY.add('x_cap_' + k); });
 
     init();
 
