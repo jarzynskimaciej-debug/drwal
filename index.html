@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v240</title>
+    <title>Gra Idle Drwal v241</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v240';
+    const GAME_VERSION = 'v241';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -3988,7 +3988,7 @@ window.onerror = function(msg, src, line, col, err) {
                 maskDeco();
                 return;
             }
-            for (let x = xmin; x <= xmax + 0.001; x += 3) { P.push(cyl(0.11, 0.13, 1.2, 6, x, 0.6, zmin, post)); P.push(cyl(0.11, 0.13, 1.2, 6, x, 0.6, zmax, post)); }
+            for (let x = xmin; x <= xmax + 0.001; x += 3) { P.push(cyl(0.11, 0.13, 1.2, 6, x, 0.6, zmin, post)); if (!(T && T.level >= 4 && x > TAV.TERR_X[0] && x < TAV.TERR_X[1])) P.push(cyl(0.11, 0.13, 1.2, 6, x, 0.6, zmax, post)); }   // v241: bez słupków na środku tarasu
             for (let z = zmin + 3; z <= zmax - 3 + 0.001; z += 3) { P.push(cyl(0.11, 0.13, 1.2, 6, xmin, 0.6, z, post)); P.push(cyl(0.11, 0.13, 1.2, 6, xmax, 0.6, z, post)); }
             const railX = (x1, x2, z) => { [0.5, 1.0].forEach(y => P.push(box(x2 - x1, 0.09, 0.09, (x1 + x2) / 2, y, z, rail))); };
             const railZ = (z1, z2, x) => { [0.5, 1.0].forEach(y => P.push(box(0.09, 0.09, z2 - z1, x, y, (z1 + z2) / 2, rail))); };
@@ -4508,7 +4508,7 @@ window.onerror = function(msg, src, line, col, err) {
         // v232: tragarz-trasa dokłada do browaru (pszenica z grafiką na ramce, woda liczona – rysowana osobno)
         function brewPut(kind) {
             if (!T || !T.brew || !T.brew.own) return;
-            if (kind === 'wheat') { T.brew.in++; const m = createWheatMesh(true); m.position.copy(brewInPos(R.brewIn.length)); R.grp.add(m); R.brewIn.push(m); }
+            if (kind === 'wheat') { T.brew.in++; if (R.brewIn.length < 24) { const m = createWheatMesh(true); m.position.copy(brewInPos(R.brewIn.length)); R.grp.add(m); R.brewIn.push(m); } }   // v241: widać najwyżej 24 snopki
             else T.brew.water = (T.brew.water | 0) + 1;
         }
         // v234: ramki karczmy można przestawiać – po zmianie pozycji (tablice TAV) poprawia meshe i stosy
@@ -4527,6 +4527,7 @@ window.onerror = function(msg, src, line, col, err) {
             for (let i = 0; i < Math.min(T.brew.out, 32); i++) { const m = beerMesh(); m.position.copy(brewOutPos(i)); R.grp.add(m); R.brewOut.push(m); }
         }
         function brewDrop(m, sp) {
+            if (R.brewIn.length >= 24) { T.brew.in++; const lt = brewInPos(23); spawnJumpAnimation(m, sp, () => lt.clone().add(R.grp.position), 0.3, 1.5, () => { scene.remove(m); }); return; }   // v241: ponad widoczny stos – ląduje na wierzchu i znika
             T.brew.in++;
             const idx = R.brewIn.length; R.brewIn.push(m);
             const lp = brewInPos(idx);
@@ -4552,6 +4553,7 @@ window.onerror = function(msg, src, line, col, err) {
                     b.busy = 0; b.in--; b.water = Math.max(0, (b.water | 0) - 1);
                     const wm = R.brewIn.shift(); if (wm && wm.parent) wm.parent.remove(wm);
                     R.brewIn.forEach((m, i) => { if (m.parent === R.grp) m.position.copy(brewInPos(i)); });
+                    while (R.brewIn.length < Math.min(b.in, 24)) { const m = createWheatMesh(true); m.position.copy(brewInPos(R.brewIn.length)); R.grp.add(m); R.brewIn.push(m); }   // v241
                     for (let k = 0; k < 2; k++) {
                         b.out++;
                         const m = beerMesh(); const sp = new THREE.Vector3(R.grp.position.x - 6.0, 1.8, R.grp.position.z + 4.75); m.position.copy(sp); scene.add(m);
@@ -5027,7 +5029,7 @@ window.onerror = function(msg, src, line, col, err) {
                 const f = facilities.kominek;
                 if (f) { f.output += int(s.carryOut, 0, 3); f.input += int(s.carryIn, 0, 6); }
                 const b = (s.brew && typeof s.brew === 'object') ? s.brew : {};
-                T.brew = { own: b.own ? 1 : 0, paid: int(b.paid, 0, TAV.BREW_COST), in: int(b.in, 0, 40), out: int(b.out, 0, 60), busy: 0, next: 0, water: int(b.water, 0, 60) };
+                T.brew = { own: b.own ? 1 : 0, paid: int(b.paid, 0, TAV.BREW_COST), in: int(b.in, 0, 120), out: int(b.out, 0, 60), busy: 0, next: 0, water: int(b.water, 0, 60) };
                 // stare zapisy: grill i browar miały już zapas
                 T.spice = s.spice === undefined ? 12 : int(s.spice, 0, 60); T.spiceLeft = int(s.spiceLeft, 0, TAV.SPICE_PER_HERB);
                 T.barman = s.barman ? 1 : 0; T.barmanPaid = int(s.barmanPaid, 0, TAV.BARMAN_COST);
@@ -7800,6 +7802,8 @@ window.onerror = function(msg, src, line, col, err) {
             }
             tufts.count = n; tufts.instanceMatrix.needsUpdate = true; tufts.instanceColor.needsUpdate = true;
             scene.add(tufts); this.R.extra.push(tufts);
+            // v241: trawa nowych terenów też chowa się pod podestem i tarasem karczmy
+            if (typeof deco !== 'undefined' && deco) { deco.inst = (deco.inst || []).filter(d => d.mesh.parent); deco.inst.push({ mesh: tufts, base: tufts.instanceMatrix.array.slice() }); if (Tavern.maskDeco) Tavern.maskDeco(); }
         },
         render() {
             const S = state.w2.areas;
@@ -10969,7 +10973,13 @@ window.onerror = function(msg, src, line, col, err) {
         w2mod({
             key: 'layout',
             defaults() { return {}; },
-            reset() { U.forEach(u => setOff(u, 0, 0)); },
+            reset() { U.forEach(u => setOff(u, 0, 0)); evicted = false; masked = false; },
+            update() {   // v241: taras na całą szerokość – raz po zbudowaniu (albo po wczytaniu) odsuwamy to, co na nim stoi
+                if (!masked) { masked = true; if (Tavern.maskDeco) Tavern.maskDeco(); }   // trawa nie wystaje spod podestów po wczytaniu
+                if (evicted || !Tavern.level || Tavern.level() < 4) return; evicted = true; if (Tavern.maskDeco) Tavern.maskDeco();
+                const g = worldObjects.tavernGroup; if (!g) return;
+                evict([g.position.x + TAV.TERR_X[0] - 0.5, g.position.x + TAV.TERR_X[1] + 0.5, g.position.z + TAV.DECK_Z3, g.position.z + TAV.DECK_Z4 + 0.5]);
+            },
             restore(v) {
                 const o = {}; if (v && typeof v === 'object') U.forEach(u => { const a = v[u.id]; if (Array.isArray(a) && isFinite(a[0]) && isFinite(a[1]) && Math.abs(a[0]) < 200 && Math.abs(a[1]) < 200) o[u.id] = [+a[0], +a[1]]; });
                 state.w2.layout = o; U.forEach(u => { const c = o[u.id] || [0, 0]; setOff(u, c[0], c[1]); });
@@ -10985,6 +10995,21 @@ window.onerror = function(msg, src, line, col, err) {
                 if (curCtx === localCtx()) showToast('✔ Przestawiono: ' + u.name);
             }
         });
+        // v241: to, co stoi na nowej podłodze karczmy (taras), odsuwa się w dół mapy
+        function evict(r) {
+            const L = state.w2.layout || (state.w2.layout = {});
+            U.forEach(u => {
+                if (u.local) return;
+                const ov = (f, dz) => f.x - f.w / 2 < r[1] && f.x + f.w / 2 > r[0] && f.z - f.h / 2 + dz < r[3] && f.z + f.h / 2 + dz > r[2];
+                const F = frames(u); if (!F.some(f => ov(f, 0))) return;
+                let dz = r[3] + 1 - Math.min(...F.map(f => f.z - f.h / 2));
+                const others = [].concat(...U.filter(o => o !== u && !o.local).map(vframes));
+                for (let k = 0; k < 25 && F.some(f => others.some(g => f.x - f.w / 2 < g.x + g.w / 2 && f.x + f.w / 2 > g.x - g.w / 2 && f.z - f.h / 2 + dz < g.z + g.h / 2 && f.z + f.h / 2 + dz > g.z - g.h / 2)); k++) dz += 1;
+                dz = Math.round(dz * 2) / 2;
+                const c = cur(u), x = c[0], z = c[1] + dz; setOff(u, x, z); L[u.id] = [x, z]; rebuild(u.mods); if (u.post) u.post();
+            });
+        }
+        let evicted = false, masked = false;
         function add(id, name, objs, mods, extra) { unit(id, name, objs, mods, extra); const u = U[U.length - 1]; u.def = u.objs.map(([o, xs, zs]) => [xs.map(f => o[f]), zs.map(f => o[f])]); }
         return { add, down, move, up, drag: () => !!D, units: () => U.map(u => u.id), ok: (id, dx, dz) => { const u = U.find(q => q.id === id); return u ? ok(u, dx, dz) : null; }, frames: id => { const u = U.find(q => q.id === id); return u ? vframes(u).map(f => ({ x: f.x, z: f.z, w: f.w, h: f.h })) : []; } };
     })();
@@ -10993,7 +11018,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v236
     // =====================================================================
     // ---------- TARAS II: dane karczmy (poziom 4) ----------
-    TAV.DECK_Z4 = 28; TAV.TERR_X = [-6, 14];
+    TAV.DECK_Z4 = 28; TAV.TERR_X = [-18, 30];   // v241: taras na całą szerokość karczmy
     TAV.EXP_COST.push(4000); TAV.EXP_REQ.push({ planks: 100, blocks: 30, glass: 10 });
     TAV.TABLES.push([0.5, 19.5, 4, 750], [0.5, 23.5, 4, 800], [8.5, 19.5, 4, 850], [8.5, 23.5, 4, 900]);
     TAV.TABLE_PLANKS.push(22, 22, 24, 24);
@@ -11325,6 +11350,34 @@ window.onerror = function(msg, src, line, col, err) {
             }
         }
     });
+
+    // ---------- v241: PSZENICA w browarze – rozbudowa ramką MAKS (+10 na poziom, 10 poziomów: 12 → 112) ----------
+    (function brewExpand() {
+        const MAXL = 10, W = 2.8;
+        Req.def('brewx', { lvl: () => state.w2.brewx.lvl, need: () => ({ planks: 10 }) });
+        const pos = () => { const g = worldObjects.tavernGroup; return { x: (g ? g.position.x : 0) + TAV.BREW_IN[0], z: (g ? g.position.z : 42) + TAV.BREW_IN[1] - 3.4 }; };
+        Object.defineProperty(TAV, 'BREW_CAP_IN', { get() { const B = state.w2 && state.w2.brewx; return 12 + 10 * (B ? Math.max(0, Math.min(MAXL, B.lvl | 0)) : 0); }, configurable: true });
+        w2mod({
+            key: 'brewx',
+            defaults() { return { lvl: 0, paid: 0 }; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.lvl = Math.max(0, Math.min(MAXL, o.lvl | 0)); state.w2.brewx = o; },
+            R: null,
+            reset() { this.R = { f: null }; },
+            vis() { return brewOK() && state.w2.brewx.lvl < MAXL; },
+            cost() { return 300 * ((state.w2.brewx.lvl | 0) + 1); },
+            build() { const p = pos(); this.R.f = mkFrame(p.x, p.z, W, W, 0x90CAF9); },
+            playerStep(now, pos2) {
+                const S = state.w2.brewx; if (!this.vis()) return; const p = pos(), c = this.cost();
+                buyStep({ x: p.x, z: p.z, w: W, h: W }, now, pos2, { rk: 'brewx', paid: () => S.paid, cost: () => c, done: () => S.lvl >= MAXL, add: () => { S.paid++; },
+                    finish: () => { S.lvl++; S.paid = 0; showToast('🌾 Browar mieści teraz ' + TAV.BREW_CAP_IN + ' pszenicy (poziom ' + S.lvl + '/10)'); } });
+            },
+            render() {
+                const f = this.R.f; if (!f) return; const vis = this.vis(); f.vis = vis; if (!vis) return;
+                { const q = pos(); if (f.x !== q.x || f.z !== q.z) { f.x = q.x; f.z = q.z; f.zone.position.x = q.x; f.zone.position.z = q.z; f.tp.mesh.position.x = q.x; f.tp.mesh.position.z = q.z; } }
+                const S = state.w2.brewx; f.tp.update(['MAKS ' + (S.lvl + 1) + '/10', ...Req.lines('brewx'), { i: 'coin', t: this.cost() - S.paid }], null);
+            }
+        });
+    })();
 
     init();
 
