@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v236</title>
+    <title>Gra Idle Drwal v237</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v236';
+    const GAME_VERSION = 'v237';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -10710,8 +10710,10 @@ window.onerror = function(msg, src, line, col, err) {
 
     // ---------- v234: PRZYSPIESZENIE OD ILOŚCI – zrzucanie i podnoszenie każdego surowca (>50: 2×, >100: 3×, >150: 5×, >200: 8×) ----------
     const QF = {};
-    function qtyFast(tk, n) {
-        const k = qtyK(n); if (k <= 1) return;
+    // v237: odbiór na plecy przyspiesza z czasem stania (seria), a nie od razu od liczby w plecaku
+    function pickK(now) { const T = state.timers; if (!(now - (T.pkT || 0) <= 1.2)) T.pkS = 0; T.pkS = (T.pkS | 0) + 1; T.pkT = now; const s = T.pkS; return s >= 150 ? 8 : s >= 90 ? 5 : s >= 50 ? 3 : s >= 20 ? 2 : 1; }
+    function qtyFast(tk, n, kk) {
+        const k = kk || qtyK(n); if (k <= 1) return;
         const t = state.timers[tk]; if (!(t > simNow)) return;
         const mk = QF[tk]; if (mk && mk[0] === simNow && mk[1] === t) return;   // to już przyspieszone w tym kroku
         const nt = simNow + (t - simNow) / k; state.timers[tk] = nt; QF[tk] = [simNow, nt];
@@ -10719,10 +10721,11 @@ window.onerror = function(msg, src, line, col, err) {
     const resCount = r => r === 'water' ? (state.water ? state.water.collected | 0 : 0) : r === 'plank' ? state.player.planks | 0 : r === 'herb' ? state.player.herbs | 0 : state.player[r] | 0;
     { const _f = dropItemToSkup; dropItemToSkup = function (type) { const n = resCount(type); const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
     { const _f = dropToFacilityInput; dropToFacilityInput = function (key) { const f = facilities[key], n = f ? resCount(f.inType) : 0; const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
-    { const _f = collectFromFacilityOutput; collectFromFacilityOutput = function (key) { const f = facilities[key], n0 = f ? f.output | 0 : 0; const r = _f.apply(this, arguments); qtyFast('nextCollectOut', Math.max(n0, f ? resCount(f.outType) : 0)); return r; }; }
+    { const _f = collectFromFacilityOutput; collectFromFacilityOutput = function (key) { const r = _f.apply(this, arguments); qtyFast('nextCollectOut', 0, pickK(simNow)); return r; }; }
+    if (0) { const _f = collectFromFacilityOutput; collectFromFacilityOutput = function (key) { const f = facilities[key], n0 = f ? f.output | 0 : 0; const r = _f.apply(this, arguments); qtyFast('nextCollectOut', Math.max(n0, f ? resCount(f.outType) : 0)); return r; }; }
     { const _f = giveItemTo; giveItemTo = function (res) { const n = resCount(res); const r = _f.apply(this, arguments); qtyFast('nextDrop', n); return r; }; }
     { const _t = Items2.take; Items2.take = function (key) { const n = state.player[key] | 0; const r = _t.apply(Items2, arguments); qtyFast('nextDrop', n); return r; }; }
-    { const _g = Items2.give; Items2.give = function (key) { const r = _g.apply(Items2, arguments); const n = state.player[key] | 0; qtyFast('nextCollectOut', n); qtyFast('nextChop', n); return r; }; }
+    { const _g = Items2.give; Items2.give = function (key) { const r = _g.apply(Items2, arguments); const k = pickK(simNow); qtyFast('nextCollectOut', 0, k); qtyFast('nextChop', 0, k); return r; }; }
 
     // ---------- v234: LICZBA SZTUK nad każdą ramką GOTOWE (od 1 sztuki, jak przy winie) ----------
     w2mod({
@@ -12652,6 +12655,7 @@ window.onerror = function(msg, src, line, col, err) {
         let mesh = fac.visualsOut.pop(); if (!mesh) return;
 
         let startPos = new THREE.Vector3(); mesh.getWorldPosition(startPos);
+        { const cap = PileTrim.FAC_CAP || 24, top = fac.visualsOut[Math.min(fac.visualsOut.length, cap) - 1]; if (fac.visualsOut.length >= cap && top) top.getWorldPosition(startPos); }   // v237: zdejmuje z wierzchu, nie z powietrza
         const group = worldObjects[key+'Group'] || worldObjects.tavernGroup;
         group.remove(mesh); scene.add(mesh); mesh.position.copy(startPos);
         
@@ -12664,12 +12668,12 @@ window.onerror = function(msg, src, line, col, err) {
         const indexOnBack = backStack.length; backStack.push(mesh);
         const getTargetPos = () => { 
             if (!playerGroup) return new THREE.Vector3(0,1,0);
-            const localPos = getPos(indexOnBack); 
+            const localPos = getPos(Math.min(indexOnBack, (PileTrim.BP_CAP || 25) - 1));   // v237: leci na widoczny wierzch plecaka 
             playerGroup.localToWorld(localPos.copy(localPos)); 
             return localPos; 
         };
         spawnJumpAnimation(mesh, startPos, getTargetPos, 0.3, 1.5, () => {
-            playerGroup.add(mesh); mesh.position.copy(getPos(indexOnBack)); mesh.rotation.set(fac.outType==='twine'?Math.PI/2:0, 0, 0);
+            playerGroup.add(mesh); mesh.position.copy(getPos(indexOnBack)); mesh.rotation.set(fac.outType==='twine'?Math.PI/2:0, 0, 0); if (indexOnBack >= (PileTrim.BP_CAP || 25)) { mesh.visible = false; mesh.userData.trim = 1; }
         });
     }
 
