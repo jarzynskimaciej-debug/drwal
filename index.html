@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v243</title>
+    <title>Gra Idle Drwal v244</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -809,7 +809,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v243';
+    const GAME_VERSION = 'v244';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -817,7 +817,11 @@ window.onerror = function(msg, src, line, col, err) {
     function coinBulk(cs, thr) { return cs >= thr ? 5 : cs >= thr * 0.6 ? 3 : cs >= thr * 0.3 ? 2 : 1; }
     // v236: tempo ogniwa (namiot „Tempo: …”, do 10 poziomów, +25% za poziom) razem z płacą pomocników
     // v243: większy magazyn wejścia zakładu – +10 za poziom (do 10)
-    function inCap(k, base) { const C = (state && state.w2) ? state.w2.capx : null; return base + 10 * (C ? Math.max(0, Math.min(10, C[k] | 0)) : 0); }
+    function inCap(k, base) { const C = (state && state.w2) ? state.w2.capx : null; return base + 10 * (C ? Math.max(0, Math.min(30, C[k] | 0)) : 0); }
+    // v243: większe GOTOWE (wyjście zakładu) – +10 za poziom (do 30)
+    // v244: przedmiot zdjęty z plecaka ponad widocznym stosem startuje z widocznego wierzchu plecaka, a nie z nieba
+    function bpTop(arr, sp) { const cap = (typeof PileTrim !== 'undefined' && PileTrim.BP_CAP) || 25; if (arr && arr.length >= cap && arr[cap - 1] && arr[cap - 1].getWorldPosition) arr[cap - 1].getWorldPosition(sp); }
+    function outCap(k, base) { const C = (state && state.w2) ? state.w2.capo : null; return base + 10 * (C ? Math.max(0, Math.min(30, C[k] | 0)) : 0); }
     function spdLv(k) { const S = (state && state.w2) ? state.w2.spd : null; return S ? Math.max(0, Math.min(10, S[k] | 0)) : 0; }
     function WK(k) { return Wage.m() * (1 + 0.25 * spdLv(k)); }
     function zzzOn(id) { const Z = (state && state.w2) ? state.w2.zzz : null; return !!(Z && Z[id]); }
@@ -4574,7 +4578,7 @@ window.onerror = function(msg, src, line, col, err) {
         function updateBrewery(now) {
             const b = T.brew;
             if (!b.own) return;
-            if (b.in > 0 && b.out < TAV.BREW_CAP_OUT && ((b.water | 0) > 0)) {
+            if (b.in > 0 && b.out < outCap('brew', TAV.BREW_CAP_OUT) && ((b.water | 0) > 0)) {
                 if (b.busy && brewTeam() >= 2) b.next -= DT;   // dwóch graczy przy kotle – dwa razy szybciej
                 if (!b.busy) { b.busy = 1; b.next = now + TAV.BREW_TIME / (1 + 0.25 * spdLv('brew')); }   // v236: tempo browaru
                 else if (now >= b.next) {
@@ -4746,7 +4750,7 @@ window.onerror = function(msg, src, line, col, err) {
                 state.timers.nextDrop = now + config.dropCooldown / qtyK(state.player.wheat);
                 state.player.wheat--;
                 let m = worldObjects.playerBackpackWheat.pop(); const sp = new THREE.Vector3();
-                if (m) { m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); } else { m = createWheatMesh(true); playerGroup.getWorldPosition(sp); sp.y += 1; }
+                if (m) { m.getWorldPosition(sp); bpTop(worldObjects.playerBackpackWheat, sp); if (m.parent) m.parent.remove(m); } else { m = createWheatMesh(true); playerGroup.getWorldPosition(sp); sp.y += 1; }
                 scene.add(m); m.position.copy(sp);
                 brewDrop(m, sp);
             }
@@ -6106,7 +6110,7 @@ window.onerror = function(msg, src, line, col, err) {
         takeRes(res);
         const arr = worldObjects[BP_OF[res]] || [];
         let m = arr.pop(); const sp = new THREE.Vector3();
-        if (m) { m.getWorldPosition(sp); if (m.parent) m.parent.remove(m); }
+        if (m) { m.getWorldPosition(sp); bpTop(arr, sp); if (m.parent) m.parent.remove(m); }
         else { m = (res === 'water') ? waterDropMesh() : meshForItem(res); if (!m) return; playerGroup.getWorldPosition(sp); sp.y += 1; }
         m.visible = true; scene.add(m); m.position.copy(sp);
         const tp = target.clone(); tp.x += (rand() - 0.5) * 1.2; tp.z += (rand() - 0.5) * 1.2; tp.y = 0.2;
@@ -6572,7 +6576,7 @@ window.onerror = function(msg, src, line, col, err) {
             sh.cyc = now;
             const D = this.dump();
             for (let k = 0, kn = cartN(); k < kn; k++) {   // v242: wózek rozbudowany – 3, 6, 9, 12 kamieni naraz
-                if (worldObjects.visualStoneOutStack.length >= sh.maxOut) break;
+                if (worldObjects.visualStoneOutStack.length >= outCap('mine', sh.maxOut)) break;
                 const sMesh = new THREE.Mesh(geoStone, matStone);
                 const startPos = new THREE.Vector3(D.x + (k % 3 - 1) * 0.3, 0.9 + Math.floor(k / 3) * 0.12, D.z + Math.floor(k / 3) * 0.18);
                 sMesh.position.copy(startPos); scene.add(sMesh);
@@ -7587,7 +7591,7 @@ window.onerror = function(msg, src, line, col, err) {
         return w2mod({
             key: sk,
             defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0, cap: d.capIn, xpaid: 0, xcost: d.xcost || 300 }; },
-            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.cap = Math.max(d.capIn, Math.min(d.capMax || d.capIn, o.cap | 0)); o.in = Math.max(0, Math.min(o.cap, o.in | 0)); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.cap = Math.max(d.capIn, Math.min(d.capMax || d.capIn, o.cap | 0)); o.in = Math.max(0, Math.min(o.cap, o.in | 0)); o.out = Math.max(0, Math.min(d.capOut + 300, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
             R: null,
             reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
             S() { return state.w2[sk]; },
@@ -7619,7 +7623,7 @@ window.onerror = function(msg, src, line, col, err) {
                 const S = this.S(); if (!S.own) return;
                 if (S.busy) {
                     if (now >= S.next) { S.busy = 0; S.out++; }
-                } else if (S.in >= d.inN && S.out < d.capOut) {
+                } else if (S.in >= d.inN && S.out < outCap('ws_' + k, d.capOut)) {
                     S.busy = 1; S.in -= d.inN; S.next = now + d.time / WK(sk);
                 }
             },
@@ -7944,7 +7948,7 @@ window.onerror = function(msg, src, line, col, err) {
         return w2mod({
             key: sk,
             defaults() { const o = { own: 0, paid: 0, out: 0, busy: 0, next: 0, inv: {} }; IN.forEach(k => o.inv[k] = 0); return o; },
-            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(k === 'water' ? d.cap + 30 : d.cap + 100, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
+            restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; IN.forEach(k => o.inv[k] = Math.max(0, Math.min(k === 'water' ? d.cap + 30 : d.cap + 300, o.inv[k] | 0))); o.out = Math.max(0, Math.min(d.capOut + 300, o.out | 0)); o.busy = 0; o.next = 0; state.w2[sk] = o; },
             R: null,
             reset() { this.R = { buy: null, fin: null, fout: null, model: null, piles: {} }; },
             S() { return state.w2[sk]; },
@@ -7974,7 +7978,7 @@ window.onerror = function(msg, src, line, col, err) {
             update(now) {
                 const S = this.S(); if (!S.own) return;
                 if (S.busy) { if (now >= S.next) { S.busy = 0; S.out++; } }
-                else if (S.out < d.capOut && IN.every(k => S.inv[k] >= d.ins[k])) { IN.forEach(k => { S.inv[k] -= d.ins[k]; }); S.busy = 1; S.next = now + d.time / WK('ws2_' + key); }
+                else if (S.out < outCap('ws2_' + key, d.capOut) && IN.every(k => S.inv[k] >= d.ins[k])) { IN.forEach(k => { S.inv[k] -= d.ins[k]; }); S.busy = 1; S.next = now + d.time / WK('ws2_' + key); }
             },
             ensureModel() {
                 if (this.R.model) return;
@@ -8504,7 +8508,7 @@ window.onerror = function(msg, src, line, col, err) {
     const Hunt = w2mod({
         key: 'hunt',
         defaults() { return { helper: 0, paid: 0, out: 0, next: 0, an: [], cap: HUNT.CAP, xpaid: 0, xcost: HUNT.XCOST, por: 0, ppaid: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.helper = o.helper ? 1 : 0; o.por = o.por ? 1 : 0; o.cap = Math.max(HUNT.CAP, Math.min(HUNT.CAPMAX, o.cap | 0)); o.out = Math.max(0, Math.min(o.cap, o.out | 0)); o.an = []; o.next = 0; state.w2.hunt = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.helper = o.helper ? 1 : 0; o.por = o.por ? 1 : 0; o.cap = Math.max(HUNT.CAP, Math.min(HUNT.CAPMAX, o.cap | 0)); o.out = Math.max(0, Math.min(o.cap + 300, o.out | 0)); o.an = []; o.next = 0; state.w2.hunt = o; },
         R: null,
         reset() { this.R = { f: null, fo: null, stand: null, an: [], helperMesh: null, piles: {}, inT: 0, ui: null }; },
         S() { return state.w2.hunt; },
@@ -8524,7 +8528,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (d > st) { a.x += dx / d * st; a.z += dz / d * st; }
             }
             // myśliwy-pomocnik: co jakiś czas dziczyzna na ramce
-            if (S.helper && S.out < S.cap && now >= S.next) { S.next = now + HUNT.HT / WK('hunt') / (1 + (S.tw | 0)); S.out++; S.sh = (S.sh | 0) + 1; if (now - (S.ka || 0) >= HUNT.HT / Wage.m() - 0.01) { S.ka = now; this.kill(now); } }   // v236: szybciej, ale bez dodatkowych padających zwierząt
+            if (S.helper && S.out < outCap('hunt', S.cap) && now >= S.next) { S.next = now + HUNT.HT / WK('hunt') / (1 + (S.tw | 0)); S.out++; S.sh = (S.sh | 0) + 1; if (now - (S.ka || 0) >= HUNT.HT / Wage.m() - 0.01) { S.ka = now; this.kill(now); } }   // v236: szybciej, ale bez dodatkowych padających zwierząt
         },
         kill(now) {
             const S = this.S(); let best = null, bd = Infinity;
@@ -8579,7 +8583,7 @@ window.onerror = function(msg, src, line, col, err) {
             if (R.fb.vis) R.fb.tp.update(buyLines('MYŚLIWY', 'hunter', HUNT.HELPER - S.paid), 'helper');
             if (R.fx.vis) R.fx.tp.update(['MAKS', ...Req.lines('huntx'), { i: 'coin', t: S.xcost - S.xpaid }], null);
             if (R.fp.vis) R.fp.tp.update(buyLines('TRAGARZ', null, HUNT.POR - S.ppaid), 'helper');
-            if (R.fo.vis) { R.fo.tp.update(['MAX ' + S.cap], 'meat'); Items2.pile(R.piles, 'meat', HUNT.OX, HUNT.OZ, S.out, 16); if (S.out) FloatLab.show('meatO', HUNT.OX, 1.8, HUNT.OZ, 'meat', S.out, 0.8); }
+            if (R.fo.vis) { R.fo.tp.update(['MAX ' + outCap('hunt', S.cap)], 'meat'); Items2.pile(R.piles, 'meat', HUNT.OX, HUNT.OZ, S.out, 16); if (S.out) FloatLab.show('meatO', HUNT.OX, 1.8, HUNT.OZ, 'meat', S.out, 0.8); }
             if (!R.stand) {
                 const g = bakeItem('ambona', () => {
                     const r = new THREE.Group(), wd = new THREE.MeshLambertMaterial({ color: 0x6D4C41 }), rf = new THREE.MeshLambertMaterial({ color: 0x4E342E });
@@ -10063,7 +10067,7 @@ window.onerror = function(msg, src, line, col, err) {
     const Bakery = w2mod({
         key: 'bakery',
         defaults() { return { own: 0, paid: 0, fl: 0, wa: 0, out: 0, busy: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP + 100, o.fl | 0); o.wa = Math.min(BAKERY.CAP + 30, o.wa | 0); state.w2.bakery = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.fl = Math.min(BAKERY.CAP + 300, o.fl | 0); o.wa = Math.min(BAKERY.CAP + 30, o.wa | 0); state.w2.bakery = o; },
         R: null,
         reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, piles: {} }; },
         S() { return state.w2.bakery; },
@@ -10099,7 +10103,7 @@ window.onerror = function(msg, src, line, col, err) {
         update(now) {
             const S = this.S(); if (!S.own) return;
             if (S.busy) { if (now >= S.next) { S.busy = 0; S.out++; } }
-            else if (S.fl >= 1 && S.wa >= 1 && S.out < BAKERY.CAPOUT) { S.busy = 1; S.fl--; S.wa--; S.next = now + BAKERY.TIME / WK('bakery'); }
+            else if (S.fl >= 1 && S.wa >= 1 && S.out < outCap('bakery', BAKERY.CAPOUT)) { S.busy = 1; S.fl--; S.wa--; S.next = now + BAKERY.TIME / WK('bakery'); }
         },
         ensureModel() {
             if (this.R.model) return;
@@ -10321,7 +10325,7 @@ window.onerror = function(msg, src, line, col, err) {
     w2mod({
         key: 'pal',
         defaults() { return { own: 0, paid: 0, in: 0, out: 0, busy: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.in = Math.max(0, Math.min(PAL.CAP + 100, o.in | 0)); o.out = Math.max(0, Math.min(PAL.CAPOUT, o.out | 0)); state.w2.pal = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.busy = 0; o.next = 0; o.in = Math.max(0, Math.min(PAL.CAP + 300, o.in | 0)); o.out = Math.max(0, Math.min(PAL.CAPOUT + 300, o.out | 0)); state.w2.pal = o; },
         R: null,
         reset() { this.R = { buy: null, fin: null, fout: null, model: null, worker: null, fire: null, spit: null, piles: {} }; },
         S() { return state.w2.pal; },
@@ -10351,7 +10355,7 @@ window.onerror = function(msg, src, line, col, err) {
         update(now) {
             const S = this.S(); if (!S.own) return;
             if (S.busy) { if (now >= S.next) { S.busy = 0; S.out++; } }
-            else if (S.in >= 1 && S.out < PAL.CAPOUT) { S.busy = 1; S.in--; S.next = now + PAL.TIME / WK('pal'); }
+            else if (S.in >= 1 && S.out < outCap('pal', PAL.CAPOUT)) { S.busy = 1; S.in--; S.next = now + PAL.TIME / WK('pal'); }
         },
         ensureModel() {
             if (this.R.model) return;
@@ -10892,7 +10896,7 @@ window.onerror = function(msg, src, line, col, err) {
     w2mod({
         key: 'sanddig',
         defaults() { return { own: 0, paid: 0, out: 0, next: 0 }; },
-        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.out = Math.max(0, Math.min(SANDD.CAP, o.out | 0)); o.next = 0; state.w2.sanddig = o; },
+        restore(v) { const o = mergeNum(this.defaults(), v); o.own = o.own ? 1 : 0; o.out = Math.max(0, Math.min(SANDD.CAP + 300, o.out | 0)); o.next = 0; state.w2.sanddig = o; },
         R: null,
         reset() { this.R = { f: null, man: null, piles: {} }; },
         S() { return state.w2.sanddig; },
@@ -10913,7 +10917,7 @@ window.onerror = function(msg, src, line, col, err) {
         },
         update(now) {
             const S = this.S(); if (!S.own || !Areas.has('south')) return;
-            if (S.out >= SANDD.CAP || now >= S.next) { if (S.out < SANDD.CAP && S.next > 0) S.out++; S.next = now + SANDD.T / WK('sanddig'); }
+            if (S.out >= outCap('sanddig', SANDD.CAP) || now >= S.next) { if (S.out < outCap('sanddig', SANDD.CAP) && S.next > 0) S.out++; S.next = now + SANDD.T / WK('sanddig'); }
         },
         render(now) {
             const R = this.R; if (!R.f) return;
@@ -10921,7 +10925,7 @@ window.onerror = function(msg, src, line, col, err) {
             Items2.pile(R.piles, 'sand', this.X(), this.Z(), vis && S.own ? S.out : 0, 12, 3);
             if (!vis) { if (R.man) R.man.visible = false; return; }
             if (!S.own) R.f.tp.update(buyLines('KOPACZ PIASKU', 'sanddig', SANDD.COST - S.paid), 'helper');
-            else R.f.tp.update(['GOTOWE', { i: 'sand', t: S.out + '/' + SANDD.CAP }], null);
+            else R.f.tp.update(['GOTOWE', { i: 'sand', t: S.out + '/' + outCap('sanddig', SANDD.CAP) }], null);
             if (S.own && !R.man) { const v = createVillagerMesh(0xE3C27A, 0x6D4C41); scene.add(v); R.man = v; }
             if (R.man) { R.man.visible = !!S.own; const k = Math.sin(now * 6); R.man.position.set(SANDPIT.X + 1.0, 0.75 + Math.abs(k) * 0.07, SANDPIT.Z + 0.4); R.man.rotation.y = Math.PI / 2 + k * 0.3; }
         }
@@ -11915,7 +11919,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
 
     // ---------- STATEK ----------
     const SHIP_TPL = {};
-    function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 2; return t; }
+    function shipTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 2; return t; }
     function buildShip(kind) {
         const noble = kind === 'n';
         const holder = new THREE.Group(), body = new THREE.Group(); body.name = 'body'; holder.add(body);
@@ -11979,7 +11983,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         // kotwica
         [-1, 1].forEach(s => { const a = add(new THREE.TorusGeometry(0.22, 0.045, 5, 10, Math.PI), dark, L / 2 - 1.7, 0.75, s * (hb(0.86) + 0.06)); a.rotation.z = Math.PI; add(new THREE.BoxGeometry(0.06, 0.6, 0.06), dark, L / 2 - 1.7, 1.0, s * (hb(0.86) + 0.06)); });
         // maszty, reje, żagle
-        const sailMat = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: canvasTex(64, 64, (g, w, h) => {
+        const sailMat = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: shipTex(64, 64, (g, w, h) => {
             g.fillStyle = noble ? '#FBF8F2' : '#F2E6CC'; g.fillRect(0, 0, w, h);
             g.fillStyle = 'rgba(110,85,50,0.14)'; for (let x = 4; x < w; x += 8) g.fillRect(x, 0, 1, h);
             g.fillStyle = 'rgba(110,85,50,0.16)'; g.fillRect(0, h - 3, w, 3); g.fillRect(0, 0, w, 2);
@@ -12035,7 +12039,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
           pn.position.set(masts[1].x, masts[1].dy + masts[1].H + 0.05, 0); pn.name = 'flag'; body.add(pn); flags.push(pn); }
         { const fp = add(new THREE.CylinderGeometry(0.035, 0.035, 1.6, 5), wood, -L / 2 - 0.15, qy + 1.7, 0); fp.rotation.z = 0.5;
           const g = new THREE.PlaneGeometry(1.3, 0.8, 8, 2); g.translate(0.65, 0, 0);
-          const fl = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: canvasTex(32, 20, (c, w, h) => {
+          const fl = new THREE.Mesh(g, new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, map: shipTex(32, 20, (c, w, h) => {
               if (noble) { c.fillStyle = '#5E1E8C'; c.fillRect(0, 0, w, h); c.fillStyle = '#D4AF37'; c.fillRect(w * 0.42, h * 0.25, w * 0.16, h * 0.5); c.fillRect(w * 0.3, h * 0.42, w * 0.4, h * 0.16); }
               else { c.fillStyle = '#FFFFFF'; c.fillRect(0, 0, w, h / 2); c.fillStyle = '#D32F2F'; c.fillRect(0, h / 2, w, h / 2); } }) }));
           fl.position.set(-L / 2 - 0.55, qy + 2.35, 0); fl.rotation.y = Math.PI; fl.name = 'flag'; body.add(fl); flags.push(fl); }
@@ -12055,7 +12059,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         // piana przy burtach i kilwater (płasko na wodzie, nie przechyla się ze statkiem)
         const ring = new THREE.Mesh(new THREE.RingGeometry(0.86, 1.08, 48), new THREE.MeshBasicMaterial({ color: 0xFFFFFF, transparent: true, opacity: 0.4, depthWrite: false }));
         ring.rotation.x = -Math.PI / 2; ring.scale.set(L / 2 + 0.6, B / 2 + 0.35, 1); ring.position.x = 0.4; ring.name = 'ring'; holder.add(ring);
-        const wake = new THREE.Mesh(new THREE.PlaneGeometry(18, 6), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, map: canvasTex(256, 64, (g, w, h) => {
+        const wake = new THREE.Mesh(new THREE.PlaneGeometry(18, 6), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, map: shipTex(256, 64, (g, w, h) => {
             g.clearRect(0, 0, w, h);
             for (let i = 0; i < 2; i++) { const gr = g.createLinearGradient(w, 0, 0, 0); gr.addColorStop(0, 'rgba(255,255,255,0.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.strokeStyle = gr; g.lineWidth = 5;
                 g.beginPath(); g.moveTo(w, h / 2); g.quadraticCurveTo(w * 0.5, h / 2 + (i ? 1 : -1) * h * 0.2, 0, i ? h - 3 : 3); g.stroke(); }
@@ -12144,7 +12148,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
       }; }
 
     // ---------- WIĘKSZY MAGAZYN: każde wejście zakładu da się rozbudować (+10 za poziom, do 10) – piasek w hucie, winogrona, marchew, mąka, mięso, drewno… ----------
-    w2mod({ key: 'capx', defaults() { return {}; }, restore(v) { const o = {}; if (v && typeof v === 'object') Object.keys(v).forEach(k => { if (/^[a-z0-9_]+$/.test(k)) o[k] = Math.max(0, Math.min(10, v[k] | 0)); }); state.w2.capx = o; } });
+    w2mod({ key: 'capx', defaults() { return {}; }, restore(v) { const o = {}; if (v && typeof v === 'object') Object.keys(v).forEach(k => { if (/^[a-z0-9_]+$/.test(k)) o[k] = Math.max(0, Math.min(30, v[k] | 0)); }); state.w2.capx = o; } });
     const CAPX = {
         ws2_huta: ['piasek w hucie', 'sand', () => own2('ws2_huta'), () => WS2.huta.cap], ws2_winery: ['winogrona i szkło w tłoczni', 'grapes', () => own2('ws2_winery'), () => WS2.winery.cap],
         ws2_kuchnia: ['marchew i dziczyzna w kuchni', 'carrot', () => own2('ws2_kuchnia'), () => WS2.kuchnia.cap], bakery: ['mąka w piekarni', 'wbag', () => own2('bakery'), () => BAKERY.CAP],
@@ -12152,13 +12156,41 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         sawmill: ['drewno przy pile (tragarz)', 'wood', () => !!(facilities.sawmill && facilities.sawmill.unlocked), () => 30], sickle: ['trawa przy sierpie (tragarz)', 'plant', () => !!(facilities.sickle && facilities.sickle.unlocked), () => 30],
         herb: ['trawa przy ziołach (tragarz)', 'herb', () => !!(facilities.herb && facilities.herb.unlocked), () => 30], threshing: ['zboże przy młynie (tragarz)', 'wheat', () => !!(facilities.threshing && facilities.threshing.unlocked), () => 30]
     };
-    Object.keys(CAPX).forEach(k => { const [nm, icon, ok, base] = CAPX[k], L = () => { const C = state.w2 && state.w2.capx; return C ? Math.max(0, Math.min(10, C[k] | 0)) : 0; };
+    Object.keys(CAPX).forEach(k => { const [nm, icon, ok, base] = CAPX[k], L = () => { const C = state.w2 && state.w2.capx; return C ? Math.max(0, Math.min(30, C[k] | 0)) : 0; };
         SHOP_ITEMS.push({ k: 'x_cap_' + k, ext: true, icon, name: 'Większy magazyn',
-            desc: () => 'Mieści się więcej: ' + nm + ' – ' + inCap(k, base()) + ', +10 za poziom (poziom ' + L() + '/10)',
-            price: () => 250 * (L() + 1), status: () => L() >= 10 ? 'max' : ok() ? 'ok' : 'lock', lockText: 'najpierw kup zakład',
-            apply: () => { if (!state.w2.capx) state.w2.capx = {}; state.w2.capx[k] = Math.min(10, L() + 1); if (curCtx === localCtx()) showToast('📦 Większy magazyn: ' + nm + ' – ' + inCap(k, base())); } }); });
+            desc: () => 'Mieści się więcej: ' + nm + ' – ' + inCap(k, base()) + ', +10 za poziom (poziom ' + L() + '/30)',
+            price: () => 250 * (L() + 1), status: () => L() >= 30 ? 'max' : ok() ? 'ok' : 'lock', lockText: 'najpierw kup zakład',
+            apply: () => { if (!state.w2.capx) state.w2.capx = {}; state.w2.capx[k] = Math.min(30, L() + 1); if (curCtx === localCtx()) showToast('📦 Większy magazyn: ' + nm + ' – ' + inCap(k, base())); } }); });
     // do paneli ROZBUDOWA tych zakładów (zaraz po tempie)
     Object.keys(CAPX).forEach(k => { const D = FAC_UI[k]; if (!D) return; const i = D.it.findIndex(x => x.indexOf('x_spd_') === 0); D.it.splice(i >= 0 ? i + 1 : D.it.length, 0, 'x_cap_' + k); PANEL_ONLY.add('x_cap_' + k); });
+
+    // ---------- WIĘKSZE GOTOWE: ramka z gotowym towarem mieści więcej (+10 za poziom, do 30, każdy kolejny droższy) ----------
+    w2mod({ key: 'capo', defaults() { return {}; }, restore(v) { const o = {}; if (v && typeof v === 'object') Object.keys(v).forEach(k => { if (/^[a-z0-9_]+$/.test(k)) o[k] = Math.max(0, Math.min(30, v[k] | 0)); }); state.w2.capo = o; } });
+    const CAPO = {
+        ws_mason: ['bloki', 'block', () => own2('ws_mason'), () => WSHOPS.mason.capOut], ws2_huta: ['szkło', 'glass', () => own2('ws2_huta'), () => WS2.huta.capOut],
+        ws2_winery: ['wino', 'wine', () => own2('ws2_winery'), () => WS2.winery.capOut], ws2_kuchnia: ['gulasz', 'stew', () => own2('ws2_kuchnia'), () => WS2.kuchnia.capOut],
+        bakery: ['chleb', 'bread', () => own2('bakery'), () => BAKERY.CAPOUT], pal: ['pieczeń', 'pieczen', () => own2('pal'), () => PAL.CAPOUT],
+        sanddig: ['piasek', 'sand', () => own2('sanddig'), () => SANDD.CAP], hunt: ['dziczyzna', 'meat', () => !!(state.w2.hunt && state.w2.hunt.helper), () => (state.w2.hunt ? state.w2.hunt.cap : HUNT.CAP)],
+        fishing: ['ryby', 'fish', () => !!(state.fishing && state.fishing.unlocked), () => state.fishing.maxOut || 15], mine: ['kamienie', 'stone', () => !!(state.stoneHelper && state.stoneHelper.unlocked), () => state.stoneHelper.maxOut || 30],
+        brew: ['piwo w browarze', 'beer', () => brewOK(), () => TAV.BREW_CAP_OUT]
+    };
+    const CAPO_FAC = { brew: 'tavern' };
+    Object.keys(CAPO).forEach(k => { const [nm, icon, ok, base] = CAPO[k], L = () => { const C = state.w2 && state.w2.capo; return C ? Math.max(0, Math.min(30, C[k] | 0)) : 0; };
+        SHOP_ITEMS.push({ k: 'x_capo_' + k, ext: true, icon, name: 'Większe GOTOWE',
+            desc: () => 'Na ramce GOTOWE mieści się więcej: ' + nm + ' – ' + outCap(k, base()) + ', +10 za poziom (poziom ' + L() + '/30)',
+            price: () => 250 * (L() + 1), status: () => L() >= 30 ? 'max' : ok() ? 'ok' : 'lock', lockText: 'najpierw kup zakład',
+            apply: () => { if (!state.w2.capo) state.w2.capo = {}; state.w2.capo[k] = Math.min(30, L() + 1); if (curCtx === localCtx()) showToast('📦 Większe GOTOWE: ' + nm + ' – ' + outCap(k, base())); } });
+        const D = FAC_UI[CAPO_FAC[k] || k]; if (!D) return;
+        const i = Math.max(D.it.indexOf('x_cap_' + k), D.it.findIndex(x => x.indexOf('x_spd_') === 0));
+        D.it.splice(i >= 0 ? i + 1 : D.it.length, 0, 'x_capo_' + k); PANEL_ONLY.add('x_capo_' + k); });
+    // licznik prawdziwej liczby nad stosem GOTOWE, gdy towaru jest więcej, niż widać
+    w2mod({ key: 'capolab', render() {
+        const lab = (id, n, vis, x, z, icon) => { if (n > vis) FloatLab.show(id, x, 1.9, z, icon, n, 0.85); };
+        Object.keys(WS2).forEach(k => { const S = state.w2['ws2_' + k], d = WS2[k]; if (S && S.own) lab('ws2o' + k, S.out | 0, 24, d.X + 4.4, d.Z, IT2[d.out] ? IT2[d.out].icon : d.out); });
+        Object.keys(WSHOPS).forEach(k => { const S = state.w2['ws_' + k], d = WSHOPS[k]; if (S && S.own) lab('wso' + k, S.out | 0, 30, d.X + 4.2, d.Z, IT2[d.out] ? IT2[d.out].icon : d.out); });
+        const P = state.w2.pal; if (P && P.own) lab('palo', P.out | 0, 24, PAL.X + 4.2, PAL.Z, 'pieczen');
+        const D = state.w2.sanddig; if (D && D.own && Areas.has('south')) lab('sando', D.out | 0, 12, SANDPIT.X + SANDD.DX, SANDPIT.Z, 'sand');
+    } });
 
     init();
 
@@ -13129,7 +13161,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
                 facilities.threshing.input++;
                 const m = worldObjects.playerBackpackWheat.pop();
                 if (m) {
-                    const sp = new THREE.Vector3(); m.getWorldPosition(sp);
+                    const sp = new THREE.Vector3(); m.getWorldPosition(sp); bpTop(worldObjects.playerBackpackWheat, sp);
                     playerGroup.remove(m); scene.add(m); m.position.copy(sp);
                     const lp = new THREE.Vector3(-3.5, 0.2, 0);
                     spawnJumpAnimation(m, sp, () => worldObjects.threshingGroup.localToWorld(lp.clone()), 0.3, 2, () => {
@@ -13164,7 +13196,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         // Ręczne łowienie ryb – stając na strefie wejścia
         if (state.fishing.unlocked && !state.fishing.helperUnlocked && worldObjects.fishingGroup.visible) {
             let pFishIn = new THREE.Vector3(); worldObjects.fishingZoneIn.getWorldPosition(pFishIn);
-            if (pos.distanceTo(pFishIn) < 3.0 && worldObjects.visualFishStack.length < state.fishing.maxOut && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
+            if (pos.distanceTo(pFishIn) < 3.0 && worldObjects.visualFishStack.length < outCap('fishing', state.fishing.maxOut) && totalItems < config.maxPlayerItems && now > state.timers.nextChop) {
                 state.timers.nextChop = now + config.chopCooldown * 2 * Skills.k('ryby') / qtyK(state.player.fish);
                 catchFish();
             }
@@ -13449,7 +13481,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         // Auto-łowienie tylko gdy pomocnik wędkowania odblokowany
         if (state.fishing.helperUnlocked && now > state.fishing.nextCatch) {
             state.fishing.nextCatch = now + 4.0 / Wage.m() / (1 + 0.3 * ((state.w2 && state.w2.fishx && state.w2.fishx.lvl) | 0));   // v234: szybszy rybak (namiot)
-            if (worldObjects.visualFishStack.length < state.fishing.maxOut) {
+            if (worldObjects.visualFishStack.length < outCap('fishing', state.fishing.maxOut)) {
                 catchFish();
             }
         }
@@ -13575,6 +13607,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         state.player[fac.inType]--; fac.input++;
 
         let startPos = new THREE.Vector3(); mesh.getWorldPosition(startPos);
+        bpTop(worldObjects[{ wood: 'playerBackpackWood', plants: 'playerBackpackPlants', fish: 'playerBackpackFish', wheat: 'playerBackpackWheat' }[fac.inType]], startPos);
         playerGroup.remove(mesh); scene.add(mesh);
         
         fac.visualsIn.push(mesh);
@@ -13984,6 +14017,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         
         if (!mesh) return;
         const startPos = new THREE.Vector3(); mesh.getWorldPosition(startPos);
+        bpTop(worldObjects[{ wood: 'playerBackpackWood', plank: 'playerBackpackPlanks', herb: 'playerBackpackHerbs', stone: 'playerBackpackStone', fish: 'playerBackpackFish', roastedFish: 'playerBackpackRoastedFish', wheat: 'playerBackpackWheat', wheatBags: 'playerBackpackWheatBags', snopki: 'playerBackpackSnopki', water: 'playerBackpackWater' }[type] || 'playerBackpackTwine'], startPos);
         playerGroup.remove(mesh); scene.add(mesh); mesh.position.copy(startPos);
         const pileIndex = dropStack.length; dropStack.push(mesh);
         
@@ -14307,7 +14341,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
 
         // Kamienie – strefa wyjścia pomocnika
         if (worldObjects.stoneOutGroup && worldObjects.stoneOutGroup.visible) {
-            worldObjects.textPlanes.stoneOut.update([`MAX ${state.stoneHelper.maxOut}`], 'stone');
+            worldObjects.textPlanes.stoneOut.update([`MAX ${outCap('mine', state.stoneHelper.maxOut)}`], 'stone');
             if (!state.stoneHelper.expanded) worldObjects.textPlanes.stoneExpand.update(['POSZERZ', ...Req.lines('stoneExpand'), { i: 'coin', t: state.stoneHelper.expandCost - state.stoneHelper.expandPaid }]);
         }
 
@@ -14327,7 +14361,7 @@ float seaNoise(vec2 p) { vec2 i = floor(p), q = fract(p); vec2 u = q * q * (3.0 
         if (worldObjects.textPlanes.fishing) {
             if (state.fishing.unlocked) {
                 worldObjects.textPlanes.fishing.update([], 'fishingRod');
-                worldObjects.textPlanes.fishingOut.update([`MAX ${state.fishing.maxOut}`], 'fish2d');
+                worldObjects.textPlanes.fishingOut.update([`MAX ${outCap('fishing', state.fishing.maxOut)}`], 'fish2d');
                 if (worldObjects.textPlanes.fishingHelper) {
                     worldObjects.textPlanes.fishingHelper.update(state.fishing.helperUnlocked ? ['ŁOWI'] : [`${state.fishing.helperCost - state.fishing.helperPaid}`], 'helper');
                 }
