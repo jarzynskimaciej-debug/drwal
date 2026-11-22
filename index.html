@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v238</title>
+    <title>Gra Idle Drwal v239</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v238';
+    const GAME_VERSION = 'v239';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -6728,7 +6728,7 @@ window.onerror = function(msg, src, line, col, err) {
             c.textAlign = 'center'; c.textBaseline = 'middle'; drawOutlined(c, 'SKUP', 256, 84, 100, '#FFE082');
             const sign = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 0.75), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) }));
             sign.position.set(0, 3.45, -0.62); g.add(sign);
-            g.position.set(4.6, 0, -7.4); sg.add(g); this.g = g;   // v234: po prawej od ramki monet
+            g.position.set(2.0, 0, -2.4); sg.add(g); this.g = g;   // v239: nad ramką, na którą trafia towar
         }
     };
 
@@ -11224,6 +11224,30 @@ window.onerror = function(msg, src, line, col, err) {
         }, true);
     })();
 
+    // ---------- v239: CENA pod każdym stosem na ramce SPRZEDAJ (ile płacą za sztukę) ----------
+    function skupPriceOf(t) {
+        const P = { twine: 2, plank: 2, planks: 2, herb: 2, herbs: 2, stone: 1, wood: 1, fish: 1, roastedFish: 1, wheat: 1, wheatBags: 4, snopki: 3, water: 1 };
+        if (t === 'gems') return MINE.GEM_PRICE; if (t === 'beer') return TAV.BEER_PRICE;
+        if (P[t]) return P[t]; return (typeof IT2 !== 'undefined' && IT2[t]) ? IT2[t].price : 0;
+    }
+    w2mod({
+        key: 'skupprice',
+        R: null,
+        reset() { if (this.R) this.R.t.forEach(tp => { if (tp && tp.mesh.parent) tp.mesh.parent.remove(tp.mesh); }); this.R = { t: [], k: [] }; },
+        render() {
+            const sg = worldObjects.skupGroup, S = state.skup; if (!sg || !S || !S.slots || !this.R) return;
+            const lim = 1 + (S.expansions | 0);
+            for (let i = 0; i < S.slots.length; i++) {
+                const ty = i < lim ? S.slots[i] : null, pr = ty ? skupPriceOf(ty) : 0;
+                let tp = this.R.t[i];
+                if (!pr) { if (tp) tp.mesh.visible = false; continue; }
+                if (!tp || tp.mesh.parent !== sg) { tp = this.R.t[i] = makeGroundText(3.7, 1.3); tp.mesh.position.set(i * 4, 0.07, 5.25); sg.add(tp.mesh); this.R.k[i] = null; }
+                tp.mesh.visible = true;
+                const key = ty + ':' + pr; if (this.R.k[i] !== key) { this.R.k[i] = key; tp.update([{ i: 'coin', t: pr + ' / szt.' }], null); }
+            }
+        }
+    });
+
     init();
 
     function init() {
@@ -11473,7 +11497,7 @@ window.onerror = function(msg, src, line, col, err) {
         worldObjects.woodZone = createZone(4, 6, 0xCD853F, 0, 3, worldObjects.skupGroup);
         worldObjects.textPlanes.wood = createGroundText(3.8, 5.8); worldObjects.textPlanes.wood.mesh.position.set(0, 0.05, 3); worldObjects.skupGroup.add(worldObjects.textPlanes.wood.mesh);
 
-        worldObjects.coinZone = createZone(4, 4, 0xFFD700, 0, -3, worldObjects.skupGroup);
+        worldObjects.coinZone = createZone(4, 4, 0xFFD700, -5.5, 5.5, worldObjects.skupGroup);   // v239: po lewej od ramki sprzedaży
         worldObjects.textPlanes.coin = createGroundText(3.8, 3.8); worldObjects.textPlanes.coin.mesh.position.set(0, 0.05, -3); worldObjects.skupGroup.add(worldObjects.textPlanes.coin.mesh);
 
         worldObjects.expandZone = createZone(4, 4, 0xFF8C00, 6, 3, worldObjects.skupGroup);
@@ -12013,7 +12037,7 @@ window.onerror = function(msg, src, line, col, err) {
     function getCoinPileLocal(index) {
         const cols = 4, rows = 4; const perLayer = cols * rows; const layer = Math.floor(index / perLayer); const idx = index % perLayer;
         const xOffset = (idx % cols) * 0.6 - 0.9; const zOffset = Math.floor(idx / cols) * 0.6 - 0.9;
-        return new THREE.Vector3(xOffset, layer * 0.12 + 0.05, -3 + zOffset);
+        { const cz = worldObjects.coinZone ? worldObjects.coinZone.position : { x: 0, z: -3 }; return new THREE.Vector3(cz.x + xOffset, layer * 0.12 + 0.05, cz.z + zOffset); }
     }
 
     function getFacilityPileLocal(index, isOutput, facKey) {
@@ -12589,12 +12613,14 @@ window.onerror = function(msg, src, line, col, err) {
                         outMesh = createWheatBagMesh();
                         const snop = createSnopekMesh();
                         const snopIdx = (worldObjects.visualSnopkiStack||[]).length;
+                        snop.userData.noFly = snopIdx >= (PileTrim.ZONE_CAP || 36);   // v239
                         const col = snopIdx%4, row = Math.floor(snopIdx/4);
                         const snopLocal = new THREE.Vector3(3.5 + col*0.6 - 0.9, 0.15 + row*0.2, -4 + (col%2)*0.3 - 0.15);
                         const snopStart = worldObjects.threshingGroup.localToWorld(new THREE.Vector3(-3.5, 1.5, 0));
                         snop.position.copy(snopStart); scene.add(snop);
                         worldObjects.visualSnopkiStack = worldObjects.visualSnopkiStack||[];
                         worldObjects.visualSnopkiStack.push(snop);
+                        if (snop.userData.noFly) { scene.remove(snop); worldObjects.threshingGroup.add(snop); snop.position.copy(snopLocal); snop.visible = false; snop.userData.trim = 1; } else
                         spawnJumpAnimation(snop, snopStart,
                             () => worldObjects.threshingGroup.localToWorld(snopLocal.clone()),
                             0.4, 2, () => { worldObjects.threshingGroup.add(snop); snop.position.copy(snopLocal); snop.rotation.set(0,0,0); }
@@ -12607,10 +12633,14 @@ window.onerror = function(msg, src, line, col, err) {
                     const facGroup = worldObjects[key+'Group'] || worldObjects.tavernGroup;
                     let endPos = facGroup.localToWorld(localOut.clone());
                     
+                    if (fac.visualsOut.length >= (PileTrim.FAC_CAP || 24)) {   // v239: ponad pułap – bez lotu, od razu w stos (ukryty, liczy licznik ×N)
+                        facGroup.add(outMesh); outMesh.position.copy(localOut); outMesh.visible = false; outMesh.userData.trim = 1;
+                    } else {
                     outMesh.position.copy(startPos); scene.add(outMesh);
                     spawnJumpAnimation(outMesh, startPos, () => endPos, 0.4, 1.5, () => {
                         facGroup.add(outMesh); outMesh.position.copy(localOut); outMesh.rotation.set(0,0,0);
                     });
+                    }
                     fac.visualsOut.push(outMesh);
                 }
             } else {
@@ -13116,6 +13146,7 @@ window.onerror = function(msg, src, line, col, err) {
         if (forHelper && worldObjects.wheatOutZone) {
             // Pomocnik odkłada na ramkę GOTOWE – siatka jak inne zakłady
             const pi = worldObjects.visualWheatStack.length; worldObjects.visualWheatStack.push(m);
+            if (pi >= (PileTrim.ZONE_CAP || 36)) { const lp0 = new THREE.Vector3(10 + (pi % 3 - 1) * 0.6, 0.1 + Math.floor(pi / 12) * 0.3, (Math.floor(pi / 3) % 4 - 1.5) * 0.55); scene.remove(m); worldObjects.wheatFieldGroup.add(m); m.position.copy(lp0); m.rotation.set(0, 0, 0); m.visible = false; m.userData.trim = 1; return; }   // v239: ponad pułap bez lotu
             const cols = 3;
             const col = pi % cols, row = Math.floor(pi / cols) % 4, layer = Math.floor(pi / (cols*4));
             const lp = new THREE.Vector3(
