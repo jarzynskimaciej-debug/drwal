@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gra Idle Drwal v239</title>
+    <title>Gra Idle Drwal v240</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2E4A1E">
     <meta name="mobile-web-app-capable" content="yes">
@@ -784,7 +784,7 @@ window.onerror = function(msg, src, line, col, err) {
     // v203 – SILNIK: stały krok 60/s, powtarzalna losowość (ziarno świata),
     // dwóch graczy we wspólnym świecie, zapis/odczyt całego świata, online.
     // =====================================================================
-    const GAME_VERSION = 'v239';
+    const GAME_VERSION = 'v240';
     // v234: im więcej danego surowca, tym szybciej się go zbiera, podnosi i zrzuca
     // v234: pojemność wody w zakładach (rozbudowa w namiocie: +10 na poziom)
     function wcap(f, base) { const X = (state && state.w2) ? state.w2.waterx : null; return base + 10 * ((X && X[f]) | 0); }
@@ -8467,7 +8467,7 @@ window.onerror = function(msg, src, line, col, err) {
                 if (d > st) { a.x += dx / d * st; a.z += dz / d * st; }
             }
             // myśliwy-pomocnik: co jakiś czas dziczyzna na ramce
-            if (S.helper && S.out < S.cap && now >= S.next) { S.next = now + HUNT.HT / WK('hunt'); S.out++; S.sh = (S.sh | 0) + 1; if (now - (S.ka || 0) >= HUNT.HT / Wage.m() - 0.01) { S.ka = now; this.kill(now); } }   // v236: szybciej, ale bez dodatkowych padających zwierząt
+            if (S.helper && S.out < S.cap && now >= S.next) { S.next = now + HUNT.HT / WK('hunt') / (1 + (S.tw | 0)); S.out++; S.sh = (S.sh | 0) + 1; if (now - (S.ka || 0) >= HUNT.HT / Wage.m() - 0.01) { S.ka = now; this.kill(now); } }   // v236: szybciej, ale bez dodatkowych padających zwierząt
         },
         kill(now) {
             const S = this.S(); let best = null, bd = Infinity;
@@ -11163,7 +11163,7 @@ window.onerror = function(msg, src, line, col, err) {
             }
             const m = R.man, tx = HUNT.X - 3.2, tz = HUNT.Z - 2.6, fy = Math.atan2(HUNT.CX - tx, HUNT.CZ - tz);
             m.visible = true;
-            if ((S.sh | 0) !== m.userData.sh) { m.userData.sh = S.sh | 0; m.userData.t0 = now; }
+            if ((S.sh | 0) !== m.userData.sh) { m.userData.sh = S.sh | 0; if ((S.sh | 0) % (1 + (S.tw | 0)) === 0) m.userData.t0 = now; }   // v240: strzelają na zmianę z nowymi ambonami
             const u = now - m.userData.t0, pull = u < 0.35 ? Math.sin(u / 0.35 * Math.PI) : 0;
             m.position.set(tx + 0.25, 3.27 + 0.2 + 0.68, tz + 0.25); m.rotation.set(0, fy, 0); m.rotation.x = -pull * 0.25;
             if (m.userData.bow) m.userData.bow.scale.set(1, 1, 1 + pull * 0.3);
@@ -11244,6 +11244,84 @@ window.onerror = function(msg, src, line, col, err) {
                 if (!tp || tp.mesh.parent !== sg) { tp = this.R.t[i] = makeGroundText(3.7, 1.3); tp.mesh.position.set(i * 4, 0.07, 5.25); sg.add(tp.mesh); this.R.k[i] = null; }
                 tp.mesh.visible = true;
                 const key = ty + ':' + pr; if (this.R.k[i] !== key) { this.R.k[i] = key; tp.update([{ i: 'coin', t: pr + ' / szt.' }], null); }
+            }
+        }
+    });
+
+    // ---------- v240: ROZBUDOWA SZAŁASU – ramka przy namiocie: deski, drewno itd. donosisz na raty, potem monety ----------
+    const HUTF = { X: -17, Z: 19.6, W: 3.4 };   // na lewo od WPŁAĆ (nie na ramce GOTOWE tartaku)
+    Req.def('hutx', { lvl: () => state.w2.hut.lvl | 0, need: () => { const n = HUT[state.w2.hut.lvl | 0]; return n ? n.need : {}; } });
+    w2mod({
+        key: 'hutx',
+        defaults() { return { paid: 0 }; },
+        restore(v) { state.w2.hutx = mergeNum(this.defaults(), v); },
+        R: null,
+        reset() { this.R = { f: null }; },
+        build() { this.R.f = mkFrame(HUTF.X, HUTF.Z, HUTF.W, HUTF.W, 0xA1887F); },
+        nx() { return HUT[state.w2.hut.lvl | 0]; },
+        on() { return !!(state.tentReqs && state.tentReqs.built) && !!this.nx(); },
+        playerStep(now, pos) {
+            if (!this.on()) return;
+            const S = state.w2.hutx, H = state.w2.hut, nx = this.nx();
+            buyStep({ x: HUTF.X, z: HUTF.Z, w: HUTF.W, h: HUTF.W }, now, pos, { rk: 'hutx', paid: () => S.paid, cost: () => nx.price, done: () => this.nx() !== nx, add: () => { S.paid++; },
+                finish: () => { H.lvl = (H.lvl | 0) + 1; S.paid = 0; showToast('🏡 ' + nx.name + ' stoi! Pomocnicy pracują szybciej'); } });
+        },
+        render() { const f = this.R.f; if (!f) return; f.vis = this.on(); if (f.vis) f.tp.update(buyLines('ROZBUDOWA', 'hutx', this.nx().price - state.w2.hutx.paid), 'house'); }
+    });
+    MV.add('hutx', 'ROZBUDOWA SZAŁASU', [[HUTF, ['X'], ['Z']]], ['hutx']);
+    { const _it = ShopX.items.bind(ShopX); ShopX.items = function () { return _it().map(i => i.k !== 'x_hut' ? i : Object.assign({}, i, { status: () => i.status() === 'max' ? 'max' : 'lock', lockText: 'przynieś do ramki ROZBUDOWA obok namiotu' })); }; }
+
+    // ---------- v240: MYŚLIWY – szybciej i NOWE AMBONY (każda to kolejny myśliwy; dziczyzna na tę samą ramkę GOTOWE) ----------
+    HUNT.HT = 10;
+    const TOWERS = [{ x: 56, z: -22, cost: 800, req: { planks: 20 } }, { x: 60, z: -33, cost: 1500, req: { planks: 30, blocks: 10 } }, { x: 74, z: -38, cost: 2500, req: { planks: 40, blocks: 20 } }];
+    { const hm = W2.mods.find(m => m.key === 'hunt'); if (hm) {
+        const d0 = hm.defaults, r0 = hm.restore;
+        hm.defaults = function () { return Object.assign(d0.call(this), { tw: 0, twp: 0 }); };
+        hm.restore = function (v) { r0.call(this, v); const S = state.w2.hunt; S.tw = Math.max(0, Math.min(TOWERS.length, (v && v.tw) | 0)); S.twp = Math.max(0, (v && v.twp) | 0); };
+    } }
+    Req.def('hunttw', { lvl: () => state.w2.hunt.tw | 0, need: () => { const t = TOWERS[state.w2.hunt.tw | 0]; return t ? t.req : {}; } });
+    w2mod({
+        key: 'hunttw',
+        R: null,
+        reset() { if (this.R) this.R.t.forEach(t => { [t.g, t.man, t.arrow].forEach(o => { if (o && o.parent) o.parent.remove(o); }); }); if (this.R && this.R.f) { this.R.f.vis = false; } this.R = { f: null, t: [] }; },
+        build() { this.R.f = mkFrame(0, 0, 3.6, 3.6, 0xFFCC80); this.R.f.vis = false; },
+        on() { const S = state.w2.hunt; return Areas.has('east') && !!(S && S.helper) && (S.tw | 0) < TOWERS.length; },
+        playerStep(now, pos) {
+            if (!this.on()) return;
+            const S = state.w2.hunt, n = S.tw | 0, t = TOWERS[n];
+            buyStep({ x: t.x, z: t.z, w: 3.6, h: 3.6 }, now, pos, { rk: 'hunttw', paid: () => S.twp | 0, cost: () => t.cost, done: () => (S.tw | 0) !== n, add: () => { S.twp = (S.twp | 0) + 1; },
+                finish: () => { S.tw = n + 1; S.twp = 0; showToast('🏹 Nowa ambona z myśliwym! Dziczyzny ' + (n + 2) + '× więcej na ramce GOTOWE'); } });
+        },
+        render(now) {
+            const R = this.R; if (!R || !R.f) return;
+            const S = state.w2.hunt, east = Areas.has('east'), on = this.on();
+            R.f.vis = on;
+            if (on) {
+                const t = TOWERS[S.tw | 0];
+                if (R.f.x !== t.x || R.f.z !== t.z) { R.f.zone.position.x = t.x; R.f.zone.position.z = t.z; R.f.tp.mesh.position.x = t.x; R.f.tp.mesh.position.z = t.z; R.f.x = t.x; R.f.z = t.z; }
+                R.f.tp.update(buyLines('AMBONA ' + ((S.tw | 0) + 2), 'hunttw', t.cost - (S.twp | 0)), 'bow');
+            }
+            const n = east && S && S.helper ? (S.tw | 0) : 0;
+            for (let i = 0; i < TOWERS.length; i++) {
+                let q = R.t[i];
+                if (i >= n) { if (q) [q.g, q.man, q.arrow].forEach(o => { if (o) o.visible = false; }); continue; }
+                const T = TOWERS[i], tx = T.x - 3.2, tz = T.z - 2.6;
+                if (!q) {
+                    q = R.t[i] = {};
+                    q.g = bakeItem('ambona', () => new THREE.Group()); q.g.position.set(tx, 0, tz); scene.add(q.g);
+                    const m = createVillagerMesh(0x556B2F, 0x3E2723), bow = new THREE.Mesh(new THREE.TorusGeometry(0.34, 0.03, 4, 12, Math.PI), new THREE.MeshLambertMaterial({ color: 0x5D4037 }));
+                    bow.position.set(0.12, 0.25, 0.42); bow.rotation.set(0, -Math.PI / 2, -Math.PI / 2); m.add(bow); m.userData.bow = bow; m.scale.setScalar(0.9); scene.add(m); q.man = m; m.userData.sh = -1; m.userData.t0 = -9;
+                    const a = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.9, 5), new THREE.MeshLambertMaterial({ color: 0x3E2723 })); a.visible = false; scene.add(a); q.arrow = a;
+                }
+                q.g.visible = true; q.man.visible = true;
+                const m = q.man, fy = Math.atan2(HUNT.CX - tx, HUNT.CZ - tz), sh = S.sh | 0;
+                if (sh !== m.userData.sh) { if (m.userData.sh >= 0 && sh % (n + 1) === i + 1) m.userData.t0 = now; m.userData.sh = sh; }
+                const u = now - m.userData.t0, pull = u < 0.35 ? Math.sin(u / 0.35 * Math.PI) : 0;
+                m.position.set(tx + 0.25, 3.27 + 0.2 + 0.68, tz + 0.25); m.rotation.set(-pull * 0.25, fy, 0);
+                if (m.userData.bow) m.userData.bow.scale.set(1, 1, 1 + pull * 0.3);
+                const a = q.arrow;
+                if (u >= 0.2 && u < 0.75) { const k = (u - 0.2) / 0.55, ex = HUNT.CX + Math.sin(m.userData.t0 * 7 + i) * 5, ez = HUNT.CZ + Math.cos(m.userData.t0 * 5 + i) * 5; a.visible = true; a.position.set(tx + (ex - tx) * k, 4.4 - k * 3.6 + Math.sin(k * Math.PI) * 1.2, tz + (ez - tz) * k); a.rotation.set(0, Math.atan2(ex - tx, ez - tz) + Math.PI / 2, Math.PI / 2); }
+                else a.visible = false;
             }
         }
     });
